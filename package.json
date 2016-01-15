@@ -1,0 +1,24 @@
+{
+  "name": "videojs-spellbook",
+  "version": "0.0.0",
+  "description": "A collection of tools to aid in the development of video.js plugins.",
+  "main": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/videojs/spellbook.git"
+  },
+  "keywords": [
+    "videojs",
+    "spellbook",
+    "cast",
+    "tools",
+    "tooling",
+    "automation"
+  ],
+  "author": "Brightcove, Inc.",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/videojs/spellbook/issues"
+  },
+  "homepage": "https://github.com/videojs/spellbook#readme"
+}
