@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "A collection of tools to aid in the development of video.js plugins.",
   "main": "",
+  "scripts": {
+    "test": "exit 0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/videojs/spellbook.git"
