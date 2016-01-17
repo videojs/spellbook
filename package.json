@@ -7,7 +7,7 @@
     "cast": "./cli.js"
   },
   "scripts": {
-    "build": "babel -q src -d .",
+    "build": "babel -q src -d . && node -e \"require('shelljs').chmod(755, './cli.js');\"",
     "lint": "vjsstandard",
     "pretest": "npm run lint && npm run build",
     "test": "tap test/**/*.test.js",
@@ -40,6 +40,9 @@
     "babel-cli": "^6.4.0",
     "babel-plugin-add-module-exports": "^0.1.3-alpha",
     "babel-preset-es2015": "^6.3.13",
+    "minimist": "^1.2.0",
+    "shelljs": "^0.5.3",
+    "tsts": "^1.0.1",
     "videojs-standard": "^4.0.0"
   }
 }
