@@ -2,9 +2,17 @@
   "name": "videojs-spellbook",
   "version": "0.0.0",
   "description": "A collection of tools to aid in the development of video.js plugins.",
-  "main": "",
+  "main": "reagents.js",
+  "bin": {
+    "cast": "./cli.js"
+  },
   "scripts": {
-    "test": "exit 0"
+    "build": "babel -q src -d .",
+    "lint": "vjsstandard",
+    "pretest": "npm run lint && npm run build",
+    "test": "tap test/**/*.test.js",
+    "preversion": "npm test",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -23,5 +31,15 @@
   "bugs": {
     "url": "https://github.com/videojs/spellbook/issues"
   },
-  "homepage": "https://github.com/videojs/spellbook#readme"
+  "homepage": "https://github.com/videojs/spellbook#readme",
+  "devDependencies": {
+    "tap": "^5.0.1"
+  },
+  "dependencies": {
+    "babel": "^6.3.26",
+    "babel-cli": "^6.4.0",
+    "babel-plugin-add-module-exports": "^0.1.3-alpha",
+    "babel-preset-es2015": "^6.3.13",
+    "videojs-standard": "^4.0.0"
+  }
 }
