@@ -1,24 +1,16 @@
+/* eslint no-console:0 */
 import 'babel-polyfill';
-
-import bannerize from 'bannerize';
 import browserify from 'browserify';
 import fs from 'fs-extra';
 import glob from 'glob';
 import path from 'path';
-import sh from 'shelljs';
-import tsts from 'tsts';
 import uglifyjs from 'uglify-js';
+import bannerize from '../lib/bannerize';
+import descope from '../lib/descope';
 
 const babel = require('babel');
 
 const cwd = process.cwd();
-
-/**
- * Removes the "@foo" scope from a package name.
- *
- * @param  {String} name
- */
-const descope = name => name.split('/').reverse()[0];
 
 /**
  * Transpile an array of files.
@@ -50,6 +42,7 @@ const transpile = files => {
 const bundle = (name) => {
   return new Promise((resolve, reject) => {
     browserify('es5/plugin.js', {standalone: name})
+      .transform('browserify-shim')
       .bundle()
       .pipe(fs.createWriteStream(`dist/${name}.js`))
       .on('finish', resolve)
@@ -58,12 +51,11 @@ const bundle = (name) => {
 };
 
 /**
- * Build spell.
+ * Build JS spell.
  *
  * @param  {Object} pkg
  */
-const build = (pkg) => {
-  const cwd = process.cwd();
+const buildJS = (pkg) => {
   const name = descope(pkg.name);
 
   transpile(glob.sync('src/**/*.js'));
@@ -71,28 +63,22 @@ const build = (pkg) => {
 
   bundle(name)
     .then(() => {
-
       let minified = uglifyjs.minify(`dist/${name}.js`);
+
       fs.writeFileSync(`dist/${name}.min.js`, minified.code);
-
-      bannerize(`dist/*.js`, {
-
-        // Make sure to pass an absolute path here, so that `bannerize()` does
-        // not look for the banner template in `cwd`.
-        banner: path.join(__dirname, '..', 'assets', 'banner.ejs'),
-        cwd
-      });
-
-      console.log('build complete.');
+      bannerize('dist/*.js');
+      console.log('build-js complete.');
     })
-    .catch(x => throw x);
+    .catch(err => {
+      throw err;
+    });
 };
 
 /**
- * Gets help text for the build spell.
+ * Gets help text for the spell.
  *
  * @return {String}
  */
-build.help = () => 'help me!';
+buildJS.help = () => 'help me!';
 
-export default build;
+export default buildJS;

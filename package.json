@@ -38,14 +38,17 @@
   "dependencies": {
     "babel": "^5.8.34",
     "babel-polyfill": "^6.3.14",
+    "babelify": "^7.2.0",
     "bannerize": "^1.0.2",
     "browserify": "^13.0.0",
     "fs-extra": "^0.26.4",
     "glob": "^6.0.4",
     "minimist": "^1.2.0",
+    "node-sass": "^3.4.2",
     "shelljs": "^0.5.3",
     "tsts": "^1.0.1",
     "uglify-js": "^2.6.1",
+    "videojs-languages": "^1.0.0",
     "videojs-standard": "^4.0.0"
   }
 }

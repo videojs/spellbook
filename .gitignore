@@ -25,6 +25,7 @@ npm-debug.log*
 node_modules/
 
 # Built program
+/lib/
 /reagents/
 /spells/
 /test/
