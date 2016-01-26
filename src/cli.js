@@ -7,6 +7,7 @@ import os from 'os';
 import path from 'path';
 import sh from 'shelljs';
 import tsts from 'tsts';
+import dirf from './lib/dirf';
 
 const argv = minimist(process.argv.slice(2));
 
@@ -50,9 +51,7 @@ if (argv._.length) {
     console.log(spell.help());
   } else {
     try {
-      let pkg = require(path.join(process.cwd(), 'package.json'));
-
-      spell(pkg, argv);
+      spell(dirf(), argv);
     } catch (x) {
       if (x.code === 'MODULE_NOT_FOUND') {
         console.error(`cast must be called from a plugin directory`);

@@ -10,23 +10,18 @@ import descope from '../lib/descope';
 
 const babel = require('babel');
 
-const cwd = process.cwd();
-
 /**
  * Transpile an array of files.
  *
- * @param  {String[]} files
+ * @param {Function} tmp
+ * @param {String[]} files
  */
-const transpile = files => {
+const transpile = (tmp, files) => {
   files.forEach(filename => {
-    filename = path.resolve(cwd, filename);
+    filename = path.resolve(tmp(), filename);
 
     let result = babel.transformFileSync(filename);
-
-    let outname = filename.replace(
-      path.join(cwd, 'src'),
-      path.join(cwd, 'es5')
-    );
+    let outname = filename.replace(tmp('src'), tmp('es5'));
 
     fs.ensureDirSync(path.dirname(outname));
     fs.writeFileSync(outname, result.code);
@@ -36,15 +31,16 @@ const transpile = files => {
 /**
  * Creates a Browserify bundle from the plugin entry point.
  *
+ * @param  {Function} tmp
  * @param  {String} name
  * @return {Promise}
  */
-const bundle = (name) => {
+const bundle = (tmp, name) => {
   return new Promise((resolve, reject) => {
-    browserify('es5/plugin.js', {standalone: name})
+    browserify(tmp('es5/plugin.js'), {standalone: name})
       .transform('browserify-shim')
       .bundle()
-      .pipe(fs.createWriteStream(`dist/${name}.js`))
+      .pipe(fs.createWriteStream(tmp(`dist/${name}.js`)))
       .on('finish', resolve)
       .on('error', reject);
   });
@@ -53,20 +49,22 @@ const bundle = (name) => {
 /**
  * Build JS spell.
  *
- * @param  {Object} pkg
+ * @param {Function} tmp
+ * @param {Object} argv
  */
-const buildJS = (pkg) => {
+const buildJS = (tmp) => {
+  const pkg = require(tmp('package.json'));
   const name = descope(pkg.name);
 
-  transpile(glob.sync('src/**/*.js'));
-  fs.ensureDirSync('dist');
+  transpile(tmp, glob.sync(tmp('src/**/*.js')));
+  fs.ensureDirSync(tmp('dist'));
 
-  bundle(name)
+  bundle(tmp, name)
     .then(() => {
-      let minified = uglifyjs.minify(`dist/${name}.js`);
+      let minified = uglifyjs.minify(tmp(`dist/${name}.js`));
 
-      fs.writeFileSync(`dist/${name}.min.js`, minified.code);
-      bannerize('dist/*.js');
+      fs.writeFileSync(tmp(`dist/${name}.min.js`), minified.code);
+      bannerize(tmp('dist/*.js'));
       console.log('build-js complete.');
     })
     .catch(err => {

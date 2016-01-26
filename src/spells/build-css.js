@@ -7,18 +7,20 @@ import descope from '../lib/descope';
 /**
  * Build CSS spell.
  *
- * @param  {Object} pkg
+ * @param {Function} tmp
+ * @param {Object} argv
  */
-const buildCSS = (pkg) => {
+const buildCSS = (tmp) => {
+  const pkg = require(tmp('package.json'));
   const name = descope(pkg.name);
   const result = sass.renderSync({
-    file: 'src/plugin.scss',
+    file: tmp('src/plugin.scss'),
     outputStyle: 'compressed'
   });
 
-  fs.ensureDirSync('dist');
-  fs.writeFileSync(`dist/${name}.css`, result.css);
-  bannerize(`dist/${name}.css`);
+  fs.ensureDirSync(tmp('dist'));
+  fs.writeFileSync(tmp(`dist/${name}.css`), result.css);
+  bannerize(tmp(`dist/${name}.css`));
   console.log('build-css complete.');
 };
 

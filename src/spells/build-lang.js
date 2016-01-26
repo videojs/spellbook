@@ -5,11 +5,14 @@ import languages from 'videojs-languages';
 /**
  * Build languages spell.
  *
- * @param  {Object} pkg
+ * @param {Function} tmp
+ * @param {Object} argv
  */
-const buildLangs = (pkg) => {
-  fs.ensureDirSync('dist/lang');
-  languages('lang/*.json', 'dist/lang');
+const buildLangs = (tmp) => {
+  const dist = tmp('dist/lang');
+
+  fs.ensureDirSync(dist);
+  languages(tmp('lang/*.json'), dist);
   console.log('build-lang complete.');
 };
 

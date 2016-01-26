@@ -1,10 +1,14 @@
 /* eslint no-console:0 */
 import sh from 'shelljs';
 
-const dirs = ['dist', 'dist-test', 'es5'];
-
-const clean = (pkg, argv) => {
-  sh.rm('-rf', dirs);
+/**
+ * Clean spell.
+ *
+ * @param {Function} tmp
+ * @param {Object} argv
+ */
+const clean = (tmp) => {
+  sh.rm('-rf', ['dist', 'dist-test', 'es5'].map(tmp));
   console.log('clean complete.');
 };
 

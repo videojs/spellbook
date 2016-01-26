@@ -7,18 +7,20 @@ import descope from '../lib/descope';
 /**
  * Build test spell.
  *
- * @param  {Object} pkg
+ * @param {Function} tmp
+ * @param {Object} argv
  */
-const buildTests = (pkg) => {
+const buildTests = (tmp) => {
+  const pkg = require(tmp('package.json'));
   const name = descope(pkg.name);
 
-  fs.ensureDirSync('dist-test');
+  fs.ensureDirSync(tmp('dist-test'));
 
-  browserify(glob.sync('test/**/*.test.js'))
+  browserify(glob.sync(tmp('test/**/*.test.js')))
     .transform('babelify')
     .transform('browserify-shim')
     .bundle()
-    .pipe(fs.createWriteStream(`dist-test/${name}.js`))
+    .pipe(fs.createWriteStream(tmp(`dist-test/${name}.js`)))
     .on('finish', () => console.log('build-tests complete.'))
     .on('error', err => {
       throw err;
