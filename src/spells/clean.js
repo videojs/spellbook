@@ -1,5 +1,5 @@
 /* eslint no-console:0 */
-import sh from 'shelljs';
+import fs from 'fs-extra';
 
 /**
  * Clean spell.
@@ -8,7 +8,7 @@ import sh from 'shelljs';
  * @param {Object} argv
  */
 const clean = (tmp) => {
-  sh.rm('-rf', ['dist', 'dist-test', 'es5'].map(tmp));
+  ['dist', 'dist-test', 'es5'].map(tmp).forEach(fs.removeSync);
   console.log('clean complete.');
 };
 

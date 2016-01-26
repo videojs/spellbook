@@ -33,6 +33,7 @@
   },
   "homepage": "https://github.com/videojs/spellbook#readme",
   "devDependencies": {
+    "shelljs": "^0.5.3",
     "tap": "^5.0.1"
   },
   "dependencies": {
@@ -45,7 +46,6 @@
     "glob": "^6.0.4",
     "minimist": "^1.2.0",
     "node-sass": "^3.4.2",
-    "shelljs": "^0.5.3",
     "tsts": "^1.0.1",
     "uglify-js": "^2.6.1",
     "videojs-languages": "^1.0.0",

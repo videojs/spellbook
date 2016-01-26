@@ -5,16 +5,11 @@
 import minimist from 'minimist';
 import os from 'os';
 import path from 'path';
-import sh from 'shelljs';
 import tsts from 'tsts';
 import dirf from './lib/dirf';
+import spells from './spells';
 
 const argv = minimist(process.argv.slice(2));
-
-// Get a full list of spells.
-const spells = sh.ls(path.join(__dirname, 'spells'))
-  .filter(f => path.extname(f) === '.js')
-  .map(f => path.basename(f, '.js'));
 
 const help = tsts.pre`
   Use the "cast" command to run automation sub-commands (a.k.a. "spells")
@@ -24,7 +19,7 @@ const help = tsts.pre`
 
   Available spells are:
 
-    ${spells.join(os.EOL + '    ')}
+    ${Object.keys(spells).join(os.EOL + '    ')}
 
   For more information on any of these spells, run:
 
@@ -35,16 +30,12 @@ const help = tsts.pre`
 if (argv._.length) {
   let name = argv._[0];
 
-  if (spells.indexOf(name) === -1) {
+  if (spells.hasOwnProperty(name)) {
     console.error(`"${name}" is not a known spell!`);
     console.log(os.EOL + help);
     process.exit(1);
   }
 
-  // A spell takes an object representing the plugin's `package.json` file
-  // and an argv object (as parsed by minimist). It should return a string
-  // message indicating completion. It should also expose a `help()`
-  // function, which returns a string with help text for the spell.
   let spell = require(path.join(__dirname, 'spells', name));
 
   if (argv.help) {
