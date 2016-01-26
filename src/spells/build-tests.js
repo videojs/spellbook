@@ -1,4 +1,3 @@
-/* eslint no-console:0 */
 import browserify from 'browserify';
 import fs from 'fs-extra';
 import glob from 'glob';
@@ -7,24 +6,24 @@ import descope from '../lib/descope';
 /**
  * Build test spell.
  *
- * @param {Function} tmp
+ * @param {Function} dir
  * @param {Object} argv
  */
-const buildTests = (tmp) => {
-  const pkg = require(tmp('package.json'));
+const buildTests = (dir) => {
+  const pkg = require(dir('package.json'));
   const name = descope(pkg.name);
 
-  fs.ensureDirSync(tmp('dist-test'));
+  return new Promise((resolve, reject) => {
+    fs.ensureDirSync(dir('dist-test'));
 
-  browserify(glob.sync(tmp('test/**/*.test.js')))
-    .transform('babelify')
-    .transform('browserify-shim')
-    .bundle()
-    .pipe(fs.createWriteStream(tmp(`dist-test/${name}.js`)))
-    .on('finish', () => console.log('build-tests complete.'))
-    .on('error', err => {
-      throw err;
-    });
+    browserify(glob.sync(dir('test/**/*.test.js')))
+      .transform('babelify')
+      .transform('browserify-shim')
+      .bundle()
+      .pipe(fs.createWriteStream(dir(`dist-test/${name}.js`)))
+      .on('finish', resolve)
+      .on('error', reject);
+  });
 };
 
 /**

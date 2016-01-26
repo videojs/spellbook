@@ -42,6 +42,7 @@
     "babelify": "^7.2.0",
     "bannerize": "^1.0.2",
     "browserify": "^13.0.0",
+    "browserify-shim": "^3.8.12",
     "fs-extra": "^0.26.4",
     "glob": "^6.0.4",
     "minimist": "^1.2.0",

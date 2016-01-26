@@ -1,14 +1,15 @@
-/* eslint no-console:0 */
 import fs from 'fs-extra';
 import tap from 'tap';
-import buildCSS from '../../spells/build-css';
+import spell from '../../spells/build-css';
 import {useFixture} from '../helpers';
 
-tap.test('compiles css', t => {
-  useFixture('build-css', tmp => {
-    let css = tmp('dist/build-css-fixture.css');
+tap.equal(typeof spell, 'function', 'the spell is a function');
+tap.equal(typeof spell.help(), 'string', 'the spell help returns a string');
 
-    buildCSS(tmp);
+tap.test('compiles css', useFixture('build-css', (t, tmp, teardown) => {
+  let css = tmp('dist/build-css-fixture.css');
+
+  spell(tmp).then(() => {
     t.ok(fs.existsSync(css), 'css file should have been created');
 
     t.equal(
@@ -17,6 +18,6 @@ tap.test('compiles css', t => {
       'sass should have been processed'
     );
 
-    t.end();
+    teardown();
   });
-});
+}));

@@ -1,19 +1,18 @@
-/* eslint no-console:0 */
 import fs from 'fs-extra';
 import languages from 'videojs-languages';
 
 /**
  * Build languages spell.
  *
- * @param {Function} tmp
+ * @param {Function} dir
  * @param {Object} argv
  */
-const buildLangs = (tmp) => {
-  const dist = tmp('dist/lang');
+const buildLangs = (dir) => {
+  const dist = dir('dist/lang');
 
   fs.ensureDirSync(dist);
-  languages(tmp('lang/*.json'), dist);
-  console.log('build-lang complete.');
+  languages(dir('lang/*.json'), dist);
+  return new Promise((resolve, reject) => resolve());
 };
 
 /**

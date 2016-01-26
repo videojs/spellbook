@@ -1,4 +1,3 @@
-/* eslint no-console:0 */
 import 'babel-polyfill';
 import browserify from 'browserify';
 import fs from 'fs-extra';
@@ -13,15 +12,15 @@ const babel = require('babel');
 /**
  * Transpile an array of files.
  *
- * @param {Function} tmp
+ * @param {Function} dir
  * @param {String[]} files
  */
-const transpile = (tmp, files) => {
+const transpile = (dir, files) => {
   files.forEach(filename => {
-    filename = path.resolve(tmp(), filename);
+    filename = path.resolve(dir(), filename);
 
     let result = babel.transformFileSync(filename);
-    let outname = filename.replace(tmp('src'), tmp('es5'));
+    let outname = filename.replace(dir('src'), dir('es5'));
 
     fs.ensureDirSync(path.dirname(outname));
     fs.writeFileSync(outname, result.code);
@@ -31,16 +30,16 @@ const transpile = (tmp, files) => {
 /**
  * Creates a Browserify bundle from the plugin entry point.
  *
- * @param  {Function} tmp
+ * @param  {Function} dir
  * @param  {String} name
  * @return {Promise}
  */
-const bundle = (tmp, name) => {
+const bundle = (dir, name) => {
   return new Promise((resolve, reject) => {
-    browserify(tmp('es5/plugin.js'), {standalone: name})
+    browserify(dir('es5/plugin.js'), {standalone: name})
       .transform('browserify-shim')
       .bundle()
-      .pipe(fs.createWriteStream(tmp(`dist/${name}.js`)))
+      .pipe(fs.createWriteStream(dir(`dist/${name}.js`)))
       .on('finish', resolve)
       .on('error', reject);
   });
@@ -49,23 +48,22 @@ const bundle = (tmp, name) => {
 /**
  * Build JS spell.
  *
- * @param {Function} tmp
+ * @param {Function} dir
  * @param {Object} argv
  */
-const buildJS = (tmp) => {
-  const pkg = require(tmp('package.json'));
+const buildJS = (dir) => {
+  const pkg = require(dir('package.json'));
   const name = descope(pkg.name);
 
-  transpile(tmp, glob.sync(tmp('src/**/*.js')));
-  fs.ensureDirSync(tmp('dist'));
+  transpile(dir, glob.sync(dir('src/**/*.js')));
+  fs.ensureDirSync(dir('dist'));
 
-  bundle(tmp, name)
+  return bundle(dir, name)
     .then(() => {
-      let minified = uglifyjs.minify(tmp(`dist/${name}.js`));
+      let minified = uglifyjs.minify(dir(`dist/${name}.js`));
 
-      fs.writeFileSync(tmp(`dist/${name}.min.js`), minified.code);
-      bannerize(tmp('dist/*.js'));
-      console.log('build-js complete.');
+      fs.writeFileSync(dir(`dist/${name}.min.js`), minified.code);
+      bannerize(dir('dist/*.js'));
     })
     .catch(err => {
       throw err;

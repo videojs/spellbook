@@ -1,4 +1,4 @@
-/* eslint no-console:0 */
+import 'babel-polyfill';
 import fs from 'fs-extra';
 import sass from 'node-sass';
 import bannerize from '../lib/bannerize';
@@ -7,21 +7,21 @@ import descope from '../lib/descope';
 /**
  * Build CSS spell.
  *
- * @param {Function} tmp
+ * @param {Function} dir
  * @param {Object} argv
  */
-const buildCSS = (tmp) => {
-  const pkg = require(tmp('package.json'));
+const buildCSS = (dir) => {
+  const pkg = require(dir('package.json'));
   const name = descope(pkg.name);
   const result = sass.renderSync({
-    file: tmp('src/plugin.scss'),
+    file: dir('src/plugin.scss'),
     outputStyle: 'compressed'
   });
 
-  fs.ensureDirSync(tmp('dist'));
-  fs.writeFileSync(tmp(`dist/${name}.css`), result.css);
-  bannerize(tmp(`dist/${name}.css`));
-  console.log('build-css complete.');
+  fs.ensureDirSync(dir('dist'));
+  fs.writeFileSync(dir(`dist/${name}.css`), result.css);
+  bannerize(dir(`dist/${name}.css`));
+  return new Promise((resolve, reject) => resolve());
 };
 
 /**

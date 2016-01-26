@@ -14,11 +14,20 @@ import dirf from '../lib/dirf';
  *         temporary directory.
  */
 const useFixture = (name, cb) => {
-  let tmp = path.join(__dirname, '..', 'tmp');
 
-  fs.copySync(path.join(__dirname, '..', 'fixtures', name), tmp);
-  cb(dirf(tmp));
-  fs.removeSync(tmp);
+  // The `t` here is a `tap` object.
+  return t => {
+    let tmp = path.join(__dirname, '..', 'tmp');
+
+    fs.copySync(path.join(__dirname, '..', 'fixtures', name), tmp);
+
+    // The callback is invoked with the `tap` object, a "dirf" of the temp
+    // directory, and a teardown function.
+    cb(t, dirf(tmp), () => {
+      fs.removeSync(tmp);
+      t.end();
+    });
+  };
 };
 
 export {
