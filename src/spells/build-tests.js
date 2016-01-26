@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import browserify from 'browserify';
 import fs from 'fs-extra';
 import glob from 'glob';

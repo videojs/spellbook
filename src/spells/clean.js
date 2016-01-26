@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import fs from 'fs-extra';
 
 /**
@@ -7,7 +8,7 @@ import fs from 'fs-extra';
  * @param {Object} argv
  */
 const clean = (dir) => {
-  ['dist', 'dist-test', 'es5'].map(dir).forEach(fs.removeSync);
+  ['dist', 'dist-test', 'es5'].map(n => dir(n)).forEach(fs.removeSync);
   return new Promise((resolve, reject) => resolve());
 };
 

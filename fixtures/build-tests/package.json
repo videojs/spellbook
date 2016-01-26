@@ -1,0 +1,9 @@
+{
+  "name": "build-tests-fixture",
+  "version": "0.0.0",
+  "author": "Brightcove, Inc.",
+  "license": "Apache-2.0",
+  "browserify-shim": {
+    "video.js": "global:videojs"
+  }
+}

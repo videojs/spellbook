@@ -1,6 +1,6 @@
 import buildCSS from './build-css';
 import buildJS from './build-js';
-import buildLang from './build-lang';
+import buildLang from './build-langs';
 import buildTests from './build-tests';
 import clean from './clean';
 import docs from './docs';

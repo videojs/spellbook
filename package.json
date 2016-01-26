@@ -7,12 +7,19 @@
     "cast": "./cli.js"
   },
   "scripts": {
+    "prebuild": "npm run clean",
     "build": "babel -q src -d . && node -e \"require('shelljs').chmod(755, './cli.js');\"",
+    "clean": "node -e \"require('shelljs').rm('-rf', ['tmp', 'lib', 'reagents', 'spells', 'test', 'cli.js', 'reagents.js']);\"",
     "lint": "vjsstandard",
     "pretest": "npm run lint && npm run build",
     "test": "tap test/**/*.test.js",
     "preversion": "npm test",
     "prepublish": "npm run build"
+  },
+  "vjsstandard": {
+    "ignore": [
+      "tmp"
+    ]
   },
   "repository": {
     "type": "git",
@@ -39,7 +46,7 @@
   "dependencies": {
     "babel": "^5.8.34",
     "babel-polyfill": "^6.3.14",
-    "babelify": "^7.2.0",
+    "babelify": "^6.4.0",
     "bannerize": "^1.0.2",
     "browserify": "^13.0.0",
     "browserify-shim": "^3.8.12",
