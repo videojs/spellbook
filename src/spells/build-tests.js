@@ -1,27 +1,12 @@
-import 'babel-polyfill';
-import browserify from 'browserify';
-import fs from 'fs-extra';
-import glob from 'glob';
+import tests from '../lib/builders/tests';
 
 /**
  * Build test spell.
  *
- * @param {Function} dir
+ * @param {Function} dirfn
  * @param {Object} argv
  */
-const spell = (dir) => {
-  return new Promise((resolve, reject) => {
-    fs.ensureDirSync(dir('test/dist'));
-
-    browserify(glob.sync(dir('test/**/*.test.js')))
-      .transform('babelify')
-      .transform('browserify-shim')
-      .bundle()
-      .pipe(fs.createWriteStream(dir(`test/dist/bundle.js`)))
-      .on('finish', resolve)
-      .on('error', reject);
-  });
-};
+const spell = (dirfn) => tests(dirfn);
 
 /**
  * Gets help text for the spell.

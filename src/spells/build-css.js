@@ -1,27 +1,16 @@
-import 'babel-polyfill';
-import fs from 'fs-extra';
-import sass from 'node-sass';
-import bannerize from '../lib/bannerize';
 import descope from '../lib/descope';
+import css from '../lib/builders/css';
 
 /**
  * Build CSS spell.
  *
- * @param {Function} dir
+ * @param {Function} dirfn
  * @param {Object} argv
  */
-const spell = (dir) => {
-  const pkg = require(dir('package.json'));
-  const name = descope(pkg.name);
-  const result = sass.renderSync({
-    file: dir('src/plugin.scss'),
-    outputStyle: 'compressed'
-  });
+const spell = (dirfn) => {
+  const pkg = require(dirfn('package.json'));
 
-  fs.ensureDirSync(dir('dist'));
-  fs.writeFileSync(dir(`dist/${name}.css`), result.css);
-  bannerize(dir(`dist/${name}.css`));
-  return new Promise((resolve, reject) => resolve());
+  return css(dirfn, descope(pkg.name));
 };
 
 /**

@@ -1,20 +1,12 @@
-import 'babel-polyfill';
-import fs from 'fs-extra';
-import languages from 'videojs-languages';
+import langs from '../lib/builders/langs';
 
 /**
  * Build languages spell.
  *
- * @param {Function} dir
+ * @param {Function} dirfn
  * @param {Object} argv
  */
-const spell = (dir) => {
-  const dist = dir('dist/lang');
-
-  fs.ensureDirSync(dist);
-  languages(dir('lang/*.json'), dist);
-  return new Promise((resolve, reject) => resolve());
-};
+const spell = (dirfn) => langs(dirfn);
 
 /**
  * Gets help text for the spell.

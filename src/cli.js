@@ -53,9 +53,9 @@ if (argv._.length) {
           console.log(chalk.green(
             `(∩｀-´)⊃━☆ﾟ.*･｡ﾟ ${name} completed in ${Date.now() - start}ms!`
           ));
-        }, (output) => {
-          if (output) {
-            console.log(output + os.EOL);
+        }, (err) => {
+          if (err) {
+            console.log(err.stack || err);
           }
           console.log(chalk.red(`(u ´-\`)⊃━... . . ${name} failed!`));
         });
