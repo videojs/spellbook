@@ -11,7 +11,7 @@ tap.test('cleans up build artifacts', useFixture('clean', (t, tmp, teardown) => 
     t.ok(fs.existsSync(tmp('package.json')), 'does not delete package.json');
     t.ok(fs.existsSync(tmp('src/plugin.js')), 'does not delete src/');
     t.notOk(fs.existsSync(tmp('dist')), 'deletes dist/');
-    t.notOk(fs.existsSync(tmp('dist-test')), 'deletes dist-test/');
+    t.notOk(fs.existsSync(tmp('test/dist')), 'deletes test/dist/');
     t.notOk(fs.existsSync(tmp('es5')), 'deletes es5/');
     teardown();
   });

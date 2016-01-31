@@ -9,7 +9,7 @@ tap.equal(typeof spell.help(), 'string', 'the spell help returns a string');
 tap.test('compiles tests', useFixture('build-tests', (t, tmp, teardown) => {
   spell(tmp).then(() => {
     t.ok(
-      fs.existsSync(tmp('dist-test/build-tests-fixture.js')),
+      fs.existsSync(tmp('test/dist/bundle.js')),
       'tests were compiled into one file'
     );
 

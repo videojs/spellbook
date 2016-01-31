@@ -7,11 +7,11 @@ import fs from 'fs-extra';
  * @param {Function} dir
  * @param {Object} argv
  */
-const clean = (dir) => {
-  ['dist', 'dist-test', 'es5'].map(n => dir(n)).forEach(fs.removeSync);
+const spell = (dir) => {
+  ['dist', 'test/dist', 'es5'].map(n => dir(n)).forEach(fs.removeSync);
   return new Promise((resolve, reject) => resolve());
 };
 
-clean.help = () => 'help me!';
+spell.help = () => 'help me!';
 
-export default clean;
+export default spell;

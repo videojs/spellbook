@@ -31,3 +31,4 @@ node_modules/
 /test/
 /cli.js
 /reagents.js
+/karma.conf.js

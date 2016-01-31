@@ -2,6 +2,7 @@
 
 /* eslint no-console:0 */
 
+import chalk from 'chalk';
 import minimist from 'minimist';
 import os from 'os';
 import path from 'path';
@@ -30,7 +31,7 @@ const help = tsts.pre`
 if (argv._.length) {
   let name = argv._[0];
 
-  if (spells.hasOwnProperty(name)) {
+  if (!spells.hasOwnProperty(name)) {
     console.error(`"${name}" is not a known spell!`);
     console.log(os.EOL + help);
     process.exit(1);
@@ -44,9 +45,20 @@ if (argv._.length) {
     try {
       let start = Date.now();
 
-      spell(dirf(), argv).then(() => {
-        console.log(`spell complete. name: ${name}, duration: ${Date.now() - start}ms`);
-      });
+      spell(dirf(), argv)
+        .then((output) => {
+          if (output) {
+            console.log(output + os.EOL);
+          }
+          console.log(chalk.green(
+            `(∩｀-´)⊃━☆ﾟ.*･｡ﾟ ${name} completed in ${Date.now() - start}ms!`
+          ));
+        }, (output) => {
+          if (output) {
+            console.log(output + os.EOL);
+          }
+          console.log(chalk.red(`(u ´-\`)⊃━... . . ${name} failed!`));
+        });
     } catch (x) {
       if (x.code === 'MODULE_NOT_FOUND') {
         console.error(`cast must be called from a plugin directory`);

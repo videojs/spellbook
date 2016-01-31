@@ -8,7 +8,7 @@ import languages from 'videojs-languages';
  * @param {Function} dir
  * @param {Object} argv
  */
-const buildLangs = (dir) => {
+const spell = (dir) => {
   const dist = dir('dist/lang');
 
   fs.ensureDirSync(dist);
@@ -21,6 +21,6 @@ const buildLangs = (dir) => {
  *
  * @return {String}
  */
-buildLangs.help = () => 'help me!';
+spell.help = () => 'help me!';
 
-export default buildLangs;
+export default spell;

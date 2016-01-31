@@ -2,7 +2,6 @@ import 'babel-polyfill';
 import browserify from 'browserify';
 import fs from 'fs-extra';
 import glob from 'glob';
-import descope from '../lib/descope';
 
 /**
  * Build test spell.
@@ -10,18 +9,15 @@ import descope from '../lib/descope';
  * @param {Function} dir
  * @param {Object} argv
  */
-const buildTests = (dir) => {
-  const pkg = require(dir('package.json'));
-  const name = descope(pkg.name);
-
+const spell = (dir) => {
   return new Promise((resolve, reject) => {
-    fs.ensureDirSync(dir('dist-test'));
+    fs.ensureDirSync(dir('test/dist'));
 
     browserify(glob.sync(dir('test/**/*.test.js')))
       .transform('babelify')
       .transform('browserify-shim')
       .bundle()
-      .pipe(fs.createWriteStream(dir(`dist-test/${name}.js`)))
+      .pipe(fs.createWriteStream(dir(`test/dist/bundle.js`)))
       .on('finish', resolve)
       .on('error', reject);
   });
@@ -32,6 +28,6 @@ const buildTests = (dir) => {
  *
  * @return {String}
  */
-buildTests.help = () => 'help me!';
+spell.help = () => 'help me!';
 
-export default buildTests;
+export default spell;

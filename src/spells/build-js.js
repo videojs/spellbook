@@ -51,7 +51,7 @@ const bundle = (dir, name) => {
  * @param {Function} dir
  * @param {Object} argv
  */
-const buildJS = (dir) => {
+const spell = (dir) => {
   const pkg = require(dir('package.json'));
   const name = descope(pkg.name);
 
@@ -75,6 +75,6 @@ const buildJS = (dir) => {
  *
  * @return {String}
  */
-buildJS.help = () => 'help me!';
+spell.help = () => 'help me!';
 
-export default buildJS;
+export default spell;

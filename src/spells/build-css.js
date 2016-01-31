@@ -10,7 +10,7 @@ import descope from '../lib/descope';
  * @param {Function} dir
  * @param {Object} argv
  */
-const buildCSS = (dir) => {
+const spell = (dir) => {
   const pkg = require(dir('package.json'));
   const name = descope(pkg.name);
   const result = sass.renderSync({
@@ -29,6 +29,6 @@ const buildCSS = (dir) => {
  *
  * @return {String}
  */
-buildCSS.help = () => 'help me!';
+spell.help = () => 'help me!';
 
-export default buildCSS;
+export default spell;
