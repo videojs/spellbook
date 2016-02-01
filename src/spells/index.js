@@ -3,6 +3,7 @@ import buildJS from './build-js';
 import buildLangs from './build-langs';
 import buildTests from './build-tests';
 import clean from './clean';
+import postversion from './postversion';
 import server from './server';
 import test from './test';
 import version from './version';
@@ -13,6 +14,7 @@ export default {
   'build-langs': buildLangs,
   'build-tests': buildTests,
   clean,
+  postversion,
   server,
   test,
   version

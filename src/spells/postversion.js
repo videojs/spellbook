@@ -4,14 +4,13 @@ import os from 'os';
 import tsts from 'tsts';
 
 /**
- * Version spell.
+ * Postversion spell.
  *
  * @param {Function} dirfn
  * @param {Object} argv
  */
 const spell = (dirfn) => {
   return new Promise((resolve, reject) => {
-    const v = require(dirfn('package.json')).version;
 
     // If there isn't a bower.json, we don't need to do anything.
     try {
@@ -21,12 +20,7 @@ const spell = (dirfn) => {
       return;
     }
 
-    exec(tsts.join`
-      git add package.json &&
-      git commit -m "${v}" &&
-      npm run build &&
-      git add -f dist
-    `, (err, stdout, stderr) => {
+    exec('git reset --hard HEAD~1', (err, stdout, stderr) => {
       if (err) {
         reject(err);
       } else {
@@ -42,16 +36,17 @@ const spell = (dirfn) => {
  * @return {String}
  */
 spell.help = () => tsts.pre`
-  The "version" spell can be cast in a video.js plugin project by way of
-  the "npm version" script.
+  The "postversion" spell can be cast in a video.js plugin project by way
+  of the "npm postversion" script.
 
   It will look for a "bower.json" file to decide if the project wants to
-  support Bower. If so, when the tag is created, it will be created on a
-  special commit off the main history with the "dist/" directory added.
+  support Bower. If so, the current branch will be rolled back by one
+  commit to keep the tag and its addition of the dist/ directory out of
+  the main history.
 
   It takes no arguments or options:
 
-    cast version
+    cast postversion
 ` + os.EOL;
 
 export default spell;
