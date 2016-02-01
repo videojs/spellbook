@@ -1,5 +1,7 @@
 import 'babel-polyfill';
 import budo from 'budo';
+import os from 'os';
+import tsts from 'tsts';
 import url from 'url';
 import builders from '../lib/builders';
 import descope from '../lib/descope';
@@ -79,6 +81,15 @@ const spell = (dir) => {
   });
 };
 
-spell.help = () => 'help me!';
+spell.help = () => tsts.pre`
+  The "server" spell can be cast in a video.js plugin project to start a
+  server at port 9999 (or the nearest available) that will reload itself
+  when certain files in the project change. It handles all build tasks
+  internally - there are no separate watch scripts to run.
+
+  It takes no arguments or options:
+
+    cast server
+` + os.EOL;
 
 export default spell;

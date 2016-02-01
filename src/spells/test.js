@@ -2,7 +2,9 @@ import 'babel-polyfill';
 import assign from 'object.assign';
 import {exec} from 'child_process';
 import fs from 'fs-extra';
+import os from 'os';
 import path from 'path';
+import tsts from 'tsts';
 
 const BROWSER_NAMES = {
   chrome: 'Chrome',
@@ -99,6 +101,21 @@ const spell = (dir, argv) => {
  *
  * @return {String}
  */
-spell.help = () => 'help me!';
+spell.help = () => tsts.pre`
+  The "test" spell can be cast in a video.js plugin project to run unit
+  tests with the Karma runner in real browser(s). Supported browsers are:
+
+    ${Object.keys(BROWSER_NAMES).join('\n    ')}
+
+  With no arguments, it will run tests in all browsers it detects from the
+  supported list:
+
+    cast test
+
+  Additionally, it can take any number of arguments to explicitly invoke
+  a subset of these browsers. For example, to run only in Chrome and IE:
+
+    cast test chrome ie
+` + os.EOL;
 
 export default spell;

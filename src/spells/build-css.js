@@ -1,3 +1,5 @@
+import os from 'os';
+import tsts from 'tsts';
 import descope from '../lib/descope';
 import css from '../lib/builders/css';
 
@@ -18,6 +20,11 @@ const spell = (dirfn) => {
  *
  * @return {String}
  */
-spell.help = () => 'help me!';
+spell.help = () => tsts.pre`
+  The "build-css" spell can be cast in a video.js plugin project to build
+  its Sass asset(s) into CSS. It takes no arguments or options:
+
+    cast build-css
+` + os.EOL;
 
 export default spell;
