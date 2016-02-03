@@ -1,5 +1,7 @@
 import 'babel-polyfill';
+import babelify from 'babelify';
 import browserify from 'browserify';
+import shim from 'browserify-shim';
 import fs from 'fs-extra';
 import glob from 'glob';
 
@@ -20,8 +22,8 @@ const tests = (dirfn) => {
     fs.ensureDirSync(dirfn(PATH_DEST));
 
     browserify(glob.sync(dirfn(PATH_SRC)))
-      .transform('babelify')
-      .transform('browserify-shim')
+      .transform(babelify)
+      .transform(shim)
       .bundle()
       .pipe(fs.createWriteStream(dirfn(PATH_BUNDLE)))
       .on('finish', resolve)
