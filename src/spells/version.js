@@ -1,6 +1,7 @@
 import 'babel-polyfill';
 import {exec} from 'child_process';
 import os from 'os';
+import * as supports from '../lib/supports';
 import tsts from 'tsts';
 
 /**
@@ -12,27 +13,35 @@ import tsts from 'tsts';
 const spell = (dirfn) => {
   return new Promise((resolve, reject) => {
     const v = require(dirfn('package.json')).version;
+    let cmd = [];
 
-    // If there isn't a bower.json, we don't need to do anything.
-    try {
-      require(dirfn('bower.json'));
-    } catch (x) {
-      reject(x);
-      return;
+    if (supports.changelog()) {
+      cmd = cmd.concat([
+        `chg release "${v}"`,
+        'git add CHANGELOG.md'
+      ]);
     }
 
-    exec(tsts.join`
-      git add package.json &&
-      git commit -m "${v}" &&
-      npm run build &&
-      git add -f dist
-    `, (err, stdout, stderr) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(stdout);
-      }
-    });
+    if (supports.bower()) {
+      cmd = cmd.concat([
+        'git add package.json',
+        `git commit -m "${v}"`,
+        'npm run build',
+        'git add -f dist'
+      ]);
+    }
+
+    if (cmd.length) {
+      exec(cmd.join(' && '), (err, stdout, stderr) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(stdout);
+        }
+      });
+    } else {
+      resolve();
+    }
   });
 };
 

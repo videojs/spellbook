@@ -1,6 +1,7 @@
 import 'babel-polyfill';
 import {exec} from 'child_process';
 import os from 'os';
+import * as supports from '../lib/supports';
 import tsts from 'tsts';
 
 /**
@@ -11,22 +12,15 @@ import tsts from 'tsts';
  */
 const spell = (dirfn) => {
   return new Promise((resolve, reject) => {
-
-    // If there isn't a bower.json, we don't need to do anything.
-    try {
-      require(dirfn('bower.json'));
-    } catch (x) {
-      reject(x);
-      return;
+    if (supports.bower()) {
+      exec('git reset --hard HEAD~1', (err, stdout, stderr) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(stdout);
+        }
+      });
     }
-
-    exec('git reset --hard HEAD~1', (err, stdout, stderr) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(stdout);
-      }
-    });
   });
 };
 
