@@ -1,59 +1,17 @@
 import 'babel-polyfill';
+import babelify from 'babelify';
+import browserify from 'browserify';
+import shim from 'browserify-shim';
+import versionify from 'browserify-versionify';
 import budo from 'budo';
+import fs from 'fs-extra';
+import glob from 'glob';
 import os from 'os';
 import tsts from 'tsts';
-import url from 'url';
 import builders from '../lib/builders';
 import descope from '../lib/descope';
-import dirf from '../lib/dirf';
 
-/**
- * Gets the plugin name without a scope.
- *
- * @param  {Function} dirfn
- * @return {String}
- */
-const getName = (dirfn) => descope(require(dirfn('package.json')).name);
-
-/**
- * Creates middleware functions that filter the pathname against a given
- * regular expression.
- *
- * @param  {RegExp} regexp
- * @param  {Function} handler
- * @return {Function}
- */
-const createMiddleware = (regexp, handler) => {
-  return (req, res, next) => {
-    const dirfn = dirf();
-    const pathname = url.parse(req.url).pathname;
-
-    if (regexp.test(pathname)) {
-      handler(dirfn, req, res, next);
-    } else {
-      next();
-    }
-  };
-};
-
-const middleware = [
-
-  createMiddleware(/^\/dist\/[^/]+\.css$/, (dirfn, req, res, next) => {
-    builders.css(dirfn, getName(dirfn)).then(next, next);
-  }),
-
-  createMiddleware(/^\/dist\/[^/]+\.js$/, (dirfn, req, res, next) => {
-    builders.plugin(dirfn, getName(dirfn)).then(next, next);
-  }),
-
-  createMiddleware(/^\/dist\/lang\/[^/]+\.js$/, (dirfn, req, res, next) => {
-    builders.langs(dirfn).then(next, next);
-  }),
-
-  createMiddleware(/^\/test\/dist\/bundle\.js$/, (dirfn, req, res, next) => {
-    builders.tests(dirfn).then(next, next);
-  })
-];
+/* eslint no-console: 0 */
 
 /**
  * Server spell.
@@ -63,16 +21,99 @@ const middleware = [
  */
 const spell = (dir) => {
   const server = budo({
-    live: true,
-    watchGlob: [
-      'lang/*.json',
-      'src/**/*.{scss,js}',
-      'test/**/*.test.js',
-      'test/index.html'
-    ],
-    middleware,
     port: 9999,
     stream: process.stdout
+  });
+
+  const name = descope(require(dir('package.json')).name);
+  const reload = server.reload.bind(server);
+
+  const bundlers = {
+
+    js: browserify({
+      debug: true,
+      entries: ['src/plugin.js'],
+      standalone: name,
+      transform: [
+        babelify,
+        shim,
+        versionify
+      ]
+    }),
+
+    tests: browserify({
+      debug: true,
+      entries: glob.sync('test/**/*.test.js'),
+      transform: [
+        babelify,
+        shim,
+        versionify
+      ]
+    })
+  };
+
+  const dests = {
+    js: `dist/${name}.js`,
+    tests: 'test/dist/bundle.js'
+  };
+
+  const bundle = (type) => {
+    return new Promise((resolve, reject) => {
+      bundlers[type]
+        .bundle()
+        .pipe(fs.createWriteStream(dests[type]))
+        .on('finish', resolve)
+        .on('error', reject);
+    });
+  };
+
+  const handlers = [{
+    regex: /^lang\/.+\.json$/,
+    fn(event, file) {
+      return builders.langs(dir);
+    }
+  }, {
+    regex: /^src\/.+\.scss$/,
+    fn(event, file) {
+      return builders.css(dir, name);
+    }
+  }, {
+    regex: /'^src\/.+\.js$/,
+    fn(event, file) {
+      return Promise.all([bundle('js'), bundle('tests')]);
+    }
+  }, {
+    regex: /^test\/.+\.test\.js$/,
+    fn(event, file) {
+      return bundle('tests');
+    }
+  }];
+
+  fs.ensureDirSync(dir('dist'));
+
+  Promise.all([bundle('js'), bundle('tests')]).then(() => {
+    server
+      .on('reload', (f) => console.log('reloading %s', f || 'everything'))
+      .live()
+      .watch([
+        'index.html',
+        'lang/*.json',
+        'src/**/*.{scss,js}',
+        'src/**/*.js',
+        'test/**/*.test.js',
+        'test/index.html'
+      ])
+      .on('watch', (event, file) => {
+        let handler = handlers.find(h => h.regex.test(file));
+
+        console.log(`detected a "${event}" event in "${file}"`);
+
+        if (handler && handler.fn) {
+          handler.fn(event, file).then(reload);
+        } else {
+          reload();
+        }
+      });
   });
 
   return new Promise((resolve, reject) => {

@@ -1,6 +1,7 @@
 import 'babel-polyfill';
 import browserify from 'browserify';
 import shim from 'browserify-shim';
+import versionify from 'browserify-versionify';
 import fs from 'fs-extra';
 import glob from 'glob';
 import path from 'path';
@@ -50,6 +51,7 @@ const bundle = (meta) => {
 
     browserify(meta.path(PATH_ENTRY), {standalone: meta.name})
       .transform(shim)
+      .transform(versionify)
       .bundle()
       .pipe(fs.createWriteStream(meta.path(PATH_OUT)))
       .on('finish', () => {
