@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+var path = require('path');
+var config = require('./utils/config');
+var RunCommand = require('./utils/run-command');
+
+require('commander')
+  .version(config.sbVersion)
+  .parse(process.argv);
+
+
+RunCommand('rm', '-rf', path.join(config.dist, 'i18n'));
+RunCommand('mkdir', '-p', path.join(config.dist, 'i18n'));
+// TODO: is this realistic?
+// TODO: watch
+RunCommand('cp', '-R', path.join(config.src, 'i18n'), path.join(config.dist));

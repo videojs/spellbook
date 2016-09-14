@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+var config = require('./utils/config');
+var PathExists = require('./utils/path-exists');
+var RunCommand = require('./utils/run-command');
+var GetBinPath = require('./utils/get-bin-path');
+var path = require('path');
+
+var program = require('commander')
+  .version(config.sbVersion)
+  .option('-w, --watch', 'incremental rebuild')
+  .option('-d, --dist <dir>', 'directory to write output to')
+  .arguments('<src-dir>')
+  .action(function(src) {
+    this.src = src;
+  })
+  .parse(process.argv);
+
+if (!program.src || !program.dist) {
+  console.error('must pass in a src and a dist, see --help for details');
+  process.exit(1);
+}
+
+if (!PathExists(program.src)) {
+  console.error(program.src + ' does not exist!');
+  process.exit(1);
+}
+
+// TODO: noderify
+// TODO: loose
+// TODO: ie8 support
+RunCommand('rm', '-rf', program.dist);
+RunCommand('mkdir', '-p', program.dist);
+
+var cmd = GetBinPath('babel') + ' '
+  + "-d '" + program.dist + "' "
+  + "--presets es2015 "
+  + "--plugins transform-object-assign "
+  + program.src;
+
+if (program.watch) {
+  cmd += ' --watch';
+}
+
+RunCommand('exec', cmd);

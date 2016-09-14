@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+/* notes
+# wrapper around yeoman
+dist/{npm,browser,test,docs,i18n}/<pkg.name>.*
+src/{js,css,test,docs,i18n}/index.*
+CHANGELOG.md
+CONTRIBUTING.md
+LICENCE
+ISSUE_TEMPLATE.md
+PULL_REQUEST_TEMPLATE.md
+README.md
+index.html
+package.json
+bower.json
+jsdoc.json
+.babelrc
+.editorconfig
+.gitignore
+.travis.yml
+.npmignore
+
+* node_modules
+* git hooks
+* git init
+*/
+
+#!/usr/bin/env node
+var config = require('./utils/config');
+
+var program = require('commander')
+  .version(config.sbVersion)
+  .parse(process.argv);
+
+// TODO: implement
+console.log('NYI');

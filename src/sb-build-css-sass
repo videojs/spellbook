@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+var config = require('./utils/config');
+var PathExists = require('./utils/path-exists');
+var shelljs = require('shelljs');
+var path = require('path');
+var RunCommand = require('./utils/run-command');
+var GetBinPath = require('./utils/get-bin-path');
+
+var program = require('commander')
+  .version(config.spellbookVersion)
+  .option('-w, --watch', 'incremental rebuild')
+  .option('-d, --dist <dist-file>', 'file to write output to')
+  .arguments('<src-file>')
+  .action(function(src) {
+    this.src = src;
+  })
+  .parse(process.argv);
+
+if (!program.src || !program.dist) {
+  console.error('must pass in a src and a dist, see --help for details');
+  process.exit(1);
+}
+
+if (!PathExists(program.src)) {
+  console.error(program.src + ' does not exist!');
+  process.exit(1);
+}
+
+RunCommand('rm', '-rf', path.dirname(program.dist));
+RunCommand('mkdir', '-p', path.dirname(program.dist));
+var cmd = ''
+    + GetBinPath('node-sass')
+    + ' ' + program.src
+    + ' ' + program.dist
+    + ' --output-style=compressed '
+    + ' --linefeed=lf '
+    + ' --source-map ' + program.dist + '.map'
+
+if (program.watch) {
+  cmd += ' --watch';
+}
+
+RunCommand('exec', cmd);

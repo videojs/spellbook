@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+var config = require('./utils/config');
+var RunCommand = require('./utils/run-command');
+var GetBinPath = require('./utils/get-bin-path');
+
+var program = require('commander')
+  .version(config.sbVersion)
+  .option('-w, --watch', 'watch files for changes and rebuild')
+  .parse(process.argv);
+
+
+RunCommand('exec', GetBinPath('sb-clean'));
+
+var commands = [
+  GetBinPath('sb-build-js'),
+  GetBinPath('sb-build-css'),
+  GetBinPath('sb-build-docs'),
+  GetBinPath('sb-build-i18n')
+];
+
+
+commands.forEach(function(command) {
+  if (program.watch) {
+    command += ' --watch';
+  }
+  RunCommand('exec', command, {async: true});
+})

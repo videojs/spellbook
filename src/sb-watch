@@ -1,0 +1,12 @@
+#!/usr/bin/env node
+var config = require('./utils/config');
+var RunCommand = require('./utils/run-command');
+var GetBinPath = require('./utils/get-bin-path');
+
+require('commander')
+  .version(config.sbVersion)
+  .parse(process.argv);
+
+RunCommand('exec', GetBinPath('sb-build') + ' --watch', {async: true});
+RunCommand('exec', GetBinPath('sb-lint') + ' --watch', {async: true});
+RunCommand('exec', GetBinPath('sb-test') + ' --watch', {async: true});

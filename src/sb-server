@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+var config = require('./utils/config');
+var path = require('path');
+var browserSync = require('browser-sync').create();
+
+require('commander')
+  .version(config.spellbookVersion)
+  .option('-p, --port <number>', 'what port to start the server on', parseInt)
+  .option('-o, --open', 'open the server in your default browser')
+  .option('-s, --sync', 'enable cross browser action sync')
+  .option('-ui, --ui', 'enable browser-sync ui')
+  .parse(process.argv);
+
+browserSync.init({
+  server: config.path,
+  port: program.port || config.port,
+  ui: program.ui || false,
+  ghostMode: program.sync || false,
+  open: program.open || false,
+  files: [
+    path.join(config.path, config.dist, 'browser', '*.*'),
+  ]
+});

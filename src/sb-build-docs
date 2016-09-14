@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+var path = require('path');
+var config = require('./utils/config');
+var RunCommand = require('./utils/run-command');
+var GetBinPath = require('./utils/get-bin-path');
+
+require('commander')
+  .version(config.sbVersion)
+  .option('-w, --watch', 'watch docs for changes and rebuild')
+  .parse(process.argv);
+
+RunCommand('rm', '-rf', path.join(config.dist, 'docs'));
+RunCommand('mkdir', '-p', path.join(config.dist, 'docs', 'api'));
+
+// TODO: watch with nodemon
+
+RunCommand('cp', '-R', path.join(config.src, 'docs'), path.join(config.dist, 'docs'), {async: true});
+// TODO add local config for markdown plugin
+RunCommand('exec', GetBinPath('jsdoc') + ' ' + path.join(config.src, 'js') + ' -r -d ' + path.join(config.dist, 'docs', 'api'), {async: true});
+RunCommand('exec', GetBinPath('doctoc') + ' ' + path.join(config.path, 'README.md'), {async: true});

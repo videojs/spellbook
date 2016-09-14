@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+var path = require('path');
+var config = require('./utils/config');
+var GetBinPath = require('./utils/get-bin-path');
+var RunCommand = require('./utils/run-command');
+
+var program = require('commander')
+  .version(config.spellbookVersion)
+  .option('-w, --watch', 'watch files for changes')
+  .parse(process.argv);
+
+var commands = [];
+
+// build tests
+commands.push(''
+  + GetBinPath('sb-build-css-sass')
+  + " --dist '" + path.join(config.dist, 'css', 'index.css') + "'"
+  + " '" + path.join(config.src, 'css', 'index.scss') + "'"
+);
+
+for (var i = 0; i < commands.length; i++) {
+  // add watch flag
+  if (program.watch) {
+    commands[i] += ' --watch';
+  }
+  RunCommand('exec', commands[i], {async: true});
+}

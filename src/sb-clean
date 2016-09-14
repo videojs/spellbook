@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+var config = require('./utils/config');
+var PathExists = require('./utils/path-exists');
+var RunCommand = require('./utils/run-command');
+var path = require('path');
+
+var program = require('commander')
+  .version(config.sbVersion)
+  .option('-d, --dry-run', 'see what would happen when you run clean')
+  .option('-q, --quiet', 'dont log any output, other than errors')
+  .parse(process.argv);
+
+if (program.quiet && program.dryRun) {
+  console.error('--dry-run should not be used with --quiet');
+  process.exit(1);
+}
+
+if (!PathExists(config.dist)) {
+  console.log('nothing to cleanup');
+  process.exit(0);
+}
+var files = [config.dist]
+
+files.forEach(function(file) {
+  if (!program.quiet) {
+    console.log('removing ' + file.replace(config.path + path.sep, ''));
+  }
+  if (!program.dryRun) {
+    RunCommand('rm', '-rf', file);
+  }
+});

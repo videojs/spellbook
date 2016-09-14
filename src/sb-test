@@ -1,0 +1,52 @@
+#!/usr/bin/env node
+var config = require('./utils/config');
+var PathExists = require('./utils/path-exists');
+var path = require('path');
+var KarmaServer = require('karma').Server;
+var GetBinPath = require('./utils/get-bin-path');
+var RunCommand = require('./uitls/run-command');
+
+var program = require('commander')
+  .version(config.spellbookVersion)
+  .arguments('<environments...>')
+  .action(function(environments) {
+    this.environments = environments;
+  })
+  .option('-w, --watch', 'keep the tester running and run as things change')
+  .parse(process.argv);
+
+program.environments.forEach(function(environment) {
+  if (!(/chrome|ie|safari|firefox|node|browserify|webpack|rollup/i).test(program.environments)) {
+    console.error('invalid environment ' + environment);
+    process.exit(1);
+  }
+});
+
+const KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
+
+if (!PathExists(path.join(config.dist, 'test', 'bundle.js'))) {
+  RunCommand.('exec', GetBinPath('spellbook-build-js'));
+}
+
+// TODO: how do we integrate this with spellbook-start (module.export?)
+// TODO: test non-browser environments somehow
+// http://localhost:9876/debug.html will be qunit UI
+var options = {
+  proxies: {'/test': 'http://localhost:' + config.port},
+  reporters: ['dots'],
+  autoWatch: program.watch,
+  singleRun: !program.watch,
+  basePath: config.path,
+  frameworks: ['qunit', 'detectBrowsers'],
+  client: {clearContext: false, qunit: {showUI: true}}
+  files: [],
+  browsers: program.browsers || null,
+  detectBrowsers: {enabled: program.browsers.length > 0, usePhantomJS: false}
+};
+
+var server = new KarmaServer(options, function(exitCode) {
+  console.log('Karma has exited with ' + exitCode)
+  process.exit(exitCode)
+});
+
+server.start();
