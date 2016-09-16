@@ -11,7 +11,5 @@
   "browserify-shim": {
     "qunit": "global:QUnit"
   },
-  "dependencies": {
-    "babel-eslint": "^6.1.2"
-  }
+  "dependencies": {}
 }

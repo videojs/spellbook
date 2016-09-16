@@ -4,4 +4,4 @@ module.exports = {
     "json"
   ],
   "extends": "videojs"
-}
+};

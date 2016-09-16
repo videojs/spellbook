@@ -12,9 +12,22 @@ require('commander')
 RunCommand('rm', '-rf', path.join(config.dist, 'docs'));
 RunCommand('mkdir', '-p', path.join(config.dist, 'docs', 'api'));
 
-// TODO: watch with nodemon
+// TODO: watch with chokidar and --watch for remark
 
-RunCommand('cp', '-R', path.join(config.src, 'docs'), path.join(config.dist, 'docs'), {async: true});
+RunCommand('exec', GetPath('remark')
+  + ' ' + path.join(config.src, 'docs')
+  + ' --use html'
+  + ' --no-config'
+  + ' --output ' + path.join(config.dist, 'docs')
+, {async: true});
+
 // TODO add local config for markdown plugin
-RunCommand('exec', GetPath('jsdoc') + ' ' + path.join(config.src, 'js') + ' -r -d ' + path.join(config.dist, 'docs', 'api'), {async: true});
-RunCommand('exec', GetPath('doctoc') + ' ' + path.join(config.path, 'README.md'), {async: true});
+RunCommand('exec', GetPath('jsdoc')
+  + ' ' + path.join(config.src, 'js')
+  + ' -r'
+  + ' -d ' + path.join(config.dist, 'docs', 'api')
+, {async: true});
+
+RunCommand('exec', GetPath('doctoc')
+  + ' ' + path.join(config.path, 'README.md')
+, {async: true});

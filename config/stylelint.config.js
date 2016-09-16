@@ -72,4 +72,4 @@ module.exports = {
     "no-invalid-double-slash-comments": true,
     "stylelint-disable-reason": "always-after"
   }
-}
+};
