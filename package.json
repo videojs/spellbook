@@ -60,6 +60,7 @@
     "rimraf": "^2.5.4",
     "rollupify": "^0.3.4",
     "shelljs": "^0.7.4",
+    "shx": "^0.1.4",
     "stylelint": "^7.2.0",
     "uglify-js": "^2.7.3",
     "watchify": "^3.7.0"

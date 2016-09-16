@@ -2,14 +2,26 @@
 var path = require('path');
 var config = require('./utils/config');
 var RunCommand = require('./utils/run-command');
+var GetPath = require('./utils/get-path');
 
-require('commander')
+var program = require('commander')
   .version(config.sbVersion)
+  .option('-w, --watch', 'watch for changes and copy to dist')
   .parse(process.argv);
 
 
+// TODO: does this make sense for building i18n?
+
 RunCommand('rm', '-rf', path.join(config.dist, 'i18n'));
 RunCommand('mkdir', '-p', path.join(config.dist, 'i18n'));
-// TODO: is this realistic?
-// TODO: watch
-RunCommand('cp', '-R', path.join(config.src, 'i18n'), path.join(config.dist));
+var cmd = GetPath('shx') + ' cp -R ' + path.join(config.src, 'i18n') + ' ' + path.join(config.dist);
+
+RunCommand('exec', cmd);
+
+if (program.watch) {
+  RunCommand('exec', GetPath('chokidar')
+    + ' ' + path.join(config.src, 'i18n', '**', '*.json')
+    + ' --debounce 100'
+    + ' --command \'' + cmd + '\''
+  );
+}
