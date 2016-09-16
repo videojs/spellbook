@@ -16,11 +16,11 @@ var RunCommand = function(type) {
     }
 
     cmd = cmd.split(path.join(__dirname, '..', '..', 'node_modules', '.bin') + path.sep).join('');
+    cmd = cmd.split(path.join(__dirname, '..', '..', 'config') + path.sep).join('');
     cmd = cmd.split(path.join(__dirname, '..') + path.sep).join('');
     cmd = cmd.split(config.path + path.sep).join('');
 
     process.stdout.write(': ' + cmd + '\n');
-
   }
   return shelljs[type].apply(null, args);
 };

@@ -3,7 +3,7 @@ var config = require('./utils/config');
 var PathExists = require('./utils/path-exists');
 var path = require('path');
 var KarmaServer = require('karma').Server;
-var GetBinPath = require('./utils/get-bin-path');
+var GetPath = require('./utils/get-path');
 var RunCommand = require('./uitls/run-command');
 
 var program = require('commander')
@@ -25,7 +25,7 @@ program.environments.forEach(function(environment) {
 const KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
 
 if (!PathExists(path.join(config.dist, 'test', 'bundle.js'))) {
-  RunCommand.('exec', GetBinPath('spellbook-build-js'));
+  RunCommand.('exec', GetPath('spellbook-build-js'));
 }
 
 // TODO: how do we integrate this with spellbook-start (module.export?)

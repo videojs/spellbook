@@ -3,7 +3,7 @@ var config = require('./utils/config');
 var PathExists = require('./utils/path-exists');
 var path = require('path');
 var RunCommand = require('./utils/run-command');
-var GetBinPath = require('./utils/get-bin-path');
+var GetPath = require('./utils/get-path');
 var glob = require('glob');
 var semver = require('semver');
 
@@ -52,8 +52,8 @@ if (PathExists(path.join(config.path, 'bower.json'))) {
   commands.push('git add package.json');
   commands.push('git commit -m "' + config.version + '"');
 
-  commands.push(GetBinPath('spellbook-build'));
-  commands.push(GetBinPath('spellbook-clean'));
+  commands.push(GetPath('spellbook-build'));
+  commands.push(GetPath('spellbook-clean'));
   commands.push('git reset --hard HEAD~1');
 }
 

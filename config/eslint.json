@@ -1,0 +1,7 @@
+{
+    "plugins": [
+        "markdown",
+        "json"
+    ],
+    "extends": "videojs"
+}

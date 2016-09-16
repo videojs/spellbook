@@ -2,7 +2,7 @@
 var config = require('./utils/config');
 var PathExists = require('./utils/path-exists');
 var RunCommand = require('./utils/run-command');
-var GetBinPath = require('./utils/get-bin-path');
+var GetPath = require('./utils/get-path');
 var path = require('path');
 
 var program = require('commander')
@@ -31,7 +31,7 @@ if (!PathExists(program.src)) {
 RunCommand('rm', '-rf', program.dist);
 RunCommand('mkdir', '-p', program.dist);
 
-var cmd = GetBinPath('babel') + ' '
+var cmd = GetPath('babel') + ' '
   + "-d '" + program.dist + "' "
   + "--presets es2015 "
   + "--plugins transform-object-assign "

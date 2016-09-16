@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var config = require('./utils/config');
 var RunCommand = require('./utils/run-command');
-var GetBinPath = require('./utils/get-bin-path');
+var GetPath = require('./utils/get-path');
 
 var program = require('commander')
   .version(config.sbVersion)
@@ -9,13 +9,13 @@ var program = require('commander')
   .parse(process.argv);
 
 
-RunCommand('exec', GetBinPath('sb-clean'));
+RunCommand('exec', GetPath('sb-clean'));
 
 var commands = [
-  GetBinPath('sb-build-js'),
-  GetBinPath('sb-build-css'),
-  GetBinPath('sb-build-docs'),
-  GetBinPath('sb-build-i18n')
+  GetPath('sb-build-js'),
+  GetPath('sb-build-css'),
+  GetPath('sb-build-docs'),
+  GetPath('sb-build-i18n')
 ];
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var path = require('path');
 var config = require('./utils/config');
-var GetBinPath = require('./utils/get-bin-path');
+var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
 
 
@@ -15,7 +15,7 @@ var commands = [];
 
 // build tests
 commands.push(''
-  + GetBinPath('sb-build-js-browser')
+  + GetPath('sb-build-js-browser')
   + ' --dont-min'
   + ' --dist ' + path.join(config.dist, 'test', 'bundle.js')
   + ' ' + path.join(config.src, 'test', '**', '*.test.js')
@@ -23,14 +23,15 @@ commands.push(''
 
 // build browser dist
 commands.push(''
-  + GetBinPath('sb-build-js-browser')
+  + GetPath('sb-build-js-browser')
   + ' --dist ' + path.join(config.dist, 'browser', config.name + '.js')
+  + ' --standalone ' + config.name
   + ' ' + path.join(config.src, 'js', 'index.js')
 );
 
 // build npm dist
 commands.push(''
-  + GetBinPath('sb-build-js-npm')
+  + GetPath('sb-build-js-npm')
   + ' --dist ' + path.join(config.dist, 'npm')
   + ' ' + path.join(config.src, 'js')
 );

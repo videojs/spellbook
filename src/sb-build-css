@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var path = require('path');
 var config = require('./utils/config');
-var GetBinPath = require('./utils/get-bin-path');
+var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
 
 var program = require('commander')
@@ -13,8 +13,8 @@ var commands = [];
 
 // build tests
 commands.push(''
-  + GetBinPath('sb-build-css-sass')
-  + " --dist '" + path.join(config.dist, 'css', 'index.css') + "'"
+  + GetPath('sb-build-css-sass')
+  + " --dist '" + path.join(config.dist, 'browser', config.name + '.css') + "'"
   + " '" + path.join(config.src, 'css', 'index.scss') + "'"
 );
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var config = require('./utils/config');
 var PathExists = require('./utils/path-exists');
-var GetBinPath = require('./utils/get-bin-path');
+var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
 var path = require('path');
 var glob = require('glob');
@@ -59,12 +59,12 @@ files.forEach(function(file) {
 RunCommand('rm', '-rf', distFile + '{.js,.js.map,.min.js,.min.js.map}');
 RunCommand('mkdir', '-p', dirName);
 if (program.watch) {
-  RunCommand('exec', GetBinPath('watchify') + ' -v ' + browserifyOpts);
+  RunCommand('exec', GetPath('watchify') + ' -v ' + browserifyOpts);
   process.exit(0);
 }
 
 // TODO: browserify-incremental?
-RunCommand('exec', GetBinPath('browserify') + ' ' + browserifyOpts);
+RunCommand('exec', GetPath('browserify') + ' ' + browserifyOpts);
 
 // TODO: print something for exorcist
 if (config.verbose) {
@@ -72,7 +72,7 @@ if (config.verbose) {
 }
 
 shelljs.cat(distFile + '.js')
-  .exec(GetBinPath('exorcist') + " '" + distFile + ".js.map'", {silent: true})
+  .exec(GetPath('exorcist') + " '" + distFile + ".js.map'", {silent: true})
   .to(distFile + '.js');
 
 console.log('wrote ' + printDistFile + '.js & ' + printDistFile + '.js.map');
@@ -80,7 +80,7 @@ console.log('wrote ' + printDistFile + '.js & ' + printDistFile + '.js.map');
 if (program.dontMin) {
   process.exit(0);
 }
-RunCommand('exec', GetBinPath('uglifyjs') + ' '
+RunCommand('exec', GetPath('uglifyjs') + ' '
   + "--compress "
   + "--mangle "
   + "--in-source-map '" + distFile + ".js.map' "
@@ -91,4 +91,3 @@ RunCommand('exec', GetBinPath('uglifyjs') + ' '
 );
 
 console.log('wrote ' + printDistFile + '.min.js & ' + printDistFile + '.min.js.map');
-

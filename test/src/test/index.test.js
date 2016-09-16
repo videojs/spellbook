@@ -6,8 +6,8 @@ QUnit.module('test', {
   afterEach() {}
 });
 
-QUnit.test('bar fn returns bar', function(assert) {
+QUnit.test('foo fn returns bar', function(assert) {
   const test = new TestingThing();
 
-  assert.strictEqual(test.bar(), 'bar', 'bar returns this.bar');
+  assert.strictEqual(test.foo(), 'bar', 'bar returns this.bar');
 });

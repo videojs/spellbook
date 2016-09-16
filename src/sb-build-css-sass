@@ -4,7 +4,7 @@ var PathExists = require('./utils/path-exists');
 var shelljs = require('shelljs');
 var path = require('path');
 var RunCommand = require('./utils/run-command');
-var GetBinPath = require('./utils/get-bin-path');
+var GetPath = require('./utils/get-path');
 
 var program = require('commander')
   .version(config.spellbookVersion)
@@ -26,18 +26,43 @@ if (!PathExists(program.src)) {
   process.exit(1);
 }
 
-RunCommand('rm', '-rf', path.dirname(program.dist));
-RunCommand('mkdir', '-p', path.dirname(program.dist));
+var dirName = path.dirname(program.dist);
+var distFile = path.join(dirName, path.basename(program.dist, path.extname(program.dist)));
+
+RunCommand('rm', '-rf', dirName);
+RunCommand('mkdir', '-p', dirName);
 var cmd = ''
-    + GetBinPath('node-sass')
+    + GetPath('node-sass')
     + ' ' + program.src
-    + ' ' + program.dist
-    + ' --output-style=compressed '
-    + ' --linefeed=lf '
-    + ' --source-map ' + program.dist + '.map'
+    + ' ' + distFile + '.css'
+    + ' --output-style=compressed'
+    + ' --linefeed=lf'
+    + ' --sourceMap true'
+    + ' --sourceMapContents'
+    + ' --sourceMapEmbed';
 
 if (program.watch) {
   cmd += ' --watch';
 }
 
 RunCommand('exec', cmd);
+
+if (program.watch) {
+  process.exit(0);
+}
+
+RunCommand('exec', GetPath('cssnano')
+  + ' --safe'
+  + ' --sourcemap'
+  + ' ' + distFile + '.css'
+, {silent: true}).to(distFile + '.min.css');
+
+shelljs.cat(distFile + '.css')
+  .exec(GetPath('exorcist') + " '" + distFile + ".css.map'", {silent: true})
+  .to(distFile + '.css');
+
+shelljs.cat(distFile + '.min.css')
+  .exec(GetPath('exorcist') + " '" + distFile + ".min.css.map'", {silent: true})
+  .to(distFile + '.min.css');
+
+

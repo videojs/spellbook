@@ -2,7 +2,7 @@
 var path = require('path');
 var config = require('./utils/config');
 var RunCommand = require('./utils/run-command');
-var GetBinPath = require('./utils/get-bin-path');
+var GetPath = require('./utils/get-path');
 
 require('commander')
   .version(config.sbVersion)
@@ -16,5 +16,5 @@ RunCommand('mkdir', '-p', path.join(config.dist, 'docs', 'api'));
 
 RunCommand('cp', '-R', path.join(config.src, 'docs'), path.join(config.dist, 'docs'), {async: true});
 // TODO add local config for markdown plugin
-RunCommand('exec', GetBinPath('jsdoc') + ' ' + path.join(config.src, 'js') + ' -r -d ' + path.join(config.dist, 'docs', 'api'), {async: true});
-RunCommand('exec', GetBinPath('doctoc') + ' ' + path.join(config.path, 'README.md'), {async: true});
+RunCommand('exec', GetPath('jsdoc') + ' ' + path.join(config.src, 'js') + ' -r -d ' + path.join(config.dist, 'docs', 'api'), {async: true});
+RunCommand('exec', GetPath('doctoc') + ' ' + path.join(config.path, 'README.md'), {async: true});
