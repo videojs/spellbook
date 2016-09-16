@@ -4,7 +4,14 @@ var config = require('./utils/config');
 var RunCommand = require('./utils/run-command');
 var GetPath = require('./utils/get-path');
 
-require('commander')
+
+var watch = function(glob, command) {
+  return GetPath('chokidar')
+    + ' ' + glob
+    + ' --debounce 100'
+    + ' --command \'' + command + '\'';
+};
+var program = require('commander')
   .version(config.sbVersion)
   .option('-w, --watch', 'watch docs for changes and rebuild')
   .parse(process.argv);
@@ -12,22 +19,41 @@ require('commander')
 RunCommand('rm', '-rf', path.join(config.dist, 'docs'));
 RunCommand('mkdir', '-p', path.join(config.dist, 'docs', 'api'));
 
-// TODO: watch with chokidar and --watch for remark
+var commands = []
 
-RunCommand('exec', GetPath('remark')
+commands.push(GetPath('remark')
   + ' ' + path.join(config.src, 'docs')
   + ' --use html'
   + ' --no-config'
   + ' --output ' + path.join(config.dist, 'docs')
-, {async: true});
+);
+
+if (program.watch) {
+  commands.push(watch(path.join(config.src, 'docs', '**', '*.md'), commands[commands.length-1]))
+}
 
 // TODO add local config for markdown plugin
-RunCommand('exec', GetPath('jsdoc')
+commands.push(GetPath('jsdoc')
   + ' ' + path.join(config.src, 'js')
+  + ' --configure ' + GetPath('jsdoc.config.json')
   + ' -r'
   + ' -d ' + path.join(config.dist, 'docs', 'api')
-, {async: true});
+);
 
-RunCommand('exec', GetPath('doctoc')
+if (program.watch) {
+  commands.push(watch(path.join(config.src, 'js', '**', '*.js'), commands[commands.length-1]))
+}
+
+commands.push(GetPath('doctoc')
   + ' ' + path.join(config.path, 'README.md')
-, {async: true});
+);
+
+/* TODO: should we watch this? how do we do it?
+if (program.watch) {
+  commands.push(watch(path.join(config.path, 'README.md'), commands[commands.length-1]))
+}
+*/
+
+commands.forEach(function(command) {
+  RunCommand('exec', command, {async: true});
+});
