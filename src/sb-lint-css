@@ -15,16 +15,12 @@ var program = require('commander')
   })
   .parse(process.argv);
 
-var command =  ''
-  + GetPath('esw')
-  + ' --color'
-  + ' --no-eslintrc'
-  + ' -c ' + GetPath('eslint.js')
-  + ' ' + program.src;
+var command =  GetPath('stylelint');
 
-if (program.watch) {
-  command += ' --watch';
-}
+command += ''
+  + ' --color'
+  + ' --config ' + GetPath('stylelint.config.js')
+  + ' ' + program.src;
 
 if (program.errors) {
   command += ' --quiet';
@@ -35,3 +31,12 @@ if (program.fix) {
 }
 
 RunCommand('exec', command);
+
+if (program.watch) {
+  command = GetPath('chokidar')
+    + ' ' + program.src
+    + ' --debounce 100'
+    + ' --command \'' + command + '\'';
+  RunCommand('exec', command);
+}
+
