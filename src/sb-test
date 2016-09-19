@@ -38,8 +38,7 @@ program.environments.forEach(function(environment) {
 
 var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
 
-if (!PathExists(path.join(config.dist, 'test', 'bundle.js')) ||
-    !PathExists(path.join(config.dist, 'browser', config.name + '.js'))) {
+if (!PathExists(path.join(config.dist, 'test', 'bundle.js'))) {
   RunCommand('exec', GetPath('sb-build-js'));
 }
 

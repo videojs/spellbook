@@ -8,6 +8,8 @@
   },
   "author": "Brandon Casey",
   "license": "MIT",
-  "dependencies": {},
-  "browserify-shim": "../config/shim.config.js"
+  "devDependencies": {
+    "sb": "*"
+  },
+  "browserify-shim": "node_modules/sb/config/shim.config.js"
 }

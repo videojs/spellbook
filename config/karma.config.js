@@ -21,9 +21,8 @@ module.exports = function(karmaConfig) {
       '/test': 'http://localhost:' + (karmaConfig.port || config.port)
     },
     files: [
-      'node_modules/sinon/pkg/sinon.js',
-      'node_modules/sinon/pkg/sinon-ie.js',
-      path.join(config.dist, 'browser', config.name + '.js'),
+      'node_modules/sb/node_modules/sinon/pkg/sinon.js',
+      'node_modules/sb/node_modules/sinon/pkg/sinon-ie.js',
       path.join(config.dist, 'browser', config.name + '.css'),
       path.join(config.dist, 'test', 'bundle.js')
     ],
