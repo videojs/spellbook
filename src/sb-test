@@ -2,51 +2,66 @@
 var config = require('./utils/config');
 var PathExists = require('./utils/path-exists');
 var path = require('path');
-var KarmaServer = require('karma').Server;
 var GetPath = require('./utils/get-path');
-var RunCommand = require('./uitls/run-command');
+var RunCommand = require('./utils/run-command');
 
 var program = require('commander')
   .version(config.spellbookVersion)
-  .arguments('<environments...>')
+  .arguments('[environments...]')
   .action(function(environments) {
     this.environments = environments;
   })
   .option('-w, --watch', 'keep the tester running and run as things change')
+  .option('-a, --all', 'test in all possible environments')
   .parse(process.argv);
 
+var browsers = [];
+var others = [];
+
+if (!program.environments) {
+  program.environments = [];
+  if (!program.all) {
+    program.all = true;
+  }
+}
+
 program.environments.forEach(function(environment) {
-  if (!(/chrome|ie|safari|firefox|node|browserify|webpack|rollup/i).test(program.environments)) {
+  if ((/chrome|ie|safari|firefox|node|browserify|webpack|rollup|all/i).test(environment)) {
+    browsers.push(environment);
+  } else if ((/node|browserify|webpack|rollup|all/i).test(environment)) {
+    others.push(environment);
+  } else {
     console.error('invalid environment ' + environment);
     process.exit(1);
   }
 });
 
-const KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
+var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
 
-if (!PathExists(path.join(config.dist, 'test', 'bundle.js'))) {
-  RunCommand.('exec', GetPath('spellbook-build-js'));
+if (!PathExists(path.join(config.dist, 'test', 'bundle.js')) ||
+    !PathExists(path.join(config.dist, 'browser', config.name + '.js'))) {
+  RunCommand('exec', GetPath('sb-build-js'));
 }
+
+if (!PathExists(path.join(config.dist, 'browser', config.name + '.css'))) {
+  RunCommand('exec', GetPath('sb-build-css'));
+}
+
 
 // TODO: how do we integrate this with spellbook-start (module.export?)
 // TODO: test non-browser environments somehow
 // http://localhost:9876/debug.html will be qunit UI
 var options = {
-  proxies: {'/test': 'http://localhost:' + config.port},
-  reporters: ['dots'],
   autoWatch: program.watch,
   singleRun: !program.watch,
-  basePath: config.path,
-  frameworks: ['qunit', 'detectBrowsers'],
-  client: {clearContext: false, qunit: {showUI: true}}
-  files: [],
-  browsers: program.browsers || null,
-  detectBrowsers: {enabled: program.browsers.length > 0, usePhantomJS: false}
 };
 
-var server = new KarmaServer(options, function(exitCode) {
-  console.log('Karma has exited with ' + exitCode)
-  process.exit(exitCode)
-});
+var command = GetPath('karma')
+  + ' start ' + GetPath('karma.config.js');
 
-server.start();
+if (program.watch) {
+  command += ' --auto-watch';
+  command += ' --no-single-run';
+}
+
+RunCommand('exec', command);

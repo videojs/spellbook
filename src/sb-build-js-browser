@@ -43,7 +43,7 @@ var browserifyOpts = ''
   + '--debug '
   + '-t rollupify '
   + '-t [ babelify --presets es2015 --plugins transform-object-assign ] '
-//  + '-g browserify-shim '
+  + '-g browserify-shim '
   + '-g browserify-versionify '
   + '-p bundle-collapser/plugin '
   + "-o '" + distFile + ".js' ";

@@ -8,8 +8,6 @@
   },
   "author": "Brandon Casey",
   "license": "MIT",
-  "browserify-shim": {
-    "qunit": "global:QUnit"
-  },
-  "dependencies": {}
+  "dependencies": {},
+  "browserify-shim": "../config/shim.config.js"
 }

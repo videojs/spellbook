@@ -1,5 +1,6 @@
 import TestingThing from '../js/index';
 import QUnit from 'qunitjs';
+import sinon from 'sinon';
 
 QUnit.module('test', {
   beforeEach() {},
