@@ -4,8 +4,6 @@ var config = require('./utils/config');
 var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
 
-
-// TODO: skip specific build step
 var program = require('commander')
   .version(config.sbVersion)
   .option('-w, --watch', 'incrementally rebuild')

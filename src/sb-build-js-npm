@@ -26,8 +26,6 @@ if (!PathExists(program.src)) {
 }
 
 // TODO: noderify
-// TODO: loose
-// TODO: ie8 support
 RunCommand('rm', '-rf', program.dist);
 RunCommand('mkdir', '-p', program.dist);
 

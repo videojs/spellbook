@@ -3,7 +3,7 @@ var config = require('./utils/config');
 var path = require('path');
 var browserSync = require('browser-sync').create();
 
-require('commander')
+var program = require('commander')
   .version(config.spellbookVersion)
   .option('-p, --port <number>', 'what port to start the server on', parseInt)
   .option('-o, --open', 'open the server in your default browser')
@@ -18,6 +18,6 @@ browserSync.init({
   ghostMode: program.sync || false,
   open: program.open || false,
   files: [
-    path.join(config.path, config.dist, 'browser', '*.*'),
+    path.join(config.dist, '**', '*.*'),
   ]
 });

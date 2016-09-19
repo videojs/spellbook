@@ -32,7 +32,6 @@ if (program.watch) {
   commands.push(watch(path.join(config.src, 'docs', '**', '*.md'), commands[commands.length-1]))
 }
 
-// TODO add local config for markdown plugin
 commands.push(GetPath('jsdoc')
   + ' ' + path.join(config.src, 'js')
   + ' --configure ' + GetPath('jsdoc.config.json')

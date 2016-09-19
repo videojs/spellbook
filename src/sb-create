@@ -33,3 +33,43 @@ var program = require('commander')
 
 // TODO: implement
 console.log('NYI');
+
+if (path.basename(path.cwd()) !== program.projectName) {
+  shelljs.mkdir('-p', program.projectName);
+  shelljs.cd(program.projectName);
+}
+
+pkg = {scripts: {}};
+
+shelljs.mkdir('-p', 'src');
+shelljs.mkdir('-p', 'test');
+
+// 'author, license, description, name'
+
+// documentation
+console.log('do to setup documentation?');
+
+console.log('do to setup internationalization?');
+
+console.log('will you be working with css?');
+
+console.log('will you be working in the browser?');
+
+console.log('will you be working in npm?');
+
+console.log('will you have html examples?');
+
+console.log('will you have html examples?');
+
+console.log('do you want to support ie8?');
+
+console.log('do you want to write es6?');
+
+console.log('do you want to support bower?');
+
+console.log('should we setup git?');
+
+console.log('do you want git commit hooks: [testing|linting|both|none]');
+
+console.log('do you want to use our versioning/changelog tool?');
+

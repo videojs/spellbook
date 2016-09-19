@@ -63,6 +63,7 @@ if (program.watch) {
   process.exit(0);
 }
 
+// TODO: ie8 support
 // TODO: browserify-incremental?
 RunCommand('exec', GetPath('browserify') + ' ' + browserifyOpts);
 
