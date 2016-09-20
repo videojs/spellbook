@@ -2,6 +2,7 @@
 var config = require('./utils/config');
 var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
+var path = require('path');
 
 var program = require('commander')
   .version(config.sbVersion)
@@ -12,24 +13,23 @@ var program = require('commander')
 
 var commands = [
   // eslint can lint doc examples, json, and js
-  GetPath('sb-lint-eslint') + ' ' + path.join(config.src, 'i18n', '**', '*.json');,
-  GetPath('sb-lint-eslint') + ' ' + path.join(config.src, 'js', '**', '*.js');,
-  GetPath('sb-lint-eslint') + ' ' + path.join(config.src, 'docs', '**', '*.md');,
+  GetPath('sb-lint-eslint') + ' ' + path.join(config.src, 'i18n', '**', '*.json'),
+  GetPath('sb-lint-eslint') + ' ' + path.join(config.src, 'js', '**', '*.js'),
+  GetPath('sb-lint-eslint') + ' ' + path.join(config.src, 'docs', '**', '*.md'),
 
-  GetPath('sb-lint-md'),
-  GetPath('sb-lint-css') + ' ' + path.join(config.src, 'css', '**', '*.*');,
+  GetPath('sb-lint-docs') + ' ' + path.join(config.src, 'docs', '**', '*.md'),
+  GetPath('sb-lint-css') + ' ' + path.join(config.src, 'css', '**', '*.*')
 ];
-
 
 commands.forEach(function(command) {
   if (program.errors) {
-    command += '--errors';
+    command += ' --errors';
   }
   if (program.watch) {
-    command += '--watch';
+    command += ' --watch';
   }
   if (program.fix) {
-    command += '--fix';
+    command += ' --fix';
   }
 
   RunCommand('exec', command, {async: true});

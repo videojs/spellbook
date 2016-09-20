@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+var config = require('./utils/config');
+var PathExists = require('./utils/path-exists');
+var path = require('path');
+var GetPath = require('./utils/get-path');
+var RunCommand = require('./utils/run-command');
+
+var program = require('commander')
+  .version(config.spellbookVersion)
+  .arguments('[files...]')
+  .action(function(files) {
+    this.files = files;
+  })
+  .option('-w, --watch', 'keep the tester running and run as things change')
+  .option('-b, --browsers', 'comma seperated list of browsers to run on')
+  .parse(process.argv);
+
+var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
+
+// TODO: how do we integrate this with spellbook-start (module.export?)
+// TODO: test non-browser environments somehow
+// http://localhost:9876/debug.html will be qunit UI
+var karmaCommand = GetPath('karma')
+  + ' start ' + GetPath('karma.config.js');
+
+if (program.watch) {
+  karmaCommand += ' --auto-watch';
+  karmaCommand += ' --no-single-run';
+}
+
+if (program.environments) {
+  karmaCommand += ' --browsers ' + browsers.join(',');
+}
+
+RunCommand('exec', karmaCommand);

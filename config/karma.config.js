@@ -10,7 +10,7 @@ module.exports = function(karmaConfig) {
     basePath: config.path,
     browsers: karmaConfig.browsers || [],
     detectBrowsers: {
-      enabled: karmaConfig.browsers ? true : false,
+      enabled: karmaConfig.browsers ? false : true,
       usePhantomJS: false
     },
     client: {
@@ -23,9 +23,7 @@ module.exports = function(karmaConfig) {
     files: [
       'node_modules/sb/node_modules/sinon/pkg/sinon.js',
       'node_modules/sb/node_modules/sinon/pkg/sinon-ie.js',
-      path.join(config.dist, 'browser', config.name + '.css'),
-      path.join(config.dist, 'test', 'bundle.js')
-    ],
+    ].concat(karmaConfig.files),
   });
 };
 

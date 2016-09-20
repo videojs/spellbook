@@ -8,7 +8,5 @@ require('commander')
   .version(config.sbVerison)
   .parse(process.argv);
 
-RunCommand('exec', GetPath('sb-build') + ' --watch', {async: true});
-RunCommand('exec', GetPath('sb-lint') + ' --watch', {async: true});
-RunCommand('exec', GetPath('sb-test') + ' --watch', {async: true});
+RunCommand('exec', GetPath('sb-watch'), {async: true});
 RunCommand('exec', GetPath('sb-server'), {async: true});

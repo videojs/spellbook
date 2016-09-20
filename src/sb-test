@@ -12,23 +12,21 @@ var program = require('commander')
     this.environments = environments;
   })
   .option('-w, --watch', 'keep the tester running and run as things change')
-  .option('-a, --all', 'test in all possible environments')
   .parse(process.argv);
 
 var browsers = [];
-var others = [];
+var others = ['rollup', 'webpack', 'node', 'browserify'];
 
 if (!program.environments) {
   program.environments = [];
-  if (!program.all) {
-    program.all = true;
-  }
+} else {
+  others = [];
 }
 
 program.environments.forEach(function(environment) {
-  if ((/chrome|ie|safari|firefox|node|browserify|webpack|rollup|all/i).test(environment)) {
+  if ((/chrome|ie|safari|firefox/i).test(environment)) {
     browsers.push(environment);
-  } else if ((/node|browserify|webpack|rollup|all/i).test(environment)) {
+  } else if ((/node|webpack|browserify|rollup/i).test(environment)) {
     others.push(environment);
   } else {
     console.error('invalid environment ' + environment);
@@ -55,12 +53,43 @@ var options = {
   singleRun: !program.watch,
 };
 
-var command = GetPath('karma')
+var commands = [];
+var karmaCommand = GetPath('karma')
   + ' start ' + GetPath('karma.config.js');
 
 if (program.watch) {
-  command += ' --auto-watch';
-  command += ' --no-single-run';
+  karmaCommand += ' --auto-watch';
+  karmaCommand += ' --no-single-run';
 }
 
-RunCommand('exec', command);
+if (program.environments) {
+  karmaCommand += ' --browsers ' + browsers.join(',');
+}
+
+others.forEach(function(other) {
+  if (other === 'node') {
+    commands.push('node ' + GetPath('node.test.js'));
+  } else if (other === 'browserify') {
+    commands.push(GetPath('browserify')
+      + ' ' + GetPath('browserify.test.js')
+      + ' -o ' + path.join(config.tmp, 'test',  'browserify.test.js')
+    );
+  } else if (other === 'rollup') {
+    commands.push(GetPath('browserify')
+      + ' ' +  GetPath('rollup.test.js')
+      + ' -c ' + GetPath('rollup-test.config.js')
+      + ' -o ' + path.join(config.tmp, 'test',  'rollup.test.js')
+    );
+  } else if (other === 'webpack') {
+    commands.push(GetPath('webpack')
+      + ' ' + GetPath('webpack.test.js')
+      + ' ' + path.join(config.tmp, 'test',  'webpack.test.js')
+    );
+  }
+});
+
+commands.forEach(function(command) {
+  RunCommand('exec', command, {async: true});
+});
+
+// RunCommand('exec', karmaCommand);

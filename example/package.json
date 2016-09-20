@@ -2,7 +2,8 @@
   "name": "test-pkg",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/npm/index.js",
+  "jsnext:main": "src/js/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

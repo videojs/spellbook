@@ -1,0 +1,93 @@
+#!/usr/bin/env node
+var config = require('./utils/config');
+var PathExists = require('./utils/path-exists');
+var path = require('path');
+var GetPath = require('./utils/get-path');
+var RunCommand = require('./utils/run-command');
+var fs = require('fs');
+
+var program = require('commander')
+  .version(config.spellbookVersion)
+  .arguments('[bundlers...]')
+  .action(function(bundlers) {
+    this.bundlers = bundlers;
+  })
+  .option('-w, --watch', 'keep the tester running and run as things change')
+  .parse(process.argv);
+
+var bundlers = ['rollup', 'webpack', 'browserify'];
+
+if (program.bundlers) {
+  bundlers = [];
+} else {
+  program.bundlers = [];
+}
+
+program.bundlers.forEach(function(bundler) {
+  if ((/webpack|browserify|rollup/i).test(environment)) {
+    bundlers.push(bundler);
+  } else {
+    console.error('invalid bundler ' + bundler);
+    process.exit(1);
+  }
+});
+
+if (!PathExists(path.join(config.main))) {
+  RunCommand('exec', GetPath('sb-build-js'));
+}
+
+var commands = [];
+var testTemp = path.join(config.tmp, 'test');
+RunCommand('rm', '-rf', testTemp);
+RunCommand('mkdir', '-p', testTemp);
+
+bundlers.forEach(function(bundler) {
+  var testFile = path.join(testTemp, bundler + '.test.js');
+  var baseFile = path.join(testTemp, bundler + '.start.js');
+
+  var testTemplate = [
+    "var pkg = require('" + path.join('..', '..', path.relative(config.path, config.main)) + "');",
+    "",
+    "QUnit.module('" + bundler + " require');",
+    "QUnit.test('" + config.name + " should be requireable via " + bundler + "', function(assert) {",
+    "  assert.ok(pkg, '" + config.name + " is required properly');",
+    "});",
+    ""
+  ].join("\n");
+
+
+  if (bundler === 'browserify') {
+    commands.push(GetPath('browserify')
+      + ' ' + baseFile
+      + ' -x qunitjs'
+      + ' -o ' + testFile
+    );
+  } else if (bundler === 'rollup') {
+    testTemplate = [
+      "import pkg from '" + path.join('..', '..', path.relative(config.path, config.jsNextMain)) + "';",
+      "",
+      "QUnit.module('" + bundler + " require');",
+      "QUnit.test('" + config.name + " should be requireable via " + bundler + "', (assert) => {",
+      "  assert.ok(pkg, '" + config.name + " is required properly');",
+      "});",
+    ].join("\n");
+    commands.push(GetPath('browserify')
+      + ' ' + baseFile
+      + ' -t rollupify'
+      + ' -x qunitjs'
+      + ' -t [ babelify --extends '  + GetPath('babel.config.json') + ' ]'
+      + ' -o ' + testFile
+    );
+  } else if (bundler === 'webpack') {
+    commands.push(GetPath('webpack')
+      + ' ' + baseFile
+      + ' ' + testFile
+    );
+  }
+
+  fs.writeFileSync(baseFile, testTemplate);
+});
+
+commands.forEach(function(command) {
+  RunCommand('exec', command);
+});

@@ -19,7 +19,7 @@ var command =  ''
   + GetPath('esw')
   + ' --color'
   + ' --no-eslintrc'
-  + ' -c ' + GetPath('eslint.js')
+  + ' -c ' + GetPath('eslint.config.js')
   + ' ' + program.src;
 
 if (program.watch) {
