@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var config = require('./utils/config');
+var config = require('./utils/get-config')();
 var PathExists = require('./utils/path-exists');
 var path = require('path');
 var GetPath = require('./utils/get-path');

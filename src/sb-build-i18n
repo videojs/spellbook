@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var path = require('path');
-var config = require('./utils/config');
+var config = require('./utils/get-config')();
 var RunCommand = require('./utils/run-command');
 var GetPath = require('./utils/get-path');
 
@@ -9,9 +9,7 @@ var program = require('commander')
   .option('-w, --watch', 'watch for changes and copy to dist')
   .parse(process.argv);
 
-
 // TODO: does this make sense for building i18n?
-
 RunCommand('rm', '-rf', path.join(config.dist, 'i18n'));
 RunCommand('mkdir', '-p', path.join(config.dist, 'i18n'));
 var cmd = GetPath('shx') + ' cp -R ' + path.join(config.src, 'i18n') + ' ' + path.join(config.dist);

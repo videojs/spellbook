@@ -1,0 +1,60 @@
+#!/usr/bin/env node
+var config = require('./utils/get-config')();
+var PathExists = require('./utils/path-exists');
+var GetPath = require('./utils/get-path');
+var RunCommand = require('./utils/run-command');
+var path = require('path');
+var glob = require('glob');
+var shelljs = require('shelljs');
+
+var program = require('commander')
+  .version(config.sbVersion)
+  .option('-w, --watch', 'incremental rebuild')
+  .option('-d, --dist <dir>', 'file to write output to')
+  .arguments('<glob>')
+  .action(function(src) {
+    this.src = src;
+  })
+  .parse(process.argv);
+
+if (!program.src) {
+  program.src = path.join(config.src, 'test', '*.test.js')
+}
+
+if (!program.dist) {
+  program.dist = path.join(config.dist, 'test');
+}
+
+var files = [program.src];
+
+if (!PathExists(program.src)) {
+  files = glob.sync(program.src);
+}
+
+var distFile = path.join(program.dist, config.name);
+var browserifyOpts = ''
+  + '--debug '
+  + '-t rollupify '
+  + '-t [ babelify --presets es2015 --plugins transform-object-assign ] '
+  + '-g browserify-shim '
+  + '-g browserify-versionify '
+  + '-p bundle-collapser/plugin '
+  + "-o '" + distFile + ".js' "
+  + files.join(' ');
+
+RunCommand('rm', '-rf', distFile + '{.js,.js.map}');
+RunCommand('mkdir', '-p', dirName);
+
+if (program.watch) {
+  RunCommand('exec', GetPath('watchify') + ' -v ' + browserifyOpts);
+  process.exit(0);
+}
+
+// TODO: ie8 support
+// TODO: browserify-incremental?
+RunCommand('exec', GetPath('browserify') + ' ' + browserifyOpts);
+
+// TODO: print something for exorcist
+shelljs.cat(distFile + '.js')
+  .exec(GetPath('exorcist') + " '" + distFile + ".js.map'", {silent: true})
+  .to(distFile + '.js');

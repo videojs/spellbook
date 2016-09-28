@@ -1,43 +1,9 @@
 #!/usr/bin/env node
-var path = require('path');
-var config = require('./utils/config');
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
+var config = require('./utils/get-config')();
 
 var program = require('commander')
   .version(config.sbVersion)
-  .option('-w, --watch', 'incrementally rebuild')
+  .command('all', 'build all possible js outputs', {isDefault: true})
+  .command('browser', 'build js browser output')
+  .command('npm', 'build npm output')
   .parse(process.argv);
-
-var commands = [];
-
-// build tests
-commands.push(''
-  + GetPath('sb-build-js-browser')
-  + ' --dont-min'
-  + ' --dist ' + path.join(config.dist, 'test', 'bundle.js')
-  + ' ' + path.join(config.src, 'test', '**', '*.test.js')
-);
-
-// build browser dist
-commands.push(''
-  + GetPath('sb-build-js-browser')
-  + ' --dist ' + path.join(config.dist, 'browser', config.name + '.js')
-  + ' --standalone ' + config.name
-  + ' ' + path.join(config.src, 'js', 'index.js')
-);
-
-// build npm dist
-commands.push(''
-  + GetPath('sb-build-js-npm')
-  + ' --dist ' + path.join(config.dist, 'npm')
-  + ' ' + path.join(config.src, 'js')
-);
-
-for (var i = 0; i < commands.length; i++) {
-  // add watch flag
-  if (program.watch) {
-    commands[i] += ' --watch';
-  }
-  RunCommand('exec', commands[i], {async: true});
-}

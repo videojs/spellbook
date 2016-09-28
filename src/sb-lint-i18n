@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-var config = require('./utils/config');
+var config = require('./utils/get-config')();
 var path = require('path');
-var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
+var eslintHelper = require('./utils/eslint-helper');
 
 var program = require('commander')
   .version(config.sbVersion)
@@ -15,23 +15,8 @@ var program = require('commander')
   })
   .parse(process.argv);
 
-var command =  ''
-  + GetPath('esw')
-  + ' --color'
-  + ' --no-eslintrc'
-  + ' -c ' + GetPath('eslint.config.js')
-  + ' ' + program.src;
-
-if (program.watch) {
-  command += ' --watch';
+if (!program.src) {
+  program.src = path.join(config.src, 'i18n', '**', '*.json')
 }
 
-if (program.errors) {
-  command += ' --quiet';
-}
-
-if (program.fix) {
-  command += ' --fix';
-}
-
-RunCommand('exec', command);
+RunCommand('exec', eslintHelper(program));

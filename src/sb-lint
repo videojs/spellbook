@@ -1,36 +1,11 @@
 #!/usr/bin/env node
-var config = require('./utils/config');
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
-var path = require('path');
+var config = require('./utils/get-config')();
 
 var program = require('commander')
   .version(config.sbVersion)
-  .option('-w, --watch', 'watch files for changes and re-lint')
-  .option('-e, --errors', 'only log errors')
-  .option('-f, --fix', 'automatically fix semantic errors were possible')
+  .command('docs', 'lint docs')
+  .command('i18n', 'lint i18n')
+  .command('js', 'lint js')
+  .command('css', 'lint css')
+  .command('all', 'lint css', {isDefault: true})
   .parse(process.argv);
-
-var commands = [
-  // eslint can lint doc examples, json, and js
-  GetPath('sb-lint-eslint') + ' ' + path.join(config.src, 'i18n', '**', '*.json'),
-  GetPath('sb-lint-eslint') + ' ' + path.join(config.src, 'js', '**', '*.js'),
-  GetPath('sb-lint-eslint') + ' ' + path.join(config.src, 'docs', '**', '*.md'),
-
-  GetPath('sb-lint-docs') + ' ' + path.join(config.src, 'docs', '**', '*.md'),
-  GetPath('sb-lint-css') + ' ' + path.join(config.src, 'css', '**', '*.*')
-];
-
-commands.forEach(function(command) {
-  if (program.errors) {
-    command += ' --errors';
-  }
-  if (program.watch) {
-    command += ' --watch';
-  }
-  if (program.fix) {
-    command += ' --fix';
-  }
-
-  RunCommand('exec', command, {async: true});
-});

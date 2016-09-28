@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var config = require('./utils/config');
+var config = require('./utils/get-config')();
 var path = require('path');
 var browserSync = require('browser-sync').create();
 

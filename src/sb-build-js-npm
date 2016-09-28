@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var config = require('./utils/config');
+var config = require('./utils/get-config')();
 var PathExists = require('./utils/path-exists');
 var RunCommand = require('./utils/run-command');
 var GetPath = require('./utils/get-path');
@@ -15,17 +15,16 @@ var program = require('commander')
   })
   .parse(process.argv);
 
-if (!program.src || !program.dist) {
-  console.error('must pass in a src and a dist, see --help for details');
-  process.exit(1);
+if (!program.src) {
+  program.src = path.join(config.src, 'js');
 }
 
-if (!PathExists(program.src)) {
-  console.error(program.src + ' does not exist!');
-  process.exit(1);
+if (!program.dist) {
+  program.dist = path.join(config.dist, 'npm');
 }
 
 // TODO: noderify
+// TODO: ie8 support
 RunCommand('rm', '-rf', program.dist);
 RunCommand('mkdir', '-p', program.dist);
 

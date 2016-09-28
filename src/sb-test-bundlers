@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-var config = require('./utils/config');
+var config = require('./utils/get-config')();
 var PathExists = require('./utils/path-exists');
 var path = require('path');
 var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
 var fs = require('fs');
+var shelljs = require('shelljs');
 
 var program = require('commander')
   .version(config.spellbookVersion)
@@ -32,7 +33,7 @@ program.bundlers.forEach(function(bundler) {
   }
 });
 
-if (!PathExists(path.join(config.main))) {
+if (!PathExists(config.main)) {
   RunCommand('exec', GetPath('sb-build-js'));
 }
 
@@ -80,6 +81,7 @@ bundlers.forEach(function(bundler) {
     );
   } else if (bundler === 'webpack') {
     commands.push(GetPath('webpack')
+      + ' -q'
       + ' ' + baseFile
       + ' ' + testFile
     );
@@ -89,5 +91,8 @@ bundlers.forEach(function(bundler) {
 });
 
 commands.forEach(function(command) {
-  RunCommand('exec', command);
+  // to silence webpack
+  shelljs.config.silent = true;
+  RunCommand('exec', command, {async: true});
+  shelljs.config.silent = false;
 });

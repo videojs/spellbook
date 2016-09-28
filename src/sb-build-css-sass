@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var config = require('./utils/config');
+var config = require('./utils/get-config')();
 var PathExists = require('./utils/path-exists');
 var shelljs = require('shelljs');
 var path = require('path');
@@ -7,30 +7,32 @@ var RunCommand = require('./utils/run-command');
 var GetPath = require('./utils/get-path');
 
 var program = require('commander')
-  .version(config.spellbookVersion)
+  .version(config.sbVersion)
   .option('-w, --watch', 'incremental rebuild')
-  .option('-d, --dist <dist-file>', 'file to write output to')
+  .option('-d, --dist <dist-dir>', 'dir to write output to')
   .arguments('<src-file>')
   .action(function(src) {
     this.src = src;
   })
   .parse(process.argv);
 
-if (!program.src || !program.dist) {
-  console.error('must pass in a src and a dist, see --help for details');
-  process.exit(1);
+if (!program.src) {
+  program.src = path.join(config.src, 'css', 'index.scss');
+}
+
+if (!program.dist) {
+  program.dist = path.join(config.dist, 'browser');
 }
 
 if (!PathExists(program.src)) {
   console.error(program.src + ' does not exist!');
-  process.exit(1);
 }
 
-var dirName = path.dirname(program.dist);
-var distFile = path.join(dirName, path.basename(program.dist, path.extname(program.dist)));
+// get the dist file with no extension
+var distFile = path.join(program.dist, config.name);
 
-RunCommand('rm', '-rf', dirName);
-RunCommand('mkdir', '-p', dirName);
+shelljs.rm('-rf', program.dist);
+shelljs.mkdir('-p', program.dist);
 var cmd = ''
     + GetPath('node-sass')
     + ' ' + program.src
@@ -45,17 +47,23 @@ if (program.watch) {
   cmd += ' --watch';
 }
 
-RunCommand('exec', cmd);
+shelljs.config.silent = true;
+shelljs.exec(cmd);
 
+console.log('Wrote ' + distFile + '.css');
+console.log('Wrote ' + distFile + '.css.map');
+
+// we don't want to bother building a .min.css file
+// during watch
 if (program.watch) {
   process.exit(0);
 }
 
-RunCommand('exec', GetPath('cssnano')
+shelljs.exec(GetPath('cssnano')
   + ' --safe'
   + ' --sourcemap'
   + ' ' + distFile + '.css'
-, {silent: true}).to(distFile + '.min.css');
+).to(distFile + '.min.css');
 
 shelljs.cat(distFile + '.css')
   .exec(GetPath('exorcist') + " '" + distFile + ".css.map'", {silent: true})
@@ -65,4 +73,6 @@ shelljs.cat(distFile + '.min.css')
   .exec(GetPath('exorcist') + " '" + distFile + ".min.css.map'", {silent: true})
   .to(distFile + '.min.css');
 
+console.log('Wrote ' + distFile + '.min.css');
+console.log('Wrote ' + distFile + '.min.css.map');
 

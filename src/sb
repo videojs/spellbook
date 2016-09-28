@@ -1,19 +1,14 @@
 #!/usr/bin/env node
-var config = require('./utils/config');
+var config = require('./utils/get-config')();
 
 var program = require('commander')
   .version(config.sbVersion)
   .command('build', 'build your packages styles, js, docs, and tests')
-  // should just run build --watch with test --watch
-  //.command('watch', 'watch your packages styles, js, docs, and tests for changes and build')
+  .command('watch', 'watch your packages styles, js, docs, and tests for changes and build')
   .command('clean', 'cleanup temporary files, and build targets')
   .command('start', 'start a development server, and run watch seprately')
   .command('server', 'alias for start')
   .command('test', 'run unit tests')
   .command('lint', 'run eslint with the standard config over files')
-  .command('list')
-  .action(function() {
-    this.help();
-  })
-  .command('version', 'version your package')
+  .command('release', 'release a new version of your package')
   .parse(process.argv);

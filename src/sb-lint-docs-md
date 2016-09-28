@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+var config = require('./utils/get-config')();
+var path = require('path');
+var GetPath = require('./utils/get-path');
+var RunCommand = require('./utils/run-command');
+
+var program = require('commander')
+  .version(config.sbVersion)
+  .option('-w, --watch', 'watch files for changes and re-lint')
+  .option('-e, --errors', 'only log errors')
+  .option('-f, --fix', 'fix problems automatically')
+  .arguments('[glob-or-file]')
+  .action(function(src) {
+    this.src = src;
+  })
+  .parse(process.argv);
+
+if (!program.src) {
+  program.src = path.join(config.src, 'docs', '**', '*.md');
+}
+
+var command =  ''
+  + GetPath('remark')
+  + ' --rc-path ' + GetPath('remark-lint.config.js')
+  + ' --no-stdout'
+  + ' --no-config'
+  + ' ' + program.src;
+
+if (program.watch) {
+  command += ' --watch';
+}
+
+if (program.errors) {
+  command += ' --quiet';
+}
+
+if (program.fix) {
+  command += ' --fix';
+}
+
+RunCommand('exec', command);

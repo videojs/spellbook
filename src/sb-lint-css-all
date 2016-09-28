@@ -1,0 +1,29 @@
+#!/usr/bin/env node
+var config = require('./utils/get-config')();
+var GetPath = require('./utils/get-path');
+var RunCommand = require('./utils/run-command');
+
+var program = require('commander')
+  .version(config.sbVersion)
+  .option('-w, --watch', 'watch files for changes and re-lint')
+  .option('-e, --errors', 'only log errors')
+  .option('-f, --fix', 'automatically fix semantic errors were possible')
+  .parse(process.argv);
+
+var commands = [
+  GetPath('sb-lint-css-sass'),
+];
+
+commands.forEach(function(command) {
+  if (program.errors) {
+    command += ' --errors';
+  }
+  if (program.watch) {
+    command += ' --watch';
+  }
+  if (program.fix) {
+    command += ' --fix';
+  }
+
+  RunCommand('exec', command, {async: true});
+});

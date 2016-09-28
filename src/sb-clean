@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-var config = require('./utils/config');
+var config = require('./utils/get-config')();
 var PathExists = require('./utils/path-exists');
-var RunCommand = require('./utils/run-command');
-var path = require('path');
+var shelljs = require('shelljs');
 
 var program = require('commander')
   .version(config.sbVersion)
   .option('-d, --dry-run', 'see what would happen when you run clean')
+  .option('-c, --cache', 'clear the  cache folder too')
   .option('-q, --quiet', 'dont log any output, other than errors')
   .parse(process.argv);
 
@@ -15,17 +15,19 @@ if (program.quiet && program.dryRun) {
   process.exit(1);
 }
 
-if (!PathExists(config.dist)) {
-  console.log('nothing to cleanup');
-  process.exit(0);
-}
 var files = [config.dist]
+if (program.cache) {
+  files.push(config.cache);
+}
 
 files.forEach(function(file) {
+  if (!PathExists(file)) {
+    return;
+  }
   if (!program.quiet) {
-    console.log('removing ' + file.replace(config.path + path.sep, ''));
+    console.log('removing ' + file);
   }
   if (!program.dryRun) {
-    RunCommand('rm', '-rf', file);
+    shelljs.rm('-rf', file);
   }
 });

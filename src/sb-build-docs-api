@@ -1,0 +1,34 @@
+#!/usr/bin/env node
+var path = require('path');
+var config = require('./utils/get-config')();
+var RunCommand = require('./utils/run-command');
+var GetPath = require('./utils/get-path');
+
+var program = require('commander')
+  .version(config.sbVersion)
+  .option('-w, --watch', 'watch docs for changes and rebuild')
+  .parse(process.argv);
+
+var watch = function(glob, command) {
+  return GetPath('chokidar')
+    + ' ' + glob
+    + ' --debounce 100'
+    + ' --command \'' + command + '\'';
+};
+
+RunCommand('rm', '-rf', path.join(config.dist, 'docs'));
+RunCommand('mkdir', '-p', path.join(config.dist, 'docs', 'api'));
+
+var command = GetPath('jsdoc')
+  + ' ' + path.join(config.src, 'js')
+  + ' --configure ' + GetPath('jsdoc.config.json')
+  + ' -r'
+  + ' -d ' + path.join(config.dist, 'docs', 'api')
+
+
+RunCommand('exec', command, {async: true});
+
+if (program.watch) {
+  RunCommand('exec', watch(path.join(config.src, 'js', '**', '*.js'), command));
+}
+

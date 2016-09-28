@@ -1,0 +1,127 @@
+#!/usr/bin/env node
+var GetConfig = require('./utils/get-config');
+var config = GetConfig();
+var PathExists = require('./utils/path-exists');
+var path = require('path');
+var RunCommand = require('./utils/run-command');
+var GetPath = require('./utils/get-path');
+var glob = require('glob');
+var semver = require('semver');
+var shelljs = require('shelljs');
+var fs = require('fs');
+var versions = [
+  'major',
+  'minor',
+  'patch',
+  'premajor',
+  'preminor',
+  'prepatch',
+  'prerelease'
+];
+
+// check if we are being run with npm
+if (process.env.npm_config_argv) {
+  var npmArgs = JSON.parse(process.env.npm_config_argv);
+
+  // check if the user is doing npm run version
+  // or npm version
+  if (npmArgs.cooked[0] !== 'run') {
+    console.error('sb-release does not support npm version <newversion>. Only use it in the following ways');
+    console.error('* run it directly: `sb-release <newversion>`');
+    console.error('* use it as an npm script: `npm run version <newversion>`');
+    process.exit(1);
+  }
+}
+
+var program = require('commander')
+  .version(config.sbVersion)
+  .option('-d, --dry-run', 'print which commands would be run')
+  .option('-q, --quiet', 'dont print any output')
+  .arguments('[new-version]')
+  .description(''
+   + '<newversion> is any valid semver (except the current one) examples:\n'
+   + '  * A valid semver version: X.X.X\n'
+   + '  * A valid semver word: major, minor, etc.')
+  .action(function(newVersion) {
+    if ((versions.indexOf(newVersion) === -1 && !semver.valid(newVersion)) || newVersion === config.version) {
+      console.error('new-version must be valid semver identifier');
+      console.error('and it cannot be the current version');
+      process.exit(1);
+    }
+
+    if (versions.indexOf(newVersion) !== -1) {
+      newVersion = semver.inc(config.version, newVersion);
+    }
+
+    this.newVersion = newVersion;
+  })
+  .parse(process.argv);
+
+if (!program.newVersion) {
+  console.error('Must pass in a new-version');
+  process.exit(1);
+}
+
+if (!PathExists(path.join(config.path, '.git'))) {
+  console.error('Your project must be a git repository');
+  process.exit(1);
+}
+
+var changelog = glob.sync(path.join(config.path, 'CHANGELOG.md'), {nocase: true})[0];
+if (!changelog) {
+  console.error('Your project must contain a CHANGELOG in the root');
+  process.exit(1);
+}
+
+shelljs.config.silent = true;
+shelljs.pushd(config.path);
+
+// reset config to current package version that npm set
+// var version = semver.
+
+// change package.json
+if (!program.dryRun) {
+  var pkg = JSON.parse(fs.readFileSync(path.join(config.path, 'package.json'), 'utf8'));
+  pkg.version = program.newVersion;
+  fs.writeFileSync(path.join(config.path, 'package.json'), JSON.stringify(pkg, null, 2));
+}
+
+var commands = [
+  GetPath('chg') + ' release ' + program.newVersion,
+  'git add --all',
+];
+
+commands.push('git commit -a -m ' + program.newVersion);
+
+var bowerSupport = PathExists(path.join(config.path, 'bower.json'));
+
+// If the project supports Bower, perform special extra versioning step.
+if (bowerSupport) {
+  commands.push(GetPath('sb-build'));
+  commands.push('git add -f ' + config.dist);
+  commands.push('git commit -a --amend -m ' + program.newVersion);
+}
+
+commands.push('git tag -f v' + program.newVersion);
+
+if (bowerSupport) {
+  commands.push('git rm -rf dist');
+  commands.push('git commit -a --amend -m ' + program.newVersion);
+}
+
+commands.forEach(function(command) {
+  if (!program.quiet) {
+    console.log('running ' + command);
+  }
+  if (!program.dryRun) {
+    shelljs.exec(command);
+  }
+});
+
+// this mimics the npm version post commands
+shelljs.popd(config.path);
+
+if (!program.quiet) {
+  console.log('Released ' + program.newVersion + ' run the following to push to the remote repo:');
+  console.log('git push --tags && git push');
+}

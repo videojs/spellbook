@@ -1,5 +1,5 @@
 var shelljs = require('shelljs');
-var config = require('./config');
+var config = require('./get-config')();
 var path = require('path');
 
 var RunCommand = function(type) {

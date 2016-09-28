@@ -1,27 +1,8 @@
 #!/usr/bin/env node
-var path = require('path');
-var config = require('./utils/config');
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
+var config = require('./utils/get-config')();
 
 var program = require('commander')
-  .version(config.spellbookVersion)
-  .option('-w, --watch', 'watch files for changes')
+  .version(config.sbVersion)
+  .command('all', 'run all commands', {isDefault: true})
+  .command('sass', 'run sass build')
   .parse(process.argv);
-
-var commands = [];
-
-// build tests
-commands.push(''
-  + GetPath('sb-build-css-sass')
-  + " --dist '" + path.join(config.dist, 'browser', config.name + '.css') + "'"
-  + " '" + path.join(config.src, 'css', 'index.scss') + "'"
-);
-
-for (var i = 0; i < commands.length; i++) {
-  // add watch flag
-  if (program.watch) {
-    commands[i] += ' --watch';
-  }
-  RunCommand('exec', commands[i], {async: true});
-}

@@ -6,7 +6,13 @@ var GetPath = require('./utils/get-path');
 
 var program = require('commander')
   .version(config.sbVersion)
-  .command('all', 'run all doc builds')
-  .command('api', 'run the api doc build')
-  .command('manual', 'run the manual doc build')
+  .option('-w, --watch', 'watch docs for changes and rebuild')
   .parse(process.argv);
+
+var commands = [
+  GetPath('sb-build-docs-api'),
+  GetPath('sb-build-docs-manual')
+];
+commands.forEach(function(command) {
+  RunCommand('exec', command, {async: true});
+});

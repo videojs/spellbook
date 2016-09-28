@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+var config = require('./utils/get-config')();
+var path = require('path');
+var RunCommand = require('./utils/run-command');
+var eslintHelper = require('./utils/eslint-helper');
+
+var program = require('commander')
+  .version(config.sbVersion)
+  .option('-w, --watch', 'watch files for changes and re-lint')
+  .option('-e, --errors', 'only log errors')
+  .option('-f, --fix', 'fix problems automatically')
+  .arguments('<glob-or-file>')
+  .action(function(src) {
+    this.src = src;
+  })
+  .parse(process.argv);
+
+if (!program.src) {
+  program.src = path.join(config.src, 'docs', '**', '*.md');
+}
+
+RunCommand('exec', eslintHelper(program));

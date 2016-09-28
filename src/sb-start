@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var config = require('./utils/config');
+var config = require('./utils/get-config')();
 var RunCommand = require('./utils/run-command');
 var GetPath = require('./utils/get-path');
 var shelljs = require('shelljs');

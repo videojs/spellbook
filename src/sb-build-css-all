@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+var config = require('./utils/get-config')();
+var GetPath = require('./utils/get-path');
+var RunCommand = require('./utils/run-command');
+
+var program = require('commander')
+  .version(config.sbVersion)
+  .option('-w, --watch', 'watch files for changes')
+  .parse(process.argv);
+
+var commands = [
+  GetPath('sb-build-css-sass')
+];
+
+commands.forEach(function(command) {
+  if (program.watch) {
+    command += ' --watch';
+  }
+  RunCommand('exec', command, {async: true});
+});

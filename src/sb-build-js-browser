@@ -1,94 +1,9 @@
 #!/usr/bin/env node
-var config = require('./utils/config');
-var PathExists = require('./utils/path-exists');
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
-var path = require('path');
-var glob = require('glob');
-var shelljs = require('shelljs');
+var config = require('./utils/get-config')();
 
 var program = require('commander')
   .version(config.sbVersion)
-  .option('-w, --watch', 'incremental rebuild')
-  .option('-d, --dist <file>', 'file to write output to')
-  .option('-dm, --dont-min', 'dont minify')
-  .option('-s, --standalone <name>', 'name to export to window')
-  .arguments('<file-or-glob>')
-  .action(function(glob) {
-    this.glob = glob;
-  })
+  .command('all', 'build all browser bundles')
+  .command('main', 'build main code browser bundle')
+  .command('test', 'build unit test browser bundle')
   .parse(process.argv);
-
-if (!program.glob || !program.dist) {
-  console.error('must pass a glob/src file and a dist, use --help for help');
-  process.exit(0);
-}
-
-var files = [program.glob];
-
-if (!PathExists(program.glob)) {
-  files = glob.sync(program.glob);
-}
-
-var dirName = path.dirname(program.dist);
-var distFile = path.join(dirName, path.basename(program.dist, path.extname(program.dist)));
-var printDistFile = distFile.replace(config.path + path.sep, '');
-
-if (!files.length) {
-  console.error('No files to browserify with ' + program.glob);
-  process.exit(1);
-}
-
-var browserifyOpts = ''
-  + '--debug '
-  + '-t rollupify '
-  + '-t [ babelify --presets es2015 --plugins transform-object-assign ] '
-  + '-g browserify-shim '
-  + '-g browserify-versionify '
-  + '-p bundle-collapser/plugin '
-  + "-o '" + distFile + ".js' ";
-
-if (program.standalone) {
-  browserifyOpts += "-s '" + program.standalone + "' ";
-}
-
-files.forEach(function(file) {
-  browserifyOpts += "'" + file + "' ";
-});
-
-RunCommand('rm', '-rf', distFile + '{.js,.js.map,.min.js,.min.js.map}');
-RunCommand('mkdir', '-p', dirName);
-if (program.watch) {
-  RunCommand('exec', GetPath('watchify') + ' -v ' + browserifyOpts);
-  process.exit(0);
-}
-
-// TODO: ie8 support
-// TODO: browserify-incremental?
-RunCommand('exec', GetPath('browserify') + ' ' + browserifyOpts);
-
-// TODO: print something for exorcist
-if (config.verbose) {
-  console.log('exorcist ' + distFile + '.js.map')
-}
-
-shelljs.cat(distFile + '.js')
-  .exec(GetPath('exorcist') + " '" + distFile + ".js.map'", {silent: true})
-  .to(distFile + '.js');
-
-console.log('wrote ' + printDistFile + '.js & ' + printDistFile + '.js.map');
-
-if (program.dontMin) {
-  process.exit(0);
-}
-RunCommand('exec', GetPath('uglifyjs') + ' '
-  + "--compress "
-  + "--mangle "
-  + "--in-source-map '" + distFile + ".js.map' "
-  + "--source-map '" + distFile + ".min.js.map' "
-  + "--preamble '" + config.banner + "' "
-  + "-o '" + distFile + ".min.js' "
-  + "-- '" + distFile + ".js' "
-);
-
-console.log('wrote ' + printDistFile + '.min.js & ' + printDistFile + '.min.js.map');

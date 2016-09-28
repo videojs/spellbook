@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var config = require('./utils/config');
+var config = require('./utils/get-config')();
 var PathExists = require('./utils/path-exists');
 var path = require('path');
 var GetPath = require('./utils/get-path');
@@ -7,36 +7,13 @@ var RunCommand = require('./utils/run-command');
 
 var program = require('commander')
   .version(config.spellbookVersion)
-  .arguments('[environments...]')
-  .action(function(environments) {
-    this.environments = environments;
-  })
+  .option('-b, --browsers', 'comma deliminated list of browsers')
+  .option('-u, --bundlers', 'comma deliminated list of bundlers')
   .option('-w, --watch', 'keep the tester running and run as things change')
   .parse(process.argv);
 
-var browsers = [];
-var others = ['rollup', 'webpack', 'node', 'browserify'];
-
-if (!program.environments) {
-  program.environments = [];
-} else {
-  others = [];
-}
-
-program.environments.forEach(function(environment) {
-  if ((/chrome|ie|safari|firefox/i).test(environment)) {
-    browsers.push(environment);
-  } else if ((/node|webpack|browserify|rollup/i).test(environment)) {
-    others.push(environment);
-  } else {
-    console.error('invalid environment ' + environment);
-    process.exit(1);
-  }
-});
-
-var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
-
-if (!PathExists(path.join(config.dist, 'test', 'bundle.js'))) {
+if (!PathExists(path.join(config.dist, 'test', 'bundle.js')) ||
+    !PathExists(config.main)) {
   RunCommand('exec', GetPath('sb-build-js'));
 }
 
@@ -48,48 +25,18 @@ if (!PathExists(path.join(config.dist, 'browser', config.name + '.css'))) {
 // TODO: how do we integrate this with spellbook-start (module.export?)
 // TODO: test non-browser environments somehow
 // http://localhost:9876/debug.html will be qunit UI
-var options = {
-  autoWatch: program.watch,
-  singleRun: !program.watch,
-};
+var buildBundle = GetPath('sb-test-build-bundles');
 
-var commands = [];
-var karmaCommand = GetPath('karma')
-  + ' start ' + GetPath('karma.config.js');
+if (program.bundlers) {
+  buildBundle += ' --bundlers ' + program.bundlers;
+}
 
 if (program.watch) {
-  karmaCommand += ' --auto-watch';
-  karmaCommand += ' --no-single-run';
+  buildBundle += ' --watch';
 }
 
-if (program.environments) {
-  karmaCommand += ' --browsers ' + browsers.join(',');
-}
 
-others.forEach(function(other) {
-  if (other === 'node') {
-    commands.push('node ' + GetPath('node.test.js'));
-  } else if (other === 'browserify') {
-    commands.push(GetPath('browserify')
-      + ' ' + GetPath('browserify.test.js')
-      + ' -o ' + path.join(config.tmp, 'test',  'browserify.test.js')
-    );
-  } else if (other === 'rollup') {
-    commands.push(GetPath('browserify')
-      + ' ' +  GetPath('rollup.test.js')
-      + ' -c ' + GetPath('rollup-test.config.js')
-      + ' -o ' + path.join(config.tmp, 'test',  'rollup.test.js')
-    );
-  } else if (other === 'webpack') {
-    commands.push(GetPath('webpack')
-      + ' ' + GetPath('webpack.test.js')
-      + ' ' + path.join(config.tmp, 'test',  'webpack.test.js')
-    );
-  }
-});
+RunCommand('exec', buildBundle);
 
-commands.forEach(function(command) {
-  RunCommand('exec', command, {async: true});
-});
-
-// RunCommand('exec', karmaCommand);
+commands.push(GetPath('sb-test-karma'));
+commands.push(GetPath('sb-test-node'));
