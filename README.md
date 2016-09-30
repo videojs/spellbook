@@ -10,7 +10,7 @@
 # TODO
 * general
   * better verbose logging support?
-  * remove RunCommand usage
+    * use RunCommand?
   * more configuration
   * have individual build packages run clean on files they will build to?
   * prepush git hooks (update readme with doctoc)
@@ -47,6 +47,10 @@
 * Unit Tests
   * utils folder
   * check file contents
+  * lint-*
+  * test-*
+  * server
+  * --watch
 * sb-docs
   * html theme?
 
