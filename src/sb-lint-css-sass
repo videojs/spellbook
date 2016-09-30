@@ -3,6 +3,7 @@ var config = require('./utils/get-config')();
 var path = require('path');
 var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
+var Watch = require('./utils/watch');
 
 var program = require('commander')
   .version(config.sbVersion)
@@ -20,8 +21,6 @@ if (!program.src) {
 }
 
 var command =  GetPath('stylelint');
-
-command += ''
   + ' --color'
   + ' --config ' + GetPath('stylelint.config.js')
   + ' ' + program.src;
@@ -37,9 +36,5 @@ if (program.fix) {
 RunCommand('exec', command);
 
 if (program.watch) {
-  command = GetPath('chokidar')
-    + ' ' + program.src
-    + ' --debounce 100'
-    + ' --command \'' + command + '\'';
-  RunCommand('exec', command);
+  Watch(program.src, command);
 }
