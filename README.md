@@ -22,7 +22,6 @@
 * ignore .js.tmp files during watchify??
 * use a name that is not taken
 * better-logging
-* clean remove npm-debug.log?
 * verify that we can find-root when we are in a dir subfolder
 * support prerelease signifiers
 
@@ -39,6 +38,7 @@
 	* get tests to run in nodejs
 	* get tests to run in browser
 	* watch all tests
+	* code coverage
 
 # Something to think about
 * better i18n build

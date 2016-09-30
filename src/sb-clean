@@ -2,6 +2,8 @@
 var config = require('./utils/get-config')();
 var PathExists = require('./utils/path-exists');
 var shelljs = require('shelljs');
+var glob = require('glob');
+var path = require('path');
 
 var program = require('commander')
   .version(config.sbVersion)
@@ -15,7 +17,10 @@ if (program.quiet && program.dryRun) {
   process.exit(1);
 }
 
-var files = [config.dist]
+
+var files = glob.sync(path.join(config.path, '**', '**', 'npm-debug.log'));
+files.push(config.dist);
+
 if (program.cache) {
   files.push(config.cache);
 }

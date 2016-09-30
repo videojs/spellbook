@@ -1,5 +1,5 @@
 node_modules
-example/dist
-example/README.md
-example/.tmp
-*npm-debug.log*
+fixtures/dist
+fixtures/README.md
+fixtures/.sb-cache
+npm-debug.log

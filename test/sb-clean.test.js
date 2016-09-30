@@ -46,6 +46,24 @@ describe('sb-clean', function() {
       });
     });
 
+    it('should delete npm-debug.log if it exists', function(done) {
+      var config = this.config;
+      var npmDebug = path.join(config.path, 'npm-debug.log');
+
+      shelljs.touch(npmDebug);
+      shelljs.exec(this.bin, function(code, stdout, stderr) {
+        var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];
+
+        assert.equal(code, 0, 'should return success');
+        assert.equal(stderr.length, 0, 'should stderr nothing');
+        assert.equal(stdouts.length, 1, 'should only print one removal');
+        assert.notEqual(stdouts.indexOf('removing ' + npmDebug), -1, 'should stdout correct removal');
+        assert.equal(PathExists(npmDebug), false, 'dist should be deleted');
+        done();
+      });
+    });
+
+
     it('should not delete cache, only dist', function(done) {
       var config = this.config;
 
