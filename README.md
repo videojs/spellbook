@@ -19,6 +19,8 @@
   * ignore .js.tmp files during watchify?? (created by rollupify, seem to cause issues?)
   * noderify npm binaries?
   * test browserify-incremental
+* build-css
+  * add banner to the minified file and update the source map with the line offset of the banner that was added
 * sb-release
   * support prerelease signifiers (beta, alpha etc)
 * sb-build-html

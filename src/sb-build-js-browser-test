@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var PathExists = require('./utils/path-exists');
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
 var path = require('path');
 var shelljs = require('shelljs');
+var browserifyHelper = require('./utils/browserify-helper');
 
 var program = require('commander')
   .version(config.sbVersion)

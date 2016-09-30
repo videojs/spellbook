@@ -39,12 +39,17 @@ if (program.watch) {
   process.exit(0);
 }
 
+// remove the last newline in the banner
+// uglify adds it for us
+var banner = config.banner;
+banner = config.banner.replace(/\n$/, '');
 shelljs.exec(GetPath('uglifyjs')
   + ' --compress'
   + ' --mangle'
   + ' --in-source-map ' + distFile + '.js.map'
   + ' --source-map ' + distFile + '.min.js.map'
-  + ' --preamble ' + config.banner
+  + ' --source-map-url ' + path.basename(distFile) + '.min.js.map'
+  + ' --preamble \'' + banner + '\''
   + ' -o ' + distFile + '.min.js'
   + ' -- ' + distFile + '.js'
 );
