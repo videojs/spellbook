@@ -46,14 +46,14 @@
   * proxy to the generator
 * Unit Tests
   * utils folder
-  * check file contents
-  * lint-*
+  * check file contents in build tests
   * test-*
   * server
-  * --watch
+  * test with --watch arguments
+  * lint-* with --fix and --errors
 * sb-docs
   * html theme?
-
+  * remark hangs if it gets passed 0 files
 
 # Something to think about
 * better i18n build

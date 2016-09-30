@@ -20,7 +20,7 @@ if (!program.src) {
   program.src = path.join(config.src, 'css', '**', '*.*')
 }
 
-var command =  GetPath('stylelint');
+var command =  GetPath('stylelint')
   + ' --color'
   + ' --config ' + GetPath('stylelint.config.js')
   + ' ' + program.src;

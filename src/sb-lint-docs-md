@@ -3,6 +3,7 @@ var config = require('./utils/get-config')();
 var path = require('path');
 var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
+var PathExists = require('./utils/path-exists');
 
 var program = require('commander')
   .version(config.sbVersion)
@@ -17,6 +18,10 @@ var program = require('commander')
 
 if (!program.src) {
   program.src = path.join(config.src, 'docs', '**', '*.md');
+}
+
+if (PathExists(program.src) && path.extname(program.src) === '') {
+  program.src = path.join(program.src, '**', '*.md');
 }
 
 var command =  ''
