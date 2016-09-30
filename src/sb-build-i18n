@@ -3,23 +3,36 @@ var path = require('path');
 var config = require('./utils/get-config')();
 var RunCommand = require('./utils/run-command');
 var GetPath = require('./utils/get-path');
+var Watch = require('./utils/watch');
+var PathExists = require('./utils/path-exists');
 
 var program = require('commander')
   .version(config.sbVersion)
   .option('-w, --watch', 'watch for changes and copy to dist')
+  .option('-d, --dist <dir>', 'dir to build to')
+  .arguments('<src-dir>')
+  .action(function(src) {
+    this.src = src;
+  })
   .parse(process.argv);
 
-// TODO: does this make sense for building i18n?
-RunCommand('rm', '-rf', path.join(config.dist, 'i18n'));
-RunCommand('mkdir', '-p', path.join(config.dist, 'i18n'));
-var cmd = GetPath('shx') + ' cp -R ' + path.join(config.src, 'i18n') + ' ' + path.join(config.dist);
+if (!program.dist) {
+  program.dist = path.join(config.dist, 'i18n');
+}
+
+if (!program.src) {
+  program.src = path.join(config.src, 'i18n');
+}
+
+if (PathExists(program.dist)) {
+  RunCommand('rm', '-rf', program.dist);
+}
+RunCommand('mkdir', '-p', program.dist);
+var cmd = GetPath('shx') + ' cp -R ' + program.src + ' ' + program.dist;
 
 RunCommand('exec', cmd);
+console.log('Wrote ' + program.dist);
 
 if (program.watch) {
-  RunCommand('exec', GetPath('chokidar')
-    + ' ' + path.join(config.src, 'i18n', '**', '*.json')
-    + ' --debounce 100'
-    + ' --command \'' + cmd + '\''
-  );
+  Watch(path.join(config.src, 'i18n', '**', '*.json'), cmd);
 }
