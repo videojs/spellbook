@@ -51,6 +51,7 @@
   * server
   * test with --watch arguments
   * lint-* with --fix and --errors
+  * convert all tests to parallel
 * sb-docs
   * html theme?
   * remark hangs if it gets passed 0 files

@@ -99,6 +99,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^3.1.0",
+    "mocha.parallel": "^0.13.0",
     "uuid": "^2.0.3"
   },
   "author": "",
