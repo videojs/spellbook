@@ -18,7 +18,7 @@ if (program.quiet && program.dryRun) {
 }
 
 
-var files = glob.sync(path.join(config.path, '**', '**', 'npm-debug.log'));
+var files = glob.sync(path.join(config.path, '**',  'npm-debug.log'), {ignore: '**/node_modules/**'});
 files.push(config.dist);
 
 if (program.cache) {
