@@ -2,7 +2,7 @@
   "name": "test-pkg",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/npm/index.js",
+  "main": "srcnpm/index.js",
   "jsnext:main": "src/js/index.js",
   "scripts": {
     "version": "sb-release"

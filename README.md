@@ -8,38 +8,48 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # TODO
-* karma + dev server
-	* Proxy? localhost:9876 etc to <project-name>.dev on your local machine
-		* hotel?
-		*	mehserve?
-		* vhost?
-* browserify unification
-
-* configuration in appRoot + package.json
-* test
-* have individual packages run clean on folders they will build to
-* prepush git hooks (update readme with doctoc)
-* ignore .js.tmp files during watchify??
-* use a name that is not taken
-* better-logging
-* verify that we can find-root when we are in a dir subfolder
-* support prerelease signifiers
-
+* general
+  * better verbose logging support?
+  * remove RunCommand usage
+  * more configuration
+  * have individual build packages run clean on files they will build to?
+  * prepush git hooks (update readme with doctoc)
+  * add ie8 support to configuration
+  * noderify when we switch to js instead of using shelljs
+* build-js
+  * js-brower-test && js-browser-main browserify unification
+  * ignore .js.tmp files during watchify?? (created by rollupify, seem to cause issues?)
+  * use babel config in browserify and npm, and support ie8 config
+  * noderify npm binaries?
+* sb-release
+  * support prerelease signifiers (beta, alpha etc)
 * sb-build-html
-	* use something like gulp-inject to inject css and js into html
-	* one page for min files and one page for normal files
-	* vulkanize min files into the index as well
-	* create an example page in the index of dist/
+  * use something like gulp-inject to inject css and js into html
+  * one page for min files and one page for normal files
+  * vulkanize min files into the index as well
+  * create an example page in the index of dist/
 * sb-lint-html ?
-	* lint all html files found in html/
+  * lint all html files found in html/
+* sb-server
+  * unify karma and dev server
+    * Proxy? localhost:9876 etc to <project-name>.dev on your local machine
+    * hotel?
+    * mehserve?
+    * vhost?
+* sb-test
+  * get bundler tests to work
+  * get tests to run in nodejs
+  * get tests to run in browser
+  * watch all tests
+  * code coverage
+* sb-create
+  * proxy to the generator
+* Unit Tests
+  * utils folder
+  * check file contents
+* sb-docs
+  * html theme?
 
-* Tests
-	* get	bundler tests to work
-	* get tests to run in nodejs
-	* get tests to run in browser
-	* watch all tests
-	* code coverage
 
 # Something to think about
 * better i18n build
-

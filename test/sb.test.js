@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var path = require('path');
-var binPath = path.join(__dirname, '..', 'src/sb');
+var binPath = path.join(__dirname, '..', 'src', 'sb');
 var pkg = require('../package.json');
 
 

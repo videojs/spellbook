@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
+var GetPath = require('./utils/get-path');
 var path = require('path');
-var browserSync = require('browser-sync').create();
+var shelljs = require('shelljs');
 
 var program = require('commander')
   .version(config.spellbookVersion)
@@ -11,6 +12,18 @@ var program = require('commander')
   .option('-ui, --ui', 'enable browser-sync ui')
   .parse(process.argv);
 
+var cmd = GetPath('browser-sync')
+  + ' start'
+  + ' --server'
+  + ' --port ' + (program.port || config.port)
+  + (program.ui ? '' : ' --no-ui')
+  + (program.ghostMode ? '' : ' --no-ghost-mode')
+  + (program.open ? '' : ' --no-open')
+  + ' --files ' + path.join(config.dist, '**', '*.*');
+
+console.log(cmd);
+shelljs.exec(cmd);
+/*
 browserSync.init({
   server: config.path,
   port: program.port || config.port,
@@ -20,4 +33,4 @@ browserSync.init({
   files: [
     path.join(config.dist, '**', '*.*'),
   ]
-});
+});*/

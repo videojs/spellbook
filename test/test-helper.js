@@ -1,9 +1,8 @@
 var shelljs = require('shelljs');
 var GetConfig = require('../src/utils/get-config');
 var path = require('path');
-var uuid = require('node-uuid');
-var baseDir = path.join(__dirname, 'test-' + path.basename(module.parent.filename));
 var fixtureDir = path.join(__dirname, 'fixtures');
+var uuid = require('uuid');
 
 module.exports = function() {
   // set silent to false if you want to debug
@@ -12,10 +11,12 @@ module.exports = function() {
   shelljs.config.fatal = true;
 
   this.setup = function() {
-    this.projectDir = path.join(baseDir, uuid.v4());
+    this.projectDir = path.join(shelljs.tempdir(), uuid.v4());
 
-    shelljs.mkdir('-p', baseDir);
+    shelljs.mkdir('-p', path.dirname(this.projectDir));
     shelljs.cp('-R', fixtureDir, this.projectDir);
+    shelljs.mkdir(path.join(this.projectDir, 'node_modules'));
+    shelljs.ln('-s', path.join(__dirname, '..', 'src'), path.join(this.projectDir, 'node_modules', '.bin'));
     shelljs.pushd(this.projectDir);
 
     // make sure that tests can use a fresh config
@@ -23,11 +24,12 @@ module.exports = function() {
     return GetConfig();
   };
 
-  this.cleanup = function() {
+  this.cleanup = function(debug) {
     shelljs.popd();
-  };
-
-  this.after = function() {
-    shelljs.rm('-rf', baseDir);
+    if (debug) {
+      console.log(this.projectDir);
+      return;
+    }
+    shelljs.rm('-rf', this.projectDir);
   };
 };

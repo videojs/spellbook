@@ -3,7 +3,7 @@ var shelljs = require('shelljs');
 var path = require('path');
 var Helper = require('./test-helper.js');
 var PathExists = require('../src/utils/path-exists');
-var binPath = path.join(__dirname, '..', 'src/sb-release');
+var binPath = path.join(__dirname, '..', 'src', 'sb-release');
 var versions = {
   'major': '2.0.0',
   'minor': '1.1.0',
@@ -25,10 +25,6 @@ describe('sb-release', function() {
   });
   afterEach(function() {
     this.helper.cleanup();
-  });
-
-  after(function() {
-    this.helper.after();
   });
 
   describe('invalid uses', function() {
@@ -116,7 +112,7 @@ describe('sb-release', function() {
 
             assert.equal(code, 0, 'should return success');
             assert.notEqual(stdouts.length, 0, 'should stdout multiple lines');
-            assert.equal(stderr.length, 0, 'should stderr nothing');
+            assert.equal(stderr, '', 'should stderr nothing');
 
             var gitLog = shelljs.exec('git log --oneline -1').grep(versionNumber);
             var gitTag = shelljs.exec('git tag').grep(versionNumber);

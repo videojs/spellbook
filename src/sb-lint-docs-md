@@ -22,7 +22,6 @@ if (!program.src) {
 var command =  ''
   + GetPath('remark')
   + ' --rc-path ' + GetPath('remark-lint.config.js')
-  + ' --no-stdout'
   + ' --no-config'
   + ' ' + program.src;
 

@@ -1,49 +1,48 @@
 #!/usr/bin/env node
 var path = require('path');
 var config = require('./utils/get-config')();
-var RunCommand = require('./utils/run-command');
 var GetPath = require('./utils/get-path');
+var PathExists = require('./utils/path-exists');
+var shelljs = require('shelljs');
+var Watch = require('./utils/watch');
+
 
 var program = require('commander')
   .version(config.sbVersion)
+  .version(config.sbVersion)
   .option('-w, --watch', 'watch docs for changes and rebuild')
+  .option('-d, --dist <dist-dir>', 'directory to build api docs to')
+  .arguments('<src-dir>')
+  .action(function(src) {
+    this.src = src;
+  })
   .parse(process.argv);
 
-var watch = function(glob, command) {
-  return GetPath('chokidar')
-    + ' ' + glob
-    + ' --debounce 100'
-    + ' --command \'' + command + '\'';
-};
-
-RunCommand('rm', '-rf', path.join(config.dist, 'docs'));
-RunCommand('mkdir', '-p', path.join(config.dist, 'docs', 'api'));
-var commands = []
-
-// TODO: should we update all docs with doctoc?
-// TODO: should we store README.md in the src/docs folder?
-commands.push(GetPath('doctoc')
-  + ' ' + path.join(config.path, 'README.md')
-);
-
-/* TODO: should we watch this? how do we do it?
-if (program.watch) {
-  commands.push(watch(path.join(config.path, 'README.md'), commands[commands.length-1]))
+if (!program.dist) {
+  program.dist = path.join(config.dist, 'docs', 'manual');
 }
-*/
 
-commands.push(GetPath('remark')
-  + ' ' + path.join(config.src, 'docs')
-  + ' --use html'
+if (!program.src) {
+  program.src = path.join(config.src, 'docs');
+}
+
+if (PathExists(program.dist)) {
+  shelljs.rm('-rf', program.dist);
+}
+
+shelljs.mkdir('-p', program.dist);
+
+var command = GetPath('remark')
+  + ' ' + program.src
+  + ' --rc-path ' + GetPath('remark-build.config.js')
   + ' --no-config'
-  + ' --output ' + path.join(config.dist, 'docs')
-);
+  + ' --output ' + program.dist;
 
+shelljs.config.silent = true;
+shelljs.exec(command);
+shelljs.config.silent = false;
+
+console.log('building docs from ' + program.src + ' to ' + program.dist);
 if (program.watch) {
-  commands.push(watch(path.join(config.src, 'docs', '**', '*.md'), commands[commands.length-1]))
+  Watch(path.join(program.src, '**', '*.md'), command);
 }
-
-
-commands.forEach(function(command) {
-  RunCommand('exec', command, {async: true});
-});

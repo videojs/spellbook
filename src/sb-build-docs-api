@@ -1,34 +1,45 @@
 #!/usr/bin/env node
 var path = require('path');
 var config = require('./utils/get-config')();
-var RunCommand = require('./utils/run-command');
 var GetPath = require('./utils/get-path');
+var PathExists = require('./utils/path-exists');
+var shelljs = require('shelljs');
+var Watch = require('./utils/watch');
 
 var program = require('commander')
   .version(config.sbVersion)
   .option('-w, --watch', 'watch docs for changes and rebuild')
+  .option('-d, --dist <dist-dir>', 'directory to build api docs to')
+  .arguments('<src-dir>')
+  .action(function(src) {
+    this.src = src;
+  })
   .parse(process.argv);
 
-var watch = function(glob, command) {
-  return GetPath('chokidar')
-    + ' ' + glob
-    + ' --debounce 100'
-    + ' --command \'' + command + '\'';
-};
+if (!program.dist) {
+  program.dist = path.join(config.dist, 'docs', 'api');
+}
 
-RunCommand('rm', '-rf', path.join(config.dist, 'docs'));
-RunCommand('mkdir', '-p', path.join(config.dist, 'docs', 'api'));
+if (!program.src) {
+  program.src = path.join(config.src, 'js');
+}
+
+if (PathExists(program.dist)) {
+  shelljs.rm('-rf', program.dist);
+}
+
+shelljs.mkdir('-p', program.dist);
 
 var command = GetPath('jsdoc')
-  + ' ' + path.join(config.src, 'js')
+  + ' ' + program.src
   + ' --configure ' + GetPath('jsdoc.config.json')
   + ' -r'
-  + ' -d ' + path.join(config.dist, 'docs', 'api')
+  + ' -d ' + program.dist;
 
-
-RunCommand('exec', command, {async: true});
+console.log('building docs from ' + program.src + ' to ' + program.dist);
+shelljs.exec(command);
 
 if (program.watch) {
-  RunCommand('exec', watch(path.join(config.src, 'js', '**', '*.js'), command));
+  Watch(path.join(program.src, '**', '*.js'), command);
 }
 

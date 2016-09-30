@@ -8,14 +8,10 @@ describe('sb-clean', function() {
   beforeEach(function() {
     this.helper = new Helper();
     this.config = this.helper.setup();
-    this.bin = path.join(__dirname, '..', 'src/sb-clean') + ' ';
+    this.bin = path.join(__dirname, '..', 'src', 'sb-clean') + ' ';
   });
   afterEach(function() {
     this.helper.cleanup();
-  });
-
-  after(function() {
-    this.helper.after();
   });
 
   describe('no arguments', function() {
