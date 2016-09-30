@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
 var PathExists = require('./utils/path-exists');
-var RunCommand = require('./utils/run-command');
 var GetPath = require('./utils/get-path');
 var path = require('path');
+var shelljs = require('shelljs');
 
 var program = require('commander')
   .version(config.sbVersion)
@@ -23,19 +23,18 @@ if (!program.dist) {
   program.dist = path.join(config.dist, 'npm');
 }
 
-// TODO: noderify
-// TODO: ie8 support
-RunCommand('rm', '-rf', program.dist);
-RunCommand('mkdir', '-p', program.dist);
+shelljs.rm('-rf', program.dist);
+shelljs.mkdir('-p', program.dist);
+
+var babelPreset = config.ie8 ? GetPath('babel-preset-ie8.config.js') : GetPath('babel-preset.config.js');
 
 var cmd = GetPath('babel') + ' '
-  + "-d '" + program.dist + "' "
-  + "--presets es2015 "
-  + "--plugins transform-object-assign "
-  + program.src;
+  + '-d ' + program.dist + ' '
+  + ' --presets ' + babelPreset
+  + ' ' + program.src;
 
 if (program.watch) {
   cmd += ' --watch';
 }
 
-RunCommand('exec', cmd);
+shelljs.exec(cmd);

@@ -14,13 +14,11 @@
   * more configuration
   * have individual build packages run clean on files they will build to?
   * prepush git hooks (update readme with doctoc)
-  * add ie8 support to configuration
   * noderify when we switch to js instead of using shelljs
 * build-js
-  * js-brower-test && js-browser-main browserify unification
   * ignore .js.tmp files during watchify?? (created by rollupify, seem to cause issues?)
-  * use babel config in browserify and npm, and support ie8 config
   * noderify npm binaries?
+  * test browserify-incremental
 * sb-release
   * support prerelease signifiers (beta, alpha etc)
 * sb-build-html

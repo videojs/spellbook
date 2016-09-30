@@ -34,6 +34,7 @@ var GetConfig = function (dir) {
     main: path.join(appRoot, workingPkg.main),
     jsNextMain: workingPkg['jsnext:main'] ? path.join(appRoot, workingPkg['jsnext:main']) : '',
 
+    verbose: workingPkg.spellbook.ie8 || false,
     verbose: workingPkg.spellbook.verbose || process.env.SB_VERBOSE || false,
     port: workingPkg.spellbook.port || 9999,
     src: workingPkg.spellbook.src || 'src',
