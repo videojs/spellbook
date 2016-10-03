@@ -34,7 +34,7 @@ var browserifyHelper = function(options) {
     + ' -g browserify-shim'
     + ' -g browserify-versionify'
     + ' -p bundle-collapser/plugin'
-    + (config.standalone ? ' -s ' + config.name : '')
+    + (options.standalone ? ' -s ' + config.name : '')
     + ' -o ' + options.dist + '.js'
     + ' ' + files.join(' ');
 

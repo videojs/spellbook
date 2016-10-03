@@ -7,6 +7,9 @@ export default class TestingThing {
   }
 }
 
+const t = new TestingThing();
+console.log(t.foo());
+
 // intentional double empty line to cause error
 
 
