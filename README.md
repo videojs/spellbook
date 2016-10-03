@@ -31,6 +31,8 @@
   * create an example page in the index of dist/
 * sb-lint-html ?
   * lint all html files found in html/
+* sb-build-js-bundles
+  * something better than building to .sb-cache/bundles
 * sb-server
   * localhost:<port> alternative such as <module-name>.dev
     * hotel?

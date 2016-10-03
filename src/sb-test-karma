@@ -21,6 +21,8 @@ var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
 var testDist = path.join(config.dist, 'test', config.name + '.js');
 var srcDist = path.join(config.dist, 'browser', config.name + '.js');
 var cssDist = path.join(config.dist, 'browser', config.name + '.css');
+var bundlerDist = path.join(config.cache, 'bundlers');
+
 if (!PathExists(testDist) || !PathExists(srcDist)) {
   RunCommand('exec', GetPath('sb-build-js'));
 }
@@ -46,6 +48,7 @@ var karmaCommand = GetPath('karma')
 if (program.watch) {
   karmaCommand += ' --auto-watch';
   karmaCommand += ' --no-single-run';
+  karmaCommand += ' --sb-watch';
 }
 
 if (program.browsers) {

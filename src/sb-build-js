@@ -6,4 +6,5 @@ var program = require('commander')
   .command('all', 'build all possible js outputs', {isDefault: true})
   .command('browser', 'build js browser output')
   .command('npm', 'build npm output')
+  .command('bundles', 'build rollup, webpack, and browserify test files')
   .parse(process.argv);

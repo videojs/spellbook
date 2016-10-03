@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cd test && git init && git commit -a -m 'initial' && mocha test/*.test.js"
+    "pretest": "cd test/fixtures && git init && git commit -a -m 'initial'",
+    "test": "mocha test/*.test.js",
+    "posttest": "cd test/fixtures && rm -rf .git"
   },
   "bin": {
     "sb": "src/sb",

@@ -23,3 +23,6 @@ commands.forEach(function(command) {
   console.log(path.basename(command));
   RunCommand('exec', command, {async: true});
 });
+
+console.log('sb-build-js-bundles')
+RunCommand('exec', GetPath('sb-build-js-bundles'));

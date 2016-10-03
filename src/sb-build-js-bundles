@@ -34,19 +34,20 @@ program.bundlers.forEach(function(bundler) {
 });
 
 if (!PathExists(config.main)) {
-  RunCommand('exec', GetPath('sb-build-js'));
+  RunCommand('exec', GetPath('sb-build-js-npm'));
 }
 
 var commands = [];
-var testTemp = path.join(config.tmp, 'test');
-RunCommand('rm', '-rf', testTemp);
-RunCommand('mkdir', '-p', testTemp);
+var testCache = path.join(config.cache, 'bundles');
+var babelPreset = config.ie8 ? GetPath('babel-preset-ie8.config.js') : GetPath('babel-preset.config.js');
+
+RunCommand('rm', '-rf', testCache);
+RunCommand('mkdir', '-p', testCache);
 
 bundlers.forEach(function(bundler) {
-  var testFile = path.join(testTemp, bundler + '.test.js');
-  var baseFile = path.join(testTemp, bundler + '.start.js');
-
-  var testTemplate = [
+  var testFile = path.join(testCache, bundler + '.test.js');
+  var baseFile = path.join(testCache, bundler + '.start.js');
+  var unitTestContents  = [
     "var pkg = require('" + path.join('..', '..', path.relative(config.path, config.main)) + "');",
     "",
     "QUnit.module('" + bundler + " require');",
@@ -54,7 +55,7 @@ bundlers.forEach(function(bundler) {
     "  assert.ok(pkg, '" + config.name + " is required properly');",
     "});",
     ""
-  ].join("\n");
+  ];
 
 
   if (bundler === 'browserify') {
@@ -64,35 +65,41 @@ bundlers.forEach(function(bundler) {
       + ' -o ' + testFile
     );
   } else if (bundler === 'rollup') {
-    testTemplate = [
+    // rollup only works on es6
+    unitTestContents = [
       "import pkg from '" + path.join('..', '..', path.relative(config.path, config.jsNextMain)) + "';",
       "",
       "QUnit.module('" + bundler + " require');",
       "QUnit.test('" + config.name + " should be requireable via " + bundler + "', (assert) => {",
       "  assert.ok(pkg, '" + config.name + " is required properly');",
       "});",
-    ].join("\n");
+    ];
     commands.push(GetPath('browserify')
       + ' ' + baseFile
       + ' -t rollupify'
       + ' -x qunitjs'
-      + ' -t [ babelify --extends '  + GetPath('babel.config.json') + ' ]'
+      + ' -t [ babelify --presets '  + babelPreset + ' ]'
       + ' -o ' + testFile
     );
   } else if (bundler === 'webpack') {
     commands.push(GetPath('webpack')
-      + ' -q'
       + ' ' + baseFile
-      + ' ' + testFile
+      + ' --output-filename ' + testFile
     );
   }
 
-  fs.writeFileSync(baseFile, testTemplate);
+  fs.writeFileSync(baseFile, unitTestContents.join('\n'));
 });
 
 commands.forEach(function(command) {
   // to silence webpack
-  shelljs.config.silent = true;
-  RunCommand('exec', command, {async: true});
-  shelljs.config.silent = false;
+  console.log(command);
+  var retval = RunCommand('exec', command, function(code, stdout, stderr) {
+    if (code !== 0 || stderr.length > 0) {
+      console.log('failed!');
+      console.log(stdout);
+      console.error(stderr);
+      process.exit(1);
+    }
+  });
 });

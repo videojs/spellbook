@@ -22,7 +22,6 @@ var pushd = function(d) {
   shelljs.config.silent = oldSilent;
 };
 
-
 module.exports = function(debug) {
   this.debug = debug || false;
   if (!this.debug) {

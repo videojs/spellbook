@@ -31,3 +31,5 @@ browserifyHelper({
 });
 console.log('Wrote ' + distFile + '.js');
 console.log('Wrote ' + distFile + '.js.map');
+
+
