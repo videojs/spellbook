@@ -6,7 +6,7 @@ var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
 
 var program = require('commander')
-  .version(config.spellbookVersion)
+  .version(config.sbVersion)
   .arguments('[files...]')
   .action(function(files) {
     this.files = files;
@@ -17,19 +17,39 @@ var program = require('commander')
 
 var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
 
+
+var testDist = path.join(config.dist, 'test', config.name + '.js');
+var srcDist = path.join(config.dist, 'browser', config.name + '.js');
+var cssDist = path.join(config.dist, 'browser', config.name + '.css');
+if (!PathExists(testDist) || !PathExists(srcDist)) {
+  RunCommand('exec', GetPath('sb-build-js'));
+}
+
+if (!PathExists(cssDist)) {
+  RunCommand('exec', GetPath('sb-build-css'));
+}
+
+if (!program.files) {
+  program.files = [
+    path.join(config.dist, 'browser', config.name + '.css'),
+    path.join(config.dist, 'test', config.name + '.js')
+  ];
+}
+
 // TODO: how do we integrate this with spellbook-start (module.export?)
 // TODO: test non-browser environments somehow
 // http://localhost:9876/debug.html will be qunit UI
 var karmaCommand = GetPath('karma')
-  + ' start ' + GetPath('karma.config.js');
+  + ' start ' + GetPath('karma.config.js')
+  + ' --sb-files ' + program.files.join(',');
 
 if (program.watch) {
   karmaCommand += ' --auto-watch';
   karmaCommand += ' --no-single-run';
 }
 
-if (program.environments) {
-  karmaCommand += ' --browsers ' + browsers.join(',');
+if (program.browsers) {
+  karmaCommand += ' --browsers ' + program.browsers.join(',');
 }
 
 RunCommand('exec', karmaCommand);

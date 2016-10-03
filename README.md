@@ -32,8 +32,7 @@
 * sb-lint-html ?
   * lint all html files found in html/
 * sb-server
-  * unify karma and dev server
-    * Proxy? localhost:9876 etc to <project-name>.dev on your local machine
+  * localhost:<port> alternative such as <module-name>.dev
     * hotel?
     * mehserve?
     * vhost?

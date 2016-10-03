@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+var config = require('./utils/get-config')();
+var PathExists = require('./utils/path-exists');
+var path = require('path');
+var GetPath = require('./utils/get-path');
+var RunCommand = require('./utils/run-command');
+
+var program = require('commander')
+  .version(config.spellbookVersion)
+  .option('-w, --watch', 'keep the tester running and run as things change')
+  .parse(process.argv);
+
+var commands = [
+  GetPath('sb-test-bundlers'),
+  GetPath('sb-test-karma'),
+  GetPath('sb-test-node')
+];
+
+commands.forEach(function(command) {
+  console.log(path.basename(command))
+
+  RunCommand('exec', command, {async: true});
+});

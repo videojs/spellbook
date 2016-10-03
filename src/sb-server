@@ -1,36 +1,57 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var GetPath = require('./utils/get-path');
 var path = require('path');
-var shelljs = require('shelljs');
+var browserSync = require('browser-sync').create();
+var proxy = require('http-proxy-middleware');
+var url = require('url');
 
 var program = require('commander')
-  .version(config.spellbookVersion)
+  .version(config.sbVersion)
   .option('-p, --port <number>', 'what port to start the server on', parseInt)
   .option('-o, --open', 'open the server in your default browser')
   .option('-s, --sync', 'enable cross browser action sync')
   .option('-ui, --ui', 'enable browser-sync ui')
   .parse(process.argv);
 
-var cmd = GetPath('browser-sync')
-  + ' start'
-  + ' --server'
-  + ' --port ' + (program.port || config.port)
-  + (program.ui ? '' : ' --no-ui')
-  + (program.ghostMode ? '' : ' --no-ghost-mode')
-  + (program.open ? '' : ' --no-open')
-  + ' --files ' + path.join(config.dist, '**', '*.*');
+/* proxy /test to karma server */
+var filter = function (pathname, req) {
+  // always re-write /test
+  if (pathname.match('^/test')) {
+    return true;
+  }
 
-console.log(cmd);
-shelljs.exec(cmd);
-/*
+  // skip proxy for non-karma requests
+  // ar karma proxy requests should only happen
+  // from /test
+  if (!req.headers.referer || url.parse(req.headers.referer).pathname !== '/test') {
+    return false;
+  }
+
+  return true;
+};
+var karmaProxy = proxy(filter, {
+  target: 'http://localhost:9876',
+  pathRewrite: {'^/test': 'debug.html' },
+  ws: true,
+  logLevel: 'error',
+  onError: function(err, req, res) {
+    res.end(''
+      + 'ERROR: Could not proxy /test to karma server. \n'
+      + 'It is likely that karma is not started.\n'
+      + 'Run `sb-test-karma --watch` to start it and reload the page.\n'
+    );
+  }
+});
+
 browserSync.init({
-  server: config.path,
-  port: program.port || config.port,
-  ui: program.ui || false,
+  server: {
+    baseDir: config.path,
+    middleware: [karmaProxy],
+  },
+  port: program.port || config.port || 9999,
   ghostMode: program.sync || false,
+  ui: program.ui || false,
   open: program.open || false,
-  files: [
-    path.join(config.dist, '**', '*.*'),
-  ]
-});*/
+  reloadOnRestart: true,
+  files: [path.join(config.path, '**', '*.*')]
+});

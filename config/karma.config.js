@@ -1,7 +1,17 @@
-var config = require('../src/utils/config');
+var config = require('../src/utils/get-config')();
 var path = require('path');
 
 module.exports = function(karmaConfig) {
+  // somwhat hacky way to add files to karma on the fly
+  var program = require('commander')
+    .option('--sb-files [list]', 'comma seperated list files, to add to karma')
+    .parse(process.argv);
+
+  program.sbFiles = program.sbFiles || [];
+  if (program.sbFiles) {
+    program.sbFiles = program.sbFiles.split(',');
+  }
+
   karmaConfig.set({
     autoWatch: false,
     singleRun: true,
@@ -17,13 +27,10 @@ module.exports = function(karmaConfig) {
       clearContext: false,
       qunit: {showUI: true}
     },
-    proxies: {
-      '/test': 'http://localhost:' + (karmaConfig.port || config.port)
-    },
     files: [
-      'node_modules/sb/node_modules/sinon/pkg/sinon.js',
-      'node_modules/sb/node_modules/sinon/pkg/sinon-ie.js',
-    ].concat(karmaConfig.files),
+      'node_modules/videojs-spellbook/node_modules/sinon/pkg/sinon.js',
+      'node_modules/videojs-spellbook/node_modules/sinon/pkg/sinon-ie.js',
+    ].concat(program.sbFiles),
   });
 };
 

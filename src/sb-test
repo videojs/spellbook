@@ -1,42 +1,10 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var PathExists = require('./utils/path-exists');
-var path = require('path');
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
 
 var program = require('commander')
-  .version(config.spellbookVersion)
-  .option('-b, --browsers', 'comma deliminated list of browsers')
-  .option('-u, --bundlers', 'comma deliminated list of bundlers')
-  .option('-w, --watch', 'keep the tester running and run as things change')
+  .version(config.sbVersion)
+  .command('node', 'run unit tests in nodejs')
+  .command('bundlers', 'make sure your code bundles in webpack, browserify, and rollup')
+  .command('karma', 'run units tests on browser')
+  .command('all', 'run all tests', {isDefault: true})
   .parse(process.argv);
-
-if (!PathExists(path.join(config.dist, 'test', 'bundle.js')) ||
-    !PathExists(config.main)) {
-  RunCommand('exec', GetPath('sb-build-js'));
-}
-
-if (!PathExists(path.join(config.dist, 'browser', config.name + '.css'))) {
-  RunCommand('exec', GetPath('sb-build-css'));
-}
-
-
-// TODO: how do we integrate this with spellbook-start (module.export?)
-// TODO: test non-browser environments somehow
-// http://localhost:9876/debug.html will be qunit UI
-var buildBundle = GetPath('sb-test-build-bundles');
-
-if (program.bundlers) {
-  buildBundle += ' --bundlers ' + program.bundlers;
-}
-
-if (program.watch) {
-  buildBundle += ' --watch';
-}
-
-
-RunCommand('exec', buildBundle);
-
-commands.push(GetPath('sb-test-karma'));
-commands.push(GetPath('sb-test-node'));
