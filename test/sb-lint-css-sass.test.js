@@ -26,7 +26,7 @@ describe('sb-lint-css-sass', function() {
     });
   });
 
-  it('should lint custom files with no args', function(done) {
+  it('should lint custom files', function(done) {
     var newsrc = path.join(this.config.src, 'newsrc');
     shelljs.mv(path.join(this.config.src, 'css'), newsrc)
     shelljs.exec(this.bin + newsrc, function(code, stdout, stderr) {
