@@ -39,20 +39,22 @@ var browserifyHelper = function(options) {
     + ' ' + files.join(' ');
 
   var retval = shelljs
-    .exec(browserify, {silent: true});
+    .exec(browserify);
 
   // remove rollup external deps errors...
   retval.stderr = retval.stderr || '';
   retval.stderr = retval.split(/^Treating '\w+' as external dependency\n$/).join('');
 
-  if (retval.stderr) {
+  if (retval.stderr || !PathExists(options.dist + '.js')) {
     process.stderr.write(retval.stderr);
+    process.stderr.write(retval.stdout);
+    process.exit(1);
   }
 
   // rip sourcemap out
   if (!options.watch) {
     shelljs.cat(options.dist + '.js')
-      .exec(GetPath('exorcist') + " '" + options.dist + ".js.map'", {silent: true})
+      .exec(GetPath('exorcist') + " '" + options.dist + ".js.map'")
       .to(options.dist + '.js');
   }
 
