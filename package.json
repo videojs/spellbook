@@ -77,7 +77,6 @@
     "karma-ie-launcher": "^1.0.0",
     "karma-qunit": "^1.2.0",
     "karma-safari-launcher": "^1.0.0",
-    "mapstraction": "^1.0.0",
     "markdownlint": "^0.2.0",
     "node-sass": "^3.10.0",
     "qunitjs": "^2.0.1",

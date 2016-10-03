@@ -12,15 +12,16 @@
   * better verbose logging support?
     * use RunCommand?
   * more configuration
-  * have individual build packages run clean on files they will build to?
   * prepush git hooks (update readme with doctoc)
   * noderify when we switch to js instead of using shelljs
 * build-js
   * ignore .js.tmp files during watchify?? (created by rollupify, seem to cause issues?)
   * noderify npm binaries?
   * test browserify-incremental
+  * sourcemap during watchify
 * build-css
   * add banner to the minified file and update the source map with the line offset of the banner that was added
+  * support plain css
 * sb-release
   * support prerelease signifiers (beta, alpha etc)
 * sb-build-html

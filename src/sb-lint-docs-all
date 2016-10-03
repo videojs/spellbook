@@ -2,6 +2,7 @@
 var config = require('./utils/get-config')();
 var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
+var path = require('path');
 
 var program = require('commander')
   .version(config.sbVersion)
@@ -12,7 +13,7 @@ var program = require('commander')
 
 var commands = [
   GetPath('sb-lint-docs-md'),
-  GetPath('sb-lint-docs-example')
+  GetPath('sb-lint-docs-examples')
 ];
 
 commands.forEach(function(command) {
@@ -26,5 +27,6 @@ commands.forEach(function(command) {
     command += ' --fix';
   }
 
+  console.log(path.basename(command));
   RunCommand('exec', command, {async: true});
 });

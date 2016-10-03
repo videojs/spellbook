@@ -6,7 +6,7 @@ var GetPath = require('./utils/get-path');
 
 var program = require('commander')
   .version(config.sbVersion)
-  .command('all', 'run all doc builds')
+  .command('all', 'run all doc builds', {isDefault: true})
   .command('api', 'run the api doc build')
   .command('manual', 'run the manual doc build')
   .parse(process.argv);

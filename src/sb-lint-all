@@ -2,6 +2,7 @@
 var config = require('./utils/get-config')();
 var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
+var path = require('path');
 
 var program = require('commander')
   .version(config.sbVersion)
@@ -30,5 +31,6 @@ commands.forEach(function(command) {
     command += ' --fix';
   }
 
+  console.log(path.basename(command));
   RunCommand('exec', command, {async: true});
 });

@@ -3,7 +3,7 @@ var config = require('./utils/get-config')();
 
 var program = require('commander')
   .version(config.sbVersion)
-  .command('all', 'build all browser bundles')
+  .command('all', 'build all browser bundles', {isDefault: true})
   .command('main', 'build main code browser bundle')
   .command('test', 'build unit test browser bundle')
   .parse(process.argv);

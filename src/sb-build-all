@@ -2,12 +2,14 @@
 var config = require('./utils/get-config')();
 var RunCommand = require('./utils/run-command');
 var GetPath = require('./utils/get-path');
+var path = require('path');
 
 var program = require('commander')
   .version(config.sbVersion)
   .option('-w, --watch', 'watch files for changes and rebuild')
   .parse(process.argv);
 
+console.log('sb-clean');
 RunCommand('exec', GetPath('sb-clean'));
 
 var commands = [
@@ -21,6 +23,8 @@ commands.forEach(function(command) {
   if (program.watch) {
     command += ' --watch';
   }
+
+  console.log(path.basename(command));
   RunCommand('exec', command, {async: true});
 });
 

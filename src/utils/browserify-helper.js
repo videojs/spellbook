@@ -24,7 +24,7 @@ var browserifyHelper = function(options) {
   var files = [options.src];
 
   if (!PathExists(options.src)) {
-    files = glob.sync(options.src);
+    files = glob.sync(options.src, {ignore: '**/node_modules/**'});
   }
 
   var browserify = (options.watch ? GetPath('watchify') + ' -v' : GetPath('browserify'))
@@ -34,7 +34,6 @@ var browserifyHelper = function(options) {
     + ' -g browserify-shim'
     + ' -g browserify-versionify'
     + ' -p bundle-collapser/plugin'
-    + ' -p mapstraction'
     + (config.standalone ? ' -s ' + config.name : '')
     + ' -o ' + options.dist + '.js'
     + ' ' + files.join(' ');
@@ -48,6 +47,13 @@ var browserifyHelper = function(options) {
 
   if (retval.stderr) {
     process.stderr.write(retval.stderr);
+  }
+
+  // rip sourcemap out
+  if (!options.watch) {
+    shelljs.cat(options.dist + '.js')
+      .exec(GetPath('exorcist') + " '" + options.dist + ".js.map'", {silent: true})
+      .to(options.dist + '.js');
   }
 
   shelljs.config.silent = true;
