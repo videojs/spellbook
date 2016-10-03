@@ -1,6 +1,2 @@
 node_modules
-test/fixtures/dist
-test/fixtures/README.md
-test/fixtures/.sb-cache
-test/fixtures/node_modules
 npm-debug.log

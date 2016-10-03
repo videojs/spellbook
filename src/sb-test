@@ -3,8 +3,7 @@ var config = require('./utils/get-config')();
 
 var program = require('commander')
   .version(config.sbVersion)
-  .command('node', 'run unit tests in nodejs')
-  .command('bundlers', 'make sure your code bundles in webpack, browserify, and rollup')
+  //.command('node', 'run unit tests in nodejs')
   .command('karma', 'run units tests on browser')
   .command('all', 'run all tests', {isDefault: true})
   .parse(process.argv);

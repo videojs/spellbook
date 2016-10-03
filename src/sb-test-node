@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+var config = require('./utils/get-config')();
+var PathExists = require('./utils/path-exists');
+var path = require('path');
+var GetPath = require('./utils/get-path');
+var RunCommand = require('./utils/run-command');
+
+var program = require('commander')
+  .version(config.sbVersion)
+  .arguments('[files...]')
+  .action(function(files) {
+    this.files = files;
+  })
+  .option('-w, --watch', 'keep the tester running and run as things change')
+  .parse(process.argv);
+
+
+console.error('Its not currently possible to run qunitjs tests in node...');
+console.error('So we are just going to exit');
+process.exit(1);

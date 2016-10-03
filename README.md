@@ -8,44 +8,13 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # TODO
-* general
-  * better verbose logging support?
-    * use RunCommand?
-  * more configuration
-  * prepush git hooks (update readme with doctoc)
-  * noderify when we switch to js instead of using shelljs
-* build-js
+* sb-build-js-browser
   * ignore .js.tmp files during watchify?? (created by rollupify, seem to cause issues?)
-  * noderify npm binaries?
-  * test browserify-incremental
-  * sourcemap during watchify
-* build-css
-  * add banner to the minified file and update the source map with the line offset of the banner that was added
+* sb-build-css-sass
+  * add banner to the minified files
+  * update the source map with the line offset of the banner that was added
+* sb-build-css-css
   * support plain css
-* sb-release
-  * support prerelease signifiers (beta, alpha etc)
-* sb-build-html
-  * use something like gulp-inject to inject css and js into html
-  * one page for min files and one page for normal files
-  * vulkanize min files into the index as well
-  * create an example page in the index of dist/
-* sb-lint-html ?
-  * lint all html files found in html/
-* sb-build-js-bundles
-  * something better than building to .sb-cache/bundles
-* sb-server
-  * localhost:<port> alternative such as <module-name>.dev
-    * hotel?
-    * mehserve?
-    * vhost?
-* sb-test
-  * get bundler tests to work
-  * get tests to run in nodejs
-  * get tests to run in browser
-  * watch all tests
-  * code coverage
-* sb-create
-  * proxy to the generator
 * Unit Tests
   * utils folder
   * check file contents in build tests
@@ -53,10 +22,36 @@
   * server
   * test with --watch arguments
   * lint-* with --fix and --errors
-  * convert all tests to parallel
 * sb-docs
-  * html theme?
   * remark hangs if it gets passed 0 files
 
-# Something to think about
-* better i18n build
+# Future Ideas
+* sb-build-js-browser
+  * sourcemap during watchify
+* sb-build-js-npm
+  * noderify npm binaries?
+* sb-create
+  * proxy to the generator
+* sb-test
+  * get tests to run in nodejs
+  * code coverage
+* sb-build-i18n
+  * does doing a copy on the json make sense?
+* sb-server
+  * localhost:<port> alternative such as <module-name>.dev
+    * hotel?
+    * mehserve?
+    * vhost?
+* sb-docs
+  * find an html theme
+* sb-build-js-bundles
+  * concat these right into dist/test/<pkg-name>.js
+* sb-build-js-browser-tests
+  * treat code being tested as external so we only build it once
+* general
+  * better verbose logging support?
+    * use RunCommand?
+  * more configuration
+  * noderify when we switch to js instead of using shelljs
+* sb-release
+  * support prerelease signifiers (beta, alpha etc)

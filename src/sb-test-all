@@ -11,9 +11,8 @@ var program = require('commander')
   .parse(process.argv);
 
 var commands = [
-  GetPath('sb-test-bundlers'),
   GetPath('sb-test-karma'),
-  GetPath('sb-test-node')
+  //GetPath('sb-test-node')
 ];
 
 commands.forEach(function(command) {

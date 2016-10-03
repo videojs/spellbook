@@ -24,6 +24,10 @@ if (program.bundlers) {
   program.bundlers = [];
 }
 
+if (!PathExists(config.main)) {
+  RunCommand('exec', GetPath('sb-build-js-npm'));
+}
+
 program.bundlers.forEach(function(bundler) {
   if ((/webpack|browserify|rollup/i).test(environment)) {
     bundlers.push(bundler);
