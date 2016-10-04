@@ -10,19 +10,14 @@ var program = require('commander')
   .option('-w, --watch', 'incrementally rebuild')
   .parse(process.argv);
 
-var commands = [
-  GetPath('sb-build-js-browser'),
-  GetPath('sb-build-js-npm')
-];
 
-commands.forEach(function(command) {
-  if (program.watch) {
-    command += ' --watch';
-  }
+console.log('sb-build-js-npm')
+RunCommand('exec', GetPath('sb-build-js-npm'), function(code, stderr, stdout) {
 
-  console.log(path.basename(command));
-  RunCommand('exec', command, {async: true});
+  console.log('sb-build-js-bundles')
+  RunCommand('exec', GetPath('sb-build-js-bundles'));
 });
 
-console.log('sb-build-js-bundles')
-RunCommand('exec', GetPath('sb-build-js-bundles'));
+console.log('sb-build-js-browser')
+RunCommand('exec', GetPath('sb-build-js-browser'), {async: true});
+

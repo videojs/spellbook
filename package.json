@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "pretest": "rm -rf test/fixtures/.git;cd test/fixtures;git init;git add --all;git commit -a -m 'initial';",
+    "clean": "rm -rf test/fixtures/{.git,dist,.sb-cache,npm-debug.log}",
+    "pretest": "npm run clean;cd test/fixtures;git init;git add --all;git commit -a -m 'initial';",
     "test": "mocha test/*.test.js",
-    "posttest": "cd test/fixtures && rm -rf .git"
+    "posttest": "npm run clean"
   },
   "bin": {
     "sb": "src/sb",

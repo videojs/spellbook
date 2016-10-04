@@ -22,7 +22,7 @@ if (!program.dist) {
   program.dist = path.join(config.dist, 'test');
 }
 
-var distFile = path.join(program.dist, config.name);
+var distFile = path.join(program.dist, config.name + '.test');
 browserifyHelper({
   dist: distFile,
   src: program.src,

@@ -1,8 +1,5 @@
 #!/usr/bin/env node
-var path = require('path');
 var config = require('./utils/get-config')();
-var RunCommand = require('./utils/run-command');
-var GetPath = require('./utils/get-path');
 
 var program = require('commander')
   .version(config.sbVersion)

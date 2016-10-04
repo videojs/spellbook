@@ -18,7 +18,6 @@ var browserifyHelper = function(options) {
 
   shelljs.config.silent = true;
   shelljs.pushd(path.join(__dirname, '..', '..'));
-  shelljs.config.silent = oldSilent;
 
   var babelPreset = config.ie8 ? GetPath('babel-preset-ie8.config.js') : GetPath('babel-preset.config.js');
   var files = [options.src];
@@ -45,7 +44,7 @@ var browserifyHelper = function(options) {
   retval.stderr = retval.stderr || '';
   retval.stderr = retval.split(/^Treating '\w+' as external dependency\n$/).join('');
 
-  if (retval.stderr || !PathExists(options.dist + '.js')) {
+  if (retval.code !== 0 || retval.stderr || !PathExists(options.dist + '.js')) {
     process.stderr.write(retval.stderr);
     process.stderr.write(retval.stdout);
     process.exit(1);
@@ -53,12 +52,18 @@ var browserifyHelper = function(options) {
 
   // rip sourcemap out
   if (!options.watch) {
-    shelljs.cat(options.dist + '.js')
-      .exec(GetPath('exorcist') + " '" + options.dist + ".js.map'")
+    retval = shelljs.cat(options.dist + '.js')
+      .exec(GetPath('exorcist') + " '" + options.dist + ".js.map'", {silent: true})
       .to(options.dist + '.js');
+
+    if (retval.code !== 0 || retval.stderr || !PathExists(options.dist + '.js')) {
+      process.stderr.write(retval.stderr);
+      process.stderr.write(retval.stdout);
+      process.exit(1);
+    }
+
   }
 
-  shelljs.config.silent = true;
   shelljs.popd();
   shelljs.config.silent = oldSilent;
   return retval;

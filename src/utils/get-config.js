@@ -25,6 +25,7 @@ var GetConfig = function (dir) {
     + " */\n";
 
   workingPkg.spellbook = workingPkg.spellbook || {};
+  process.NODE_ENV = process.NODE_ENV || {};
 
   var config = {
     name: workingPkg.name,
@@ -34,8 +35,8 @@ var GetConfig = function (dir) {
     main: path.join(appRoot, workingPkg.main),
     jsNextMain: workingPkg['jsnext:main'] ? path.join(appRoot, workingPkg['jsnext:main']) : '',
 
-    verbose: workingPkg.spellbook.ie8 || false,
-    verbose: workingPkg.spellbook.verbose || process.env.SB_VERBOSE || false,
+    ie8: workingPkg.spellbook.ie8 || false,
+    logLevel: workingPkg.spellbook.logLevel || process.NODE_ENV.SB_LOG_LEVEL || 'info',
     port: workingPkg.spellbook.port || 9999,
     src: workingPkg.spellbook.src || 'src',
     dist: workingPkg.spellbook.dist || 'dist',

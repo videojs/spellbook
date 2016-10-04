@@ -6,6 +6,33 @@ var GetPath = require('./utils/get-path');
 var RunCommand = require('./utils/run-command');
 var fs = require('fs');
 var shelljs = require('shelljs');
+var es5 = function(bundler) {
+  return [
+    '/**',
+    ' * ' + bundler + ' test ',
+    ' */',
+    'var pkg = require("' + path.join('..', '..', path.relative(config.path, config.main)) + '");',
+    '',
+    'QUnit.module("' + bundler + ' require");',
+    'QUnit.test("' + config.name + ' should be requireable via ' + bundler + '", function(assert) {',
+    '  assert.ok(pkg, "' + config.name + ' is required properly");',
+    '});',
+  ].join('\n');
+};
+var es6 = function(bundler) {
+  return [
+    '/**',
+    ' * ' + bundler + ' test ',
+    ' */',
+    'import pkg from "' + path.join('..', '..', path.relative(config.path, config.jsNextMain)) + '";',
+    '',
+    'QUnit.module("' + bundler + ' require");',
+    'QUnit.test("' + config.name + ' should be requireable via ' + bundler + '", (assert) => {',
+    '  assert.ok(pkg, "' + config.name + ' is required properly");',
+    '});',
+  ].join('\n');
+};
+shelljs.config.silent = true;
 
 var program = require('commander')
   .version(config.spellbookVersion)
@@ -41,69 +68,61 @@ if (!PathExists(config.main)) {
   RunCommand('exec', GetPath('sb-build-js-npm'));
 }
 
-var commands = [];
 var testCache = path.join(config.cache, 'bundles');
 var babelPreset = config.ie8 ? GetPath('babel-preset-ie8.config.js') : GetPath('babel-preset.config.js');
 
 RunCommand('rm', '-rf', testCache);
 RunCommand('mkdir', '-p', testCache);
 
-bundlers.forEach(function(bundler) {
-  var testFile = path.join(testCache, bundler + '.test.js');
-  var baseFile = path.join(testCache, bundler + '.start.js');
-  var unitTestContents  = [
-    "var pkg = require('" + path.join('..', '..', path.relative(config.path, config.main)) + "');",
-    "",
-    "QUnit.module('" + bundler + " require');",
-    "QUnit.test('" + config.name + " should be requireable via " + bundler + "', function(assert) {",
-    "  assert.ok(pkg, '" + config.name + " is required properly');",
-    "});",
-    ""
-  ];
+bundlers.forEach(function(bundlerName) {
+  var srcFile = path.join(testCache, bundlerName + '.start.js');
+  var distFile = path.join(config.dist, 'test', bundlerName + '.test.js');
+  var unitTestContents  = es5(bundlerName);
+  var command;
 
-
-  if (bundler === 'browserify') {
-    commands.push(GetPath('browserify')
-      + ' ' + baseFile
+  if (bundlerName === 'browserify') {
+    command = ''
+      + GetPath('browserify')
+      + ' ' + srcFile
+      + ' --debug'
+      + ' --no-detect-globals'
       + ' -x qunitjs'
-      + ' -o ' + testFile
-    );
-  } else if (bundler === 'rollup') {
+      + ' -o ' + distFile;
+  } else if (bundlerName === 'rollup') {
     // rollup only works on es6
-    unitTestContents = [
-      "import pkg from '" + path.join('..', '..', path.relative(config.path, config.jsNextMain)) + "';",
-      "",
-      "QUnit.module('" + bundler + " require');",
-      "QUnit.test('" + config.name + " should be requireable via " + bundler + "', (assert) => {",
-      "  assert.ok(pkg, '" + config.name + " is required properly');",
-      "});",
-    ];
-    commands.push(GetPath('browserify')
-      + ' ' + baseFile
+    unitTestContents = es6(bundlerName);
+    command = ''
+      + GetPath('browserify')
+      + ' ' + srcFile
       + ' -t rollupify'
+      + ' --debug'
+      + ' --no-detect-globals'
       + ' -x qunitjs'
       + ' -t [ babelify --presets '  + babelPreset + ' ]'
-      + ' -o ' + testFile
-    );
-  } else if (bundler === 'webpack') {
-    commands.push(GetPath('webpack')
-      + ' ' + baseFile
-      + ' --output-filename ' + testFile
-    );
+      + ' -o ' + distFile;
+  } else if (bundlerName === 'webpack') {
+    command = ''
+      + GetPath('webpack')
+      + ' ' + srcFile
+      + ' --devtool inline-source-map'
+      + ' --output-filename ' + distFile;
   }
 
-  fs.writeFileSync(baseFile, unitTestContents.join('\n'));
+  RunCommand('mkdir', '-p', path.dirname(srcFile));
+  RunCommand('mkdir', '-p', path.dirname(distFile));
+  fs.writeFileSync(srcFile, unitTestContents);
+    // to silence webpack
+    console.log('Building ' + bundlerName + '.test.js');
+    RunCommand('exec', command, function(code, stdout, stderr) {
+      console.log(bundlerName + ' done');
+      if (code !== 0 || stderr.length > 0) {
+        console.log(bundlerName + ' failed!');
+        console.log(stdout);
+        console.error(stderr);
+        process.exit(1);
+      }
+    });
 });
 
-commands.forEach(function(command) {
-  // to silence webpack
-  console.log(command);
-  var retval = RunCommand('exec', command, function(code, stdout, stderr) {
-    if (code !== 0 || stderr.length > 0) {
-      console.log('failed!');
-      console.log(stdout);
-      console.error(stderr);
-      process.exit(1);
-    }
-  });
-});
+
+// RunCommand('rm', '-rf', testCache);
