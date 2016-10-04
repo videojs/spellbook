@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .command('js', 'build js for the project')
-  .command('css', 'build css for the project')
-  .command('docs', 'build docs for the project')
-  .command('i18n', 'build i18n for the project')
-  .command('all', 'run all builds', {isDefault: true})
-  .parse(process.argv);
-
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch for changes and rebuild on change')
+    .command('js', 'build js for the project')
+    .command('css', 'build css for the project')
+    .command('docs', 'build docs for the project')
+    .command('i18n', 'build i18n for the project')
+    .command('all', 'run all builds', {isDefault: true});
+});

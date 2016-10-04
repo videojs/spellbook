@@ -12,5 +12,8 @@
   "devDependencies": {
     "videojs-spellbook": "*"
   },
-  "browserify-shim": "node_modules/videojs-spellbook/config/shim.config.js"
+  "browserify-shim": "node_modules/videojs-spellbook/config/shim.config.js",
+  "spellbook": {
+    "log-level": "info"
+  }
 }

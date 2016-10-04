@@ -1,26 +1,20 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
-var path = require('path');
+var RunAll = require('./utils/run-all');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'incrementally rebuild')
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'incrementally rebuild');
+});
 
 var commands = [
-  GetPath('sb-build-js-browser-main'),
-  GetPath('sb-build-js-browser-test')
+  ['sb-build-js-browser-main'],
+  ['sb-build-js-browser-test']
 ];
+var args = [];
 
+if (program.watch) {
+  args.push('--watch');
+}
 
-commands.forEach(function(command) {
-  // add watch flag
-  if (program.watch) {
-    command += ' --watch';
-  }
-
-  console.log(path.basename(command));
-  RunCommand('exec', command, {async: true});
-});
+RunAll(commands, args);

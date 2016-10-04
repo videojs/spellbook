@@ -1,48 +1,48 @@
 #!/usr/bin/env node
 var path = require('path');
-var config = require('./utils/get-config')();
-var GetPath = require('./utils/get-path');
-var PathExists = require('./utils/path-exists');
 var shelljs = require('shelljs');
+var config = require('./utils/get-config')();
+var GetFiles = require('./utils/get-files');
+var Clean = require('./utils/clean');
 var Watch = require('./utils/watch');
+var log = require('./utils/log');
+var exec = require('./utils/exec');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-
-var program = require('commander')
-  .version(config.sbVersion)
-  .version(config.sbVersion)
-  .option('-w, --watch', 'watch docs for changes and rebuild')
-  .option('-d, --dist <dist-dir>', 'directory to build api docs to')
-  .arguments('<src-dir>')
-  .action(function(src) {
-    this.src = src;
-  })
-  .parse(process.argv);
-
-if (!program.dist) {
-  program.dist = path.join(config.dist, 'docs', 'manual');
-}
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch docs for changes and rebuild')
+    .option('-d, --dist <dir>', 'directory to build api docs to', path.join(config.dist, 'docs', 'manual'))
+    .arguments('<dir>')
+    .action(function(src) {
+      this.src = src;
+    });
+});
 
 if (!program.src) {
   program.src = path.join(config.src, 'docs');
 }
 
-if (PathExists(program.dist)) {
-  shelljs.rm('-rf', program.dist);
+if (!GetFiles(program.src, path.join('**', '*.md'))) {
+  log.error('Source directory ' + process.src + ' doesnt exist or contains no md files!');
+  process.exit(1);
 }
 
-shelljs.mkdir('-p', program.dist);
+var command = [
+  'remark', program.src,
+  '--no-config',
+  '--rc-path', 'remark-build.config.js',
+  '--output', program.dist
+];
 
-var command = GetPath('remark')
-  + ' ' + program.src
-  + ' --rc-path ' + GetPath('remark-build.config.js')
-  + ' --no-config'
-  + ' --output ' + program.dist;
+var build = function() {
+  Clean(program.dist)
+  exec(command, {silent: true});
+  log.info('Wrote manual docs to ' + program.dist);
+};
 
-shelljs.config.silent = true;
-shelljs.exec(command);
-shelljs.config.silent = false;
-
-console.log('building docs from ' + program.src + ' to ' + program.dist);
 if (program.watch) {
-  Watch(path.join(program.src, '**', '*.md'), command);
+  Watch(path.join(program.src, '**', '*.md'), build);
+} else {
+  build();
 }

@@ -1,39 +1,50 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var path = require('path');
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
 var Watch = require('./utils/watch');
+var exec = require('./utils/exec')
+var path = require('path');
+var log = require('./utils/log');
+var CommanderWrapper = require('./utils/commander-wrapper');
+var PathExists = require('./utils/path-exists');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'watch files for changes and re-lint')
-  .option('-e, --errors', 'only log errors')
-  .option('-f, --fix', 'fix problems automatically')
-  .arguments('<glob-or-file>')
-  .action(function(src) {
-    this.src = src;
-  })
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch files for changes and re-lint')
+    .option('-e, --errors', 'only log errors')
+    .option('-f, --fix', 'fix problems automatically')
+    .arguments('<glob-or-file...>')
+    .action(function(src) {
+      this.src = src;
+    });
+});
 
 if (!program.src) {
-  program.src = path.join(config.src, 'css', '**', '*.*')
+  program.src = [path.join(config.src, 'css', '**', '*.scss')];
 }
 
-var command =  GetPath('stylelint')
-  + ' --color'
-  + ' --config ' + GetPath('stylelint.config.js')
-  + ' ' + program.src;
+var files = [];
+program.src.forEach(function(src) {
+  if (!path.extname(src)) {
+    src = path.join(src, '**', '*.scss');
+  }
+  files.push(src);
+});
+
+var command =  [
+  'stylelint',
+  '--color',
+  '--config', 'stylelint.config.js',
+].concat(files);
 
 if (program.errors) {
-  command += ' --quiet';
+  command.push('--quiet');
 }
 
 if (program.fix) {
-  command += ' --fix';
+  command.push('--fix');
 }
 
-RunCommand('exec', command);
+exec(command);
 
 if (program.watch) {
   Watch(program.src, command);

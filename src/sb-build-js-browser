@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .command('all', 'build all browser bundles', {isDefault: true})
-  .command('main', 'build main code browser bundle')
-  .command('test', 'build unit test browser bundle')
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .command('all', 'build all browser bundles', {isDefault: true})
+    .command('main', 'build main code browser bundle')
+    .command('test', 'build unit test browser bundle');
+});
+

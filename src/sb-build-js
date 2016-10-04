@@ -1,10 +1,13 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .command('all', 'build all possible js outputs', {isDefault: true})
-  .command('browser', 'build js browser output')
-  .command('npm', 'build npm output')
-  .command('bundles', 'build rollup, webpack, and browserify test files')
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .command('all', 'build all possible js outputs', {isDefault: true})
+    .command('browser', 'build js browser output')
+    .command('npm', 'build npm output')
+    .command('bundles', 'build rollup, webpack, and browserify test files');
+});
+
+
+

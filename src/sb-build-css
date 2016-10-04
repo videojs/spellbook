@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .command('all', 'run all commands', {isDefault: true})
-  .command('sass', 'run sass build')
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .command('all', 'run all commands', {isDefault: true})
+    .command('sass', 'run sass build');
+});

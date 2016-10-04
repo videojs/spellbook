@@ -3,9 +3,11 @@ var config = require('./utils/get-config')();
 var PathExists = require('./utils/path-exists');
 var path = require('path');
 var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
 var fs = require('fs');
 var shelljs = require('shelljs');
+var exec = require('./utils/exec');
+var log = require('./utils/log');
+var Promiseo = require('bluebird');
 var es5 = function(bundler) {
   return [
     '/**',
@@ -32,97 +34,75 @@ var es6 = function(bundler) {
     '});',
   ].join('\n');
 };
-shelljs.config.silent = true;
 
-var program = require('commander')
-  .version(config.spellbookVersion)
-  .arguments('[bundlers...]')
-  .action(function(bundlers) {
-    this.bundlers = bundlers;
-  })
-  .option('-w, --watch', 'keep the tester running and run as things change')
-  .parse(process.argv);
-
-var bundlers = ['rollup', 'webpack', 'browserify'];
-
-if (program.bundlers) {
-  bundlers = [];
-} else {
-  program.bundlers = [];
-}
-
-if (!PathExists(config.main)) {
-  RunCommand('exec', GetPath('sb-build-js-npm'));
-}
-
-program.bundlers.forEach(function(bundler) {
-  if ((/webpack|browserify|rollup/i).test(environment)) {
-    bundlers.push(bundler);
-  } else {
-    console.error('invalid bundler ' + bundler);
-    process.exit(1);
-  }
+var CommanderWrapper = require('./utils/commander-wrapper');
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'keep the tester running and run as things change');
 });
 
+program.bundlers = ['rollup', 'webpack', 'browserify'];
+
 if (!PathExists(config.main)) {
-  RunCommand('exec', GetPath('sb-build-js-npm'));
+  exec('sb-build-js-npm');
 }
 
 var testCache = path.join(config.cache, 'bundles');
-var babelPreset = config.ie8 ? GetPath('babel-preset-ie8.config.js') : GetPath('babel-preset.config.js');
+var babelPreset = config.ie8 ? 'babel-preset-ie8.config.js' : 'babel-preset.config.js';
+var promises = [];
 
-RunCommand('rm', '-rf', testCache);
-RunCommand('mkdir', '-p', testCache);
+if (PathExists(testCache)) {
+  shelljs.rm('-rf', testCache);
+}
+shelljs.mkdir('-p', testCache);
 
-bundlers.forEach(function(bundlerName) {
+program.bundlers.forEach(function(bundlerName) {
   var srcFile = path.join(testCache, bundlerName + '.start.js');
   var distFile = path.join(config.dist, 'test', bundlerName + '.test.js');
   var unitTestContents  = es5(bundlerName);
   var command;
 
   if (bundlerName === 'browserify') {
-    command = ''
-      + GetPath('browserify')
-      + ' ' + srcFile
-      + ' --debug'
-      + ' --no-detect-globals'
-      + ' -x qunitjs'
-      + ' -o ' + distFile;
+    command = [
+      'browserify', srcFile,
+      '--debug',
+      '--no-detect-globals',
+      '-x', 'qunitjs',
+      '-o', distFile
+    ];
   } else if (bundlerName === 'rollup') {
     // rollup only works on es6
     unitTestContents = es6(bundlerName);
-    command = ''
-      + GetPath('browserify')
-      + ' ' + srcFile
-      + ' -t rollupify'
-      + ' --debug'
-      + ' --no-detect-globals'
-      + ' -x qunitjs'
-      + ' -t [ babelify --presets '  + babelPreset + ' ]'
-      + ' -o ' + distFile;
+    command = [
+      'browserify', srcFile,
+      '--debug',
+      '-t', 'rollupify',
+      '--no-detect-globals',
+      '-x', 'qunitjs',
+      '-t', '[', 'babelify', '--presets', babelPreset, ']',
+      '-o', distFile
+    ];
   } else if (bundlerName === 'webpack') {
-    command = ''
-      + GetPath('webpack')
-      + ' ' + srcFile
-      + ' --devtool inline-source-map'
-      + ' --output-filename ' + distFile;
+    command = [
+      'webpack', srcFile,
+      '--devtool', 'inline-source-map',
+      '--output-filename', distFile
+    ];
   }
 
-  RunCommand('mkdir', '-p', path.dirname(srcFile));
-  RunCommand('mkdir', '-p', path.dirname(distFile));
+  shelljs.mkdir('-p', path.dirname(srcFile));
+  shelljs.mkdir('-p', path.dirname(distFile));
+
   fs.writeFileSync(srcFile, unitTestContents);
-    // to silence webpack
-    console.log('Building ' + bundlerName + '.test.js');
-    RunCommand('exec', command, function(code, stdout, stderr) {
-      console.log(bundlerName + ' done');
-      if (code !== 0 || stderr.length > 0) {
-        console.log(bundlerName + ' failed!');
-        console.log(stdout);
-        console.error(stderr);
-        process.exit(1);
-      }
-    });
+  promises.push(exec(command, {async: true, silent: true}).then(function(retval) {
+    return Promise.resolve(retval);
+  }));
+
 });
 
-
-// RunCommand('rm', '-rf', testCache);
+Promise.all(promises).then(function() {
+  program.bundlers.forEach(function(bundlerName) {
+    log.info('Wrote bundle test ' + bundlerName + '.test.js');
+  });
+  shelljs.rm('-rf', testCache);
+});

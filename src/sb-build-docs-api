@@ -1,45 +1,51 @@
 #!/usr/bin/env node
 var path = require('path');
 var config = require('./utils/get-config')();
-var GetPath = require('./utils/get-path');
-var PathExists = require('./utils/path-exists');
+var GetFiles = require('./utils/get-files');
+var Clean = require('./utils/clean');
 var shelljs = require('shelljs');
 var Watch = require('./utils/watch');
+var exec = require('./utils/exec');
+var log = require('./utils/log');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'watch docs for changes and rebuild')
-  .option('-d, --dist <dist-dir>', 'directory to build api docs to')
-  .arguments('<src-dir>')
-  .action(function(src) {
-    this.src = src;
-  })
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch docs for changes and rebuild')
+    .option('-d, --dist <dir>', 'directory to build api docs to', path.join(config.dist, 'docs', 'api'))
+    .arguments('<dir>')
+    .action(function(src) {
+      this.src = src;
+    });
+});
 
-if (!program.dist) {
-  program.dist = path.join(config.dist, 'docs', 'api');
-}
 
 if (!program.src) {
   program.src = path.join(config.src, 'js');
 }
 
-if (PathExists(program.dist)) {
-  shelljs.rm('-rf', program.dist);
+if (!GetFiles(program.src, path.join('**', '*.js')).length) {
+  log.fatal('Source directory ' + program.src + ' does not exist or contains no js files!');
+  process.exit(1);
 }
 
-shelljs.mkdir('-p', program.dist);
 
-var command = GetPath('jsdoc')
-  + ' ' + program.src
-  + ' --configure ' + GetPath('jsdoc.config.json')
-  + ' -r'
-  + ' -d ' + program.dist;
+var command = [
+  'jsdoc', program.src,
+  '--configure', 'jsdoc.config.json',
+  '-r',
+  '-d', program.dist
+];
 
-console.log('building docs from ' + program.src + ' to ' + program.dist);
-shelljs.exec(command);
+var build = function() {
+  Clean(program.dist);
+  exec(command, {silent: true});
+  log.info('Wrote API docs to ' + program.dist);
+};
+
 
 if (program.watch) {
-  Watch(path.join(program.src, '**', '*.js'), command);
+  Watch(path.join(program.src, '**', '*.js'), build);
+} else {
+  build();
 }
-

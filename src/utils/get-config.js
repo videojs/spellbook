@@ -14,7 +14,6 @@ var GetConfig = function (dir) {
   }
 
   var appRoot = findRoot(dir);
-
   var workingPkg = readJSON(path.join(appRoot, 'package.json'));
   var sbPkg = readJSON(path.join(__dirname, '..', '..', 'package.json'));
   var banner = ""
@@ -36,7 +35,7 @@ var GetConfig = function (dir) {
     jsNextMain: workingPkg['jsnext:main'] ? path.join(appRoot, workingPkg['jsnext:main']) : '',
 
     ie8: workingPkg.spellbook.ie8 || false,
-    logLevel: workingPkg.spellbook.logLevel || process.NODE_ENV.SB_LOG_LEVEL || 'info',
+    logLevel: process.NODE_ENV.SB_LOG_LEVEL || workingPkg.spellbook['log-level'] || 'debug',
     port: workingPkg.spellbook.port || 9999,
     src: workingPkg.spellbook.src || 'src',
     dist: workingPkg.spellbook.dist || 'dist',

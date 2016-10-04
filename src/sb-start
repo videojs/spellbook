@@ -1,12 +1,9 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
-var RunCommand = require('./utils/run-command');
-var GetPath = require('./utils/get-path');
-var shelljs = require('shelljs');
+var RunAll = require('./utils/run-all');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-require('commander')
-  .version(config.sbVerison)
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander;
+});
 
-RunCommand('exec', GetPath('sb-watch'), {async: true});
-RunCommand('exec', GetPath('sb-server'), {async: true});
+RunAll(['sb-watch', 'sb-server']);

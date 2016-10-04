@@ -1,38 +1,40 @@
 #!/usr/bin/env node
 var path = require('path');
+var shelljs = require('shelljs');
 var config = require('./utils/get-config')();
-var RunCommand = require('./utils/run-command');
-var GetPath = require('./utils/get-path');
 var Watch = require('./utils/watch');
-var PathExists = require('./utils/path-exists');
+var log = require('./utils/log');
+var GetFiles = require('./utils/get-files');
+var Clean = require('./utils/clean');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'watch for changes and copy to dist')
-  .option('-d, --dist <dir>', 'dir to build to')
-  .arguments('<src-dir>')
-  .action(function(src) {
-    this.src = src;
-  })
-  .parse(process.argv);
-
-if (!program.dist) {
-  program.dist = path.join(config.dist, 'i18n');
-}
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch for changes and copy to dist')
+    .option('-d, --dist <dir>', 'dir to build to', path.join(config.dist, 'i18n'))
+    .arguments('<dir>')
+    .action(function(src) {
+      this.src = src;
+    });
+});
 
 if (!program.src) {
   program.src = path.join(config.src, 'i18n');
 }
 
-if (PathExists(program.dist)) {
-  RunCommand('rm', '-rf', program.dist);
+if (!GetFiles(path.join(program.src, '**', '*.json'))) {
+  log.fatal('Source directory ' + program.src + ' does not exist or contains no json files!');
+  process.exit(1);
 }
-RunCommand('mkdir', '-p', program.dist);
-var cmd = GetPath('shx') + ' cp -R ' + program.src + ' ' + program.dist;
 
-RunCommand('exec', cmd);
-console.log('Wrote ' + program.dist);
+var build = function() {
+  Clean(program.dist);
+  shelljs.cp('-r', program.src, program.dist);
+  log.info('Wrote i18n to ' + program.dist);
+};
 
 if (program.watch) {
-  Watch(path.join(config.src, 'i18n', '**', '*.json'), cmd);
+  Watch(path.join(program.src, '**', '*.json'), build);
+} else {
+  build();
 }

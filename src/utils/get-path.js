@@ -7,6 +7,7 @@ var spellbin = path.join(spell, 'src');
 var confdir = path.join(spell, 'config');
 
 var GetPath = function(name) {
+  name = name || '';
   var nodepath = path.join(nodebin, name);
   var spellpath = path.join(spellbin, name);
   var confpath = path.join(confdir, name);
@@ -22,6 +23,8 @@ var GetPath = function(name) {
   if (PathExists(confpath)) {
     return confpath;
   }
+
+  return name;
 };
 
 module.exports = GetPath;

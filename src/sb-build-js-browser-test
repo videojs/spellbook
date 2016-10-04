@@ -1,35 +1,32 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
 var path = require('path');
-var shelljs = require('shelljs');
 var browserifyHelper = require('./utils/browserify-helper');
+var CommanderWrapper = require('./utils/commander-wrapper');
+var GetFiles = require('./utils/get-files');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'incremental rebuild')
-  .option('-d, --dist <dir>', 'file to write output to')
-  .arguments('<glob>')
-  .action(function(src) {
-    this.src = src;
-  })
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'incremental rebuild')
+    .option('-d, --dist <dir>', 'file to write output to', path.join(config.dist, 'test'))
+    .arguments('<dir>')
+    .action(function(src) {
+      this.src = src;
+    });
+});
 
 if (!program.src) {
-  program.src = path.join(config.src, 'test', '*.test.js')
+  program.src = path.join(config.src, 'test');
 }
 
-if (!program.dist) {
-  program.dist = path.join(config.dist, 'test');
+if(!GetFiles(program.src, path.join('**', '*.test.js'))) {
+  log.fatal('Source directory ' + program.src + ' does not exist or contains no test.js files!');
+  process.exit(1);
 }
 
-var distFile = path.join(program.dist, config.name + '.test');
 browserifyHelper({
-  dist: distFile,
-  src: program.src,
+  dist: path.join(program.dist, config.name + '.test'),
+  src: path.join(program.src, '**', '*.test.js'),
   standalone: false,
   watch: program.watch
 });
-console.log('Wrote ' + distFile + '.js');
-console.log('Wrote ' + distFile + '.js.map');
-
-

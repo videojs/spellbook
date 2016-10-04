@@ -1,40 +1,49 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
 var PathExists = require('./utils/path-exists');
-var GetPath = require('./utils/get-path');
 var path = require('path');
+var CommanderWrapper = require('./utils/commander-wrapper');
+var exec = require('./utils/exec');
 var shelljs = require('shelljs');
+var log = require('./utils/log');
+var Clean = require('./utils/clean');
+var GetFiles = require('./utils/get-files');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'incremental rebuild')
-  .option('-d, --dist <dir>', 'directory to write output to')
-  .arguments('<src-dir>')
-  .action(function(src) {
-    this.src = src;
-  })
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'incremental rebuild')
+    .option('-d, --dist <dir>', 'directory to write output to', path.join(config.dist, 'npm'))
+    .arguments('<dir>')
+    .action(function(src) {
+      this.src = src;
+    });
+});
 
 if (!program.src) {
   program.src = path.join(config.src, 'js');
 }
 
-if (!program.dist) {
-  program.dist = path.join(config.dist, 'npm');
+if (!GetFiles(program.src, path.join('**', '*.js'))) {
+  log.fatal('Source directory ' + program.src + ' does not exist or contains no js files!');
+  process.exit(1);
 }
 
-shelljs.rm('-rf', program.dist);
-shelljs.mkdir('-p', program.dist);
-
-var babelPreset = config.ie8 ? GetPath('babel-preset-ie8.config.js') : GetPath('babel-preset.config.js');
-
-var cmd = GetPath('babel') + ' '
-  + '-d ' + program.dist + ' '
-  + ' --presets ' + babelPreset
-  + ' ' + program.src;
+var babelPreset = config.ie8 ? 'babel-preset-ie8.config.js' : 'babel-preset.config.js';
+var cmd = [
+  'babel',
+  '-d', program.dist,
+  '--presets', babelPreset,
+  program.src
+];
 
 if (program.watch) {
-  cmd += ' --watch';
+  cmd.push('--watch');
 }
 
-shelljs.exec(cmd);
+Clean(program.dist);
+if (program.watch) {
+  exec(cmd);
+} else {
+  exec(cmd, {silent: true});
+  log.info('Wrote npm dist to ' + program.dist);
+}

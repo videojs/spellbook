@@ -8,8 +8,10 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # TODO
-* sb-build-js-browser
+* js
   * ignore .js.tmp files during watchify?? (created by rollupify, seem to cause issues?)
+  * fix watchify
+  * fix js-bundlers watch
 * sb-build-css-sass
   * add banner to the minified files
   * update the source map with the line offset of the banner that was added
@@ -21,9 +23,6 @@
   * test-*
   * server
   * test with --watch arguments
-  * lint-* with --fix and --errors
-* sb-docs
-  * remark hangs if it gets passed 0 files
 
 # Future Ideas
 * sb-build-js-browser
@@ -49,8 +48,6 @@
 * sb-build-js-browser-tests
   * treat code being tested as external so we only build it once
 * general
-  * better verbose logging support?
-    * use RunCommand?
   * more configuration
   * noderify when we switch to js instead of using shelljs
 * sb-release

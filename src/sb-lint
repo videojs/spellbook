@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .command('docs', 'lint docs')
-  .command('i18n', 'lint i18n')
-  .command('js', 'lint js')
-  .command('css', 'lint css')
-  .command('all', 'lint css', {isDefault: true})
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch for changes and re-lint on change')
+    .command('docs', 'lint docs')
+    .command('i18n', 'lint i18n')
+    .command('js', 'lint js')
+    .command('css', 'lint css')
+    .command('all', 'lint css', {isDefault: true})
+});

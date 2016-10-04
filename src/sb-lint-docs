@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .command('md', 'lint markdown files')
-  .command('examples', 'lint js examples in markdown files')
-  .command('all', 'run all', {isDefault: true})
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .command('md', 'lint markdown files')
+    .command('examples', 'lint js examples in markdown files')
+    .command('all', 'run all', {isDefault: true});
+});

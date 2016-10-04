@@ -1,12 +1,17 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
-var RunCommand = require('./utils/run-command');
-var GetPath = require('./utils/get-path');
+var RunAll = require('./utils/run-all');
 
-require('commander')
-  .version(config.sbVersion)
-  .parse(process.argv);
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-RunCommand('exec', GetPath('sb-build') + ' --watch', {async: true});
-RunCommand('exec', GetPath('sb-lint') + ' --watch', {async: true});
-RunCommand('exec', GetPath('sb-test') + ' --watch', {async: true});
+var program = CommanderWrapper(function(commander) {
+  return commander;
+});
+
+var commands = [
+  ['sb-build-all'],
+  ['sb-lint-all'],
+  ['sb-test-all'],
+];
+var args = ['--watch']
+
+RunAll(commands, args);

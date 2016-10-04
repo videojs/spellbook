@@ -2,54 +2,43 @@
 var config = require('./utils/get-config')();
 var PathExists = require('./utils/path-exists');
 var path = require('path');
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
+var log = require('./utils/log');
+var exec = require('./utils/exec');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'keep the tester running and run as things change')
-  .option('-b, --browsers', 'comma seperated list of browsers to run on')
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'keep the tester running and run as things change')
+    .option('-b, --browsers', 'comma seperated list of browsers to run on');
+});
 
 var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
-
-
-var testDist = path.join(config.dist, 'test', config.name + '.js');
+var testDist = path.join(config.dist, 'test', config.name + '.test.js');
+var bundlerDist = path.join(config.dist, 'test', 'rollup.test.js');
 var srcDist = path.join(config.dist, 'browser', config.name + '.js');
 var cssDist = path.join(config.dist, 'browser', config.name + '.css');
-var bundlerDist = path.join(config.cache, 'bundlers');
 
-if (!PathExists(testDist) || !PathExists(srcDist)) {
-  RunCommand('exec', GetPath('sb-build-js'));
+if (!PathExists(testDist) || !PathExists(srcDist) || !PathExists(cssDist) || !PathExists(bundlerDist)) {
+  exec('sb-build');
 }
 
-if (!PathExists(cssDist)) {
-  RunCommand('exec', GetPath('sb-build-css'));
-}
-
-if (!program.files) {
-  program.files = [
-    path.join(config.dist, 'browser', config.name + '.css'),
-    path.join(config.dist, 'test', config.name + '.js')
-  ];
-}
-
-// TODO: how do we integrate this with spellbook-start (module.export?)
-// TODO: test non-browser environments somehow
-// http://localhost:9876/debug.html will be qunit UI
-var karmaCommand = GetPath('karma')
-  + ' start ' + GetPath('karma.config.js')
+var command = [
+  'karma',
+  'start',
+  'karma.config.js'
+];
 
 if (program.watch) {
-  karmaCommand += ' --auto-watch';
-  karmaCommand += ' --no-single-run';
+  command.push('--auto-watch');
+  command.push('--no-single-run');
 } else  {
-  karmaCommand += ' --no-auto-watch';
-  karmaCommand += ' --single-run';
+  command.push('--no-auto-watch');
+  command.push('--single-run');
 }
 
 if (program.browsers) {
-  karmaCommand += ' --browsers ' + program.browsers.join(',');
+  command.push('--browsers');
+  command.push(program.browsers.join(','));
 }
 
-RunCommand('exec', karmaCommand);
+exec(command);

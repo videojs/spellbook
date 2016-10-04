@@ -1,45 +1,62 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
 var path = require('path');
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
 var PathExists = require('./utils/path-exists');
+var log = require('./utils/log');
+var exec = require('./utils/exec');
+var glob = require('glob');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'watch files for changes and re-lint')
-  .option('-e, --errors', 'only log errors')
-  .option('-f, --fix', 'fix problems automatically')
-  .arguments('[glob-or-file]')
-  .action(function(src) {
-    this.src = src;
-  })
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch files for changes and re-lint')
+    .option('-e, --errors', 'only log errors')
+    .option('-f, --fix', 'fix problems automatically')
+    .arguments('<glob-or-file...>')
+    .action(function(src) {
+      this.src = src;
+    });
+});
 
 if (!program.src) {
-  program.src = path.join(config.src, 'docs', '**', '*.md');
+  program.src = [path.join(config.src, '**', '*.md')];
 }
 
-if (PathExists(program.src) && path.extname(program.src) === '') {
-  program.src = path.join(program.src, '**', '*.md');
-}
+// make it glob
+var files = [];
+program.src.forEach(function(src) {
+  if (path.extname(src) === '') {
+    src = path.join(src, '**', '*.md');
+  }
 
-var command =  ''
-  + GetPath('remark')
-  + ' --rc-path ' + GetPath('remark-lint.config.js')
-  + ' --no-config'
-  + ' ' + program.src;
+  var f = glob.sync(src);
+
+  // remark hangs if we have no files
+  if (f.length === 0) {
+    log.fatal('No docs to lint for glob ' + src + '!');
+    process.exit(1);
+  }
+  files.push(src);
+});
+
+
+var command = [
+  'remark',
+  '--rc-path', 'remark-lint.config.js',
+  '--no-config',
+  '--no-stdout',
+].concat(files);
 
 if (program.watch) {
-  command += ' --watch';
+  command.push('--watch');
 }
 
 if (program.errors) {
-  command += ' --quiet';
+  command.push('--quiet');
 }
 
 if (program.fix) {
-  command += ' --fix';
+  command.push('--fix');
 }
 
-RunCommand('exec', command);
+exec(command);

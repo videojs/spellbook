@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .command('all', 'run all doc builds', {isDefault: true})
-  .command('api', 'run the api doc build')
-  .command('manual', 'run the manual doc build')
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .command('all', 'run all doc builds', {isDefault: true})
+    .command('api', 'run the api doc build')
+    .command('manual', 'run the manual doc build');
+});

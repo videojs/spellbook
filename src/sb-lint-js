@@ -1,22 +1,22 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
 var path = require('path');
-var RunCommand = require('./utils/run-command');
 var eslintHelper = require('./utils/eslint-helper');
+var exec = require('./utils/exec');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'watch files for changes and re-lint')
-  .option('-e, --errors', 'only log errors')
-  .option('-f, --fix', 'fix problems automatically')
-  .arguments('<glob-or-file>')
-  .action(function(src) {
-    this.src = src;
-  })
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch files for changes and re-lint')
+    .option('-e, --errors', 'only log errors')
+    .option('-f, --fix', 'fix problems automatically')
+    .arguments('<glob-or-file...>')
+    .action(function(src) {
+      this.src = src;
+    });
+});
 
 if (!program.src) {
-  program.src = path.join(config.src, 'js', '**', '*.js')
+  program.src = [path.join(config.src, 'js', '**', '*.js')];
 }
-
-RunCommand('exec', eslintHelper(program));
+exec(eslintHelper(program));

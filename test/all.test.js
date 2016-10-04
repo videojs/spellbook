@@ -5,7 +5,7 @@ var pkg = require('../package.json');
 var parallel = require('mocha.parallel');
 
 Object.keys(pkg.bin).forEach(function(key) {
-  parallel(key + ' --help, -h, -V, --version', function() {
+  parallel(key, function() {
     var binPath = path.join(__dirname, '..', pkg.bin[key]);
 
     beforeEach(function() {
@@ -22,7 +22,9 @@ Object.keys(pkg.bin).forEach(function(key) {
           var stdouts = stdout.trim().split('\n');
 
           assert.equal(code, 0, 'should return success');
-          assert.ok((/^Usage:/).test(stdouts[0]), 'should print help');
+          assert.ok((/start/).test(stdouts[0]), 'should print start');
+          assert.ok((/^  Usage:/).test(stdouts[2]), 'should print help');
+          assert.ok((/finish/).test(stdouts[stdouts.length -1]), 'should print finish');
           assert.equal(stderr.length, 0, 'no errors');
           done();
         });
@@ -35,7 +37,9 @@ Object.keys(pkg.bin).forEach(function(key) {
           var stdouts = stdout.trim().split('\n');
 
           assert.equal(code, 0, 'should return success');
-          assert.ok(stdouts[0], pkg.version, 'should print version');
+          assert.ok((/start/).test(stdouts[0]), 'should print start');
+          assert.ok(stdouts[1], pkg.version, 'should print version');
+          assert.ok((/finish/).test(stdouts[stdouts.length -1]), 'should print finish');
           assert.equal(stderr.length, 0, 'no errors');
           done();
         });

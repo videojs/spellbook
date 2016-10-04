@@ -1,23 +1,19 @@
 #!/usr/bin/env node
-var path = require('path');
-var config = require('./utils/get-config')();
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
-var path = require('path');
+var exec = require('./utils/exec');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'incrementally rebuild')
-  .parse(process.argv);
-
-
-console.log('sb-build-js-npm')
-RunCommand('exec', GetPath('sb-build-js-npm'), function(code, stderr, stdout) {
-
-  console.log('sb-build-js-bundles')
-  RunCommand('exec', GetPath('sb-build-js-bundles'));
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'incrementally rebuild');
 });
 
-console.log('sb-build-js-browser')
-RunCommand('exec', GetPath('sb-build-js-browser'), {async: true});
+var args = [];
 
+if (program.watch) {
+  args.push('--watch');
+}
+exec(['sb-build-js-npm'].concat(args), {async: true}).then(function() {
+  return exec(['sb-build-js-bundles'].concat(args), {async: true});
+});
+
+exec(['sb-build-js-browser-all'].concat(args), {async: true});

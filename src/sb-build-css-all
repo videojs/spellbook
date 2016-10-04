@@ -1,22 +1,19 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
-var path = require('path');
+var CommanderWrapper = require('./utils/commander-wrapper');
+var RunAll = require('./utils/run-all');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'watch files for changes')
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch files for changes')
+});
 
 var commands = [
-  GetPath('sb-build-css-sass')
+  ['sb-build-css-sass']
 ];
+var args = [];
 
-commands.forEach(function(command) {
-  if (program.watch) {
-    command += ' --watch';
-  }
-  console.log(path.basename(command));
-  RunCommand('exec', command, {async: true});
-});
+if (program.watch) {
+  args.push('--watch');
+}
+
+RunAll(commands, args)

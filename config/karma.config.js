@@ -8,8 +8,6 @@ module.exports = function(karmaConfig) {
     detectBrowsers = false;
   }
 
-  console.log(karmaConfig.autoWatch);
-  console.log(karmaConfig.singleRun);
   karmaConfig.set({
     reporters: ['dots'],
     frameworks: ['qunit', 'detectBrowsers'],
@@ -26,6 +24,7 @@ module.exports = function(karmaConfig) {
     files: [
       'node_modules/videojs-spellbook/node_modules/sinon/pkg/sinon.js',
       'node_modules/videojs-spellbook/node_modules/sinon/pkg/sinon-ie.js',
+      path.join(config.dist, 'browser', config.name + '.css'),
       path.join(config.dist, 'test', '*.test.js')
     ]
   });

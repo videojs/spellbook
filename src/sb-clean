@@ -4,19 +4,20 @@ var PathExists = require('./utils/path-exists');
 var shelljs = require('shelljs');
 var glob = require('glob');
 var path = require('path');
+var log = require('./utils/log');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-d, --dry-run', 'see what would happen when you run clean')
-  .option('-c, --cache', 'clear the  cache folder too')
-  .option('-q, --quiet', 'dont log any output, other than errors')
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-d, --dry-run', 'see what would happen when you run clean')
+    .option('-c, --cache', 'clear the  cache folder too')
+    .option('-q, --quiet', 'dont log any output, other than errors');
+});
 
 if (program.quiet && program.dryRun) {
-  console.error('--dry-run should not be used with --quiet');
+  log.fatal('--dry-run should not be used with --quiet');
   process.exit(1);
 }
-
 
 var files = glob.sync(path.join(config.path, '**',  'npm-debug.log'), {ignore: '**/node_modules/**'});
 files.push(config.dist);
@@ -24,13 +25,12 @@ files.push(config.dist);
 if (program.cache) {
   files.push(config.cache);
 }
-
 files.forEach(function(file) {
   if (!PathExists(file)) {
     return;
   }
   if (!program.quiet) {
-    console.log('removing ' + file);
+    log.info('removing ' + file);
   }
   if (!program.dryRun) {
     shelljs.rm('-rf', file);

@@ -14,7 +14,6 @@ describe('sb-build-css-sass', function() {
     this.helper.cleanup();
   });
 
-  // TODO: check file contents
   it('should build default files with no args', function(done) {
     shelljs.exec(this.bin, function(code, stdout, stderr) {
       var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];

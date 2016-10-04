@@ -1,17 +1,18 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
 var path = require('path');
-var browserSync = require('browser-sync').create();
 var proxy = require('http-proxy-middleware');
 var url = require('url');
+var browserSync = require('browser-sync');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-p, --port <number>', 'what port to start the server on', parseInt)
-  .option('-o, --open', 'open the server in your default browser')
-  .option('-s, --sync', 'enable cross browser action sync')
-  .option('-ui, --ui', 'enable browser-sync ui')
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-p, --port <number>', 'what port to start the server on', parseInt)
+    .option('-o, --open', 'open the server in your default browser')
+    .option('-s, --sync', 'enable cross browser action sync')
+    .option('-ui, --ui', 'enable browser-sync ui')
+});
 
 /* proxy /test to karma server */
 var filter = function (pathname, req) {
@@ -43,7 +44,7 @@ var karmaProxy = proxy(filter, {
   }
 });
 
-browserSync.init({
+browserSync.create().init({
   server: {
     baseDir: config.path,
     middleware: [karmaProxy],

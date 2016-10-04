@@ -1,33 +1,36 @@
 #!/usr/bin/env node
 var config = require('./get-config')();
-var GetPath = require('./get-path');
 var path = require('path');
 var PathExists = require('./path-exists');
 
 var eslintHelper = function(program) {
-  // make it recursive
-  if (PathExists(program.src) && path.extname(program.src) === '') {
-    program.src = path.join(program.src, '**', '*.*');
-  }
+  var files = [];
+  program.src.forEach(function(src) {
+    // make it recursive
+    if (PathExists(src) && path.extname(src) === '') {
+      src = path.join(src, '**', '*.*');
+    }
+    files.push(src);
+  });
 
-  var command =  ''
-    + GetPath('esw')
-    + ' --color'
-    + ' --no-eslintrc'
-    + ' --ignore node_modules'
-    + ' -c ' + GetPath('eslint.config.js')
-    + ' ' + program.src;
+  var command =  [
+    'esw',
+    '--color',
+    '--no-eslintrc',
+    '--ignore node_modules',
+    '-c', 'eslint.config.js',
+  ].concat(files);
 
   if (program.watch) {
-    command += ' --watch';
+    command.push('--watch');
   }
 
   if (program.errors) {
-    command += ' --quiet';
+    command.push('--quiet');
   }
 
   if (program.fix) {
-    command += ' --fix';
+    command.push('--fix');
   }
 
   return command;

@@ -1,29 +1,33 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var PathExists = require('./utils/path-exists');
-var GetPath = require('./utils/get-path');
 var path = require('path');
-var shelljs = require('shelljs');
 var browserifyHelper = require('./utils/browserify-helper');
+var exec = require('./utils/exec');
+var log = require('./utils/log');
+var CommanderWrapper = require('./utils/commander-wrapper');
+var GetFiles = require('./utils/get-files');
+var Clean = require('./utils/clean');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'incremental rebuild')
-  .option('-d, --dist <dir>', 'dir to write output to')
-  .arguments('<entry-file>')
-  .action(function(src) {
-    this.src = src;
-  })
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'incremental rebuild')
+    .option('-d, --dist <dir>', 'dir to write output to', path.join(config.dist, 'browser'))
+    .arguments('<dir>')
+    .action(function(src) {
+      this.src = src;
+    });
+});
 
 if (!program.src) {
-  program.src = path.join(config.src, 'js', 'index.js')
+  program.src = path.join(config.src, 'js', 'index.js');
 }
 
-if (!program.dist) {
-  program.dist = path.join(config.dist, 'browser');
+if(!GetFiles(program.src, 'index.js')) {
+  log.fatal('Source directory ' + program.src + ' does not exist or contains no index.js!');
+  process.exit(1);
 }
 
+Clean(program.dist);
 var distFile = path.join(program.dist, config.name);
 browserifyHelper({
   dist: distFile,
@@ -31,29 +35,31 @@ browserifyHelper({
   standalone: true,
   watch: program.watch
 });
-console.log('Wrote ' + distFile + '.js');
-console.log('Wrote ' + distFile + '.js.map');
 
 // we don't want to uglify after watching
-if (program.watch) {
-  process.exit(0);
+if (!program.watch) {
+
+  // remove the last newline in the banner
+  // uglify adds it for us
+  var banner = config.banner;
+  banner = config.banner.replace(/\n$/, '');
+  exec([
+    'uglifyjs',
+    '--compress',
+    '--mangle',
+    '--in-source-map',
+    distFile + '.js.map',
+    '--source-map ',
+    distFile + '.min.js.map',
+    '--source-map-url ',
+    path.basename(distFile) + '.min.js.map',
+    '--preamble',
+    '\'' + banner + '\'',
+    '-o',
+   distFile + '.min.js',
+    '--',
+   distFile + '.js'
+], {silent: true});
+  log.info('Wrote ' + distFile + '.min.js');
+  log.info('Wrote ' + distFile + '.min.js.map');
 }
-
-// remove the last newline in the banner
-// uglify adds it for us
-var banner = config.banner;
-banner = config.banner.replace(/\n$/, '');
-shelljs.exec(GetPath('uglifyjs')
-  + ' --compress'
-  + ' --mangle'
-  + ' --in-source-map ' + distFile + '.js.map'
-  + ' --source-map ' + distFile + '.min.js.map'
-  + ' --source-map-url ' + path.basename(distFile) + '.min.js.map'
-  + ' --preamble \'' + banner + '\''
-  + ' -o ' + distFile + '.min.js'
-  + ' -- ' + distFile + '.js'
-);
-console.log('Wrote ' + distFile + '.min.js');
-console.log('Wrote ' + distFile + '.min.js.map');
-
-shelljs.rm('-f', path.join(config.path, '.babelrc'));

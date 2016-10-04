@@ -1,30 +1,25 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
-var RunCommand = require('./utils/run-command');
-var GetPath = require('./utils/get-path');
-var path = require('path');
+var RunAll = require('./utils/run-all');
+var exec = require('./utils/exec');
+var log = require('./utils/log');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'watch files for changes and rebuild')
-  .parse(process.argv);
-
-console.log('sb-clean');
-RunCommand('exec', GetPath('sb-clean'));
-
-var commands = [
-  GetPath('sb-build-js'),
-  GetPath('sb-build-css'),
-  GetPath('sb-build-docs'),
-  GetPath('sb-build-i18n')
-];
-
-commands.forEach(function(command) {
-  if (program.watch) {
-    command += ' --watch';
-  }
-
-  console.log(path.basename(command));
-  RunCommand('exec', command, {async: true});
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch files for changes and rebuild')
 });
 
+exec('sb-clean');
+var commands = [
+  ['sb-build-js-all'],
+  ['sb-build-css-all'],
+  ['sb-build-docs-all'],
+  ['sb-build-i18n']
+];
+var args = []
+
+if (program.watch) {
+  args.push('--watch');
+}
+
+RunAll(commands, args);

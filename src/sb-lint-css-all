@@ -1,31 +1,27 @@
 #!/usr/bin/env node
-var config = require('./utils/get-config')();
-var GetPath = require('./utils/get-path');
-var RunCommand = require('./utils/run-command');
-var path = require('path');
+var RunAll = require('./utils/run-all');
+var CommanderWrapper = require('./utils/commander-wrapper');
 
-var program = require('commander')
-  .version(config.sbVersion)
-  .option('-w, --watch', 'watch files for changes and re-lint')
-  .option('-e, --errors', 'only log errors')
-  .option('-f, --fix', 'automatically fix semantic errors were possible')
-  .parse(process.argv);
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch files for changes and re-lint')
+    .option('-e, --errors', 'only log errors')
+    .option('-f, --fix', 'automatically fix semantic errors were possible');
+});
 
 var commands = [
-  GetPath('sb-lint-css-sass'),
+  ['sb-lint-css-sass'],
 ];
+var args = [];
 
-commands.forEach(function(command) {
-  if (program.errors) {
-    command += ' --errors';
-  }
-  if (program.watch) {
-    command += ' --watch';
-  }
-  if (program.fix) {
-    command += ' --fix';
-  }
+if (program.watch) {
+  args.push('--watch');
+}
+if (program.errors) {
+  args.push('--errors');
+}
+if (program.fix) {
+  args.push('--fix');
+}
 
-  console.log(path.basename(command));
-  RunCommand('exec', command, {async: true});
-});
+RunAll(commands, args);
