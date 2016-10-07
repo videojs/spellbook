@@ -7,7 +7,10 @@ var fs = require('fs');
 var shelljs = require('shelljs');
 var exec = require('./utils/exec');
 var log = require('./utils/log');
-var Promiseo = require('bluebird');
+var Promise = require('bluebird');
+var Clean = require('./utils/clean');
+var Watch = require('./utils/watch');
+
 var es5 = function(bundler) {
   return [
     '/**',
@@ -41,68 +44,74 @@ var program = CommanderWrapper(function(commander) {
     .option('-w, --watch', 'keep the tester running and run as things change');
 });
 
-program.bundlers = ['rollup', 'webpack', 'browserify'];
-
 if (!PathsExist(config.main)) {
   exec('sb-build-js-npm');
 }
 
-var testCache = path.join(config.cache, 'bundles');
-var babelPreset = config.ie8 ? 'babel-preset-ie8.config.js' : 'babel-preset.config.js';
-var promises = [];
+var build = function() {
+  program.bundlers = ['rollup', 'webpack', 'browserify'];
 
-if (PathsExist(testCache)) {
-  shelljs.rm('-rf', testCache);
-}
-shelljs.mkdir('-p', testCache);
+  var testCache = path.join(config.cache, 'bundles');
+  var babelPreset = config.ie8 ? 'babel-preset-ie8.config.js' : 'babel-preset.config.js';
+  var promises = [];
 
-program.bundlers.forEach(function(bundlerName) {
-  var srcFile = path.join(testCache, bundlerName + '.start.js');
-  var distFile = path.join(config.dist, 'test', bundlerName + '.test.js');
-  var unitTestContents  = es5(bundlerName);
-  var command;
-
-  if (bundlerName === 'browserify') {
-    command = [
-      'browserify', srcFile,
-      '--debug',
-      '--no-detect-globals',
-      '-x', 'qunitjs',
-      '-o', distFile
-    ];
-  } else if (bundlerName === 'rollup') {
-    // rollup only works on es6
-    unitTestContents = es6(bundlerName);
-    command = [
-      'browserify', srcFile,
-      '--debug',
-      '-t', 'rollupify',
-      '--no-detect-globals',
-      '-x', 'qunitjs',
-      '-t', '[', 'babelify', '--presets', babelPreset, ']',
-      '-o', distFile
-    ];
-  } else if (bundlerName === 'webpack') {
-    command = [
-      'webpack', srcFile,
-      '--devtool', 'inline-source-map',
-      '--output-filename', distFile
-    ];
-  }
-
-  shelljs.mkdir('-p', path.dirname(srcFile));
-  shelljs.mkdir('-p', path.dirname(distFile));
-
-  fs.writeFileSync(srcFile, unitTestContents);
-  promises.push(exec(command, {async: true, silent: true}).then(function(retval) {
-    return Promise.resolve(retval);
-  }));
-
-});
-
-Promise.all(promises).then(function() {
+  log.info('Building...')
+  Clean(testCache);
   program.bundlers.forEach(function(bundlerName) {
-    log.info('Wrote bundle test ' + bundlerName + '.test.js');
+    var srcFile = path.join(testCache, bundlerName + '.start.js');
+    var distFile = path.join(config.dist, 'test', bundlerName + '.test.js');
+    var unitTestContents  = es5(bundlerName);
+    var command;
+
+    if (bundlerName === 'browserify') {
+      command = [
+        'browserify', srcFile,
+        '--debug',
+        '--no-detect-globals',
+        '-x', 'qunitjs',
+        '-o', distFile
+      ];
+    } else if (bundlerName === 'rollup') {
+      // rollup only works on es6
+      unitTestContents = es6(bundlerName);
+      command = [
+        'browserify', srcFile,
+        '--debug',
+        '-t', 'rollupify',
+        '--no-detect-globals',
+        '-x', 'qunitjs',
+        '-t', '[', 'babelify', '--presets', babelPreset, ']',
+        '-o', distFile
+      ];
+    } else if (bundlerName === 'webpack') {
+      command = [
+        'webpack', srcFile,
+        '--devtool', 'inline-source-map',
+        '--output-filename', distFile
+      ];
+    }
+
+    shelljs.mkdir('-p', path.dirname(srcFile));
+    shelljs.mkdir('-p', path.dirname(distFile));
+
+    fs.writeFileSync(srcFile, unitTestContents);
+    promises.push(exec(command, {async: true, silent: true}).then(function(retval) {
+      return Promise.resolve(retval);
+    }));
+
   });
-  shelljs.rm('-rf', testCache);
-});
+
+  Promise.all(promises).then(function() {
+    program.bundlers.forEach(function(bundlerName) {
+      log.info('Wrote bundle test ' + bundlerName + '.test.js');
+    });
+    shelljs.rm('-rf', testCache);
+  });
+
+};
+
+if (program.watch) {
+  Watch(path.join(config.dist, 'npm', '**', '*.js'), build);
+} else {
+  build();
+}

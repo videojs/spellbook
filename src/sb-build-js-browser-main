@@ -30,39 +30,38 @@ if(!GetFiles(path.join(program.src, 'index.js'))) {
 
 Clean(program.dist);
 var distFile = path.join(program.dist, config.name);
-var build = function () {
-  browserifyHelper({
-    dist: distFile,
-    src: path.join(program.src, 'index.js'),
-    standalone: true,
-  });
-};
+var p = browserifyHelper({
+  dist: distFile,
+  src: path.join(program.src, 'index.js'),
+  standalone: true,
+  watch: program.watch
+});
 
 // we don't want to uglify after watching
-if (program.watch) {
-  Watch(path.join(program.src, '**', '*.js'), build);
-} else {
-  // remove the last newline in the banner
-  // uglify adds it for us
-  var banner = config.banner;
-  banner = config.banner.replace(/\n$/, '');
-  exec([
-    'uglifyjs',
-    '--compress',
-    '--mangle',
-    '--in-source-map',
-    distFile + '.js.map',
-    '--source-map ',
-    distFile + '.min.js.map',
-    '--source-map-url ',
-    path.basename(distFile) + '.min.js.map',
-    '--preamble',
-    '\'' + banner + '\'',
-    '-o',
-    distFile + '.min.js',
-    '--',
-    distFile + '.js'
-  ], {silent: true});
-  log.info('Wrote ' + distFile + '.min.js');
-  log.info('Wrote ' + distFile + '.min.js.map');
+if (!program.watch) {
+  p.then(function() {
+    // remove the last newline in the banner
+    // uglify adds it for us
+    var banner = config.banner;
+    banner = config.banner.replace(/\n$/, '');
+    exec([
+      'uglifyjs',
+      '--compress',
+      '--mangle',
+      '--in-source-map',
+      distFile + '.js.map',
+      '--source-map ',
+      distFile + '.min.js.map',
+      '--source-map-url ',
+      path.basename(distFile) + '.min.js.map',
+      '--preamble',
+      '\'' + banner + '\'',
+      '-o',
+      distFile + '.min.js',
+      '--',
+      distFile + '.js'
+    ], {silent: true});
+    log.info('Wrote: ' + distFile + '.min.js');
+    log.info('Wrote: ' + distFile + '.min.js.map');
+  });
 }

@@ -8,5 +8,3 @@ var program = CommanderWrapper(function(commander) {
     .command('all', 'run all tests', {isDefault: true});
 });
 
-
-

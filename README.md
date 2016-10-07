@@ -8,9 +8,6 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # TODO
-* js
-  * use rollup directly
-  * fix js-bundlers watch
 * sb-build-css-sass
   * add banner to the minified files
   * update the source map with the line offset of the banner that was added
@@ -24,6 +21,11 @@
   * test with --watch arguments
 
 # Future Ideas
+* make faster
+  * build-js-bundles
+  * build-js-npm
+* js
+  * get rollupify to work with watchify
 * sb-build-js-npm
   * noderify npm binaries?
 * sb-create
@@ -49,3 +51,6 @@
   * noderify when we switch to js instead of using shelljs
 * sb-release
   * support prerelease signifiers (beta, alpha etc)
+* shim
+  * when browserify-shim support config passing, use that rather than using browserify-shim in user pkg.json
+    * see: https://github.com/thlorenz/browserify-shim/pull/195

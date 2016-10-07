@@ -1,12 +1,14 @@
 var config = require('./get-config')();
 var shelljs = require('shelljs');
 var path = require('path');
-var glob = require('glob');
-var exorcistHelper = require('./exorcist-helper');
 var log = require('./log');
-var exec = require('./exec');
 var GetFiles = require('./get-files');
-var PathsExist = require('./paths-exist');
+var browserify = require('browserify');
+var browserifyInc = require('browserify-incremental');
+var streamToPromise = require('stream-to-promise');
+var GetPath = require('./get-path');
+var exorcist = require('exorcist');
+var fs = require('fs');
 
 // dist, src, standalone
 var browserifyHelper = function(options) {
@@ -23,43 +25,60 @@ var browserifyHelper = function(options) {
     process.exit(1);
   }
 
+  shelljs.mkdir('-p', path.dirname(cacheFile));
   shelljs.mkdir('-p', path.dirname(options.dist));
 
-  var command = [
-    '-v',
-    '--debug',
-    /*'--cachefile', cacheFile,*/
-    /* currently broken: '-t', 'rollupify',*/
-    '-t', '[', 'babelify', '--presets', babelPreset, ']',
-    '-g', 'browserify-shim',
-    '-g', 'browserify-versionify',
-    '-p', 'bundle-collapser/plugin',
-    '-o', options.dist + '.js',
-  ].concat(files);
+  var opts = {
+    basedir: config.path,
+    debug: true,
+    standalone: (options.standalone ? config.name : false),
+    cacheFile: cacheFile,
+    fullPaths: true,
+    cache: {},
+    packageCache: {},
+    plugin: [
+      'errorify',
+      'bundle-collapser/plugin'
+    ],
+    transform: [
+      /* broken for external shims during watchify... 'rollupify',*/
+      ['babelify', {presets: GetPath(babelPreset)}],
+      ['browserify-shim', {global: true}],
+      ['browserify-versionify', {global: true}]
+    ]
+  };
 
-  if (options.standalone) {
-    command.push('-s');
-    command.push(config.name);
-  }
-  command.unshift('browserifyinc');
-  var retval = exec(command, {silent: true});
-
-  // remove rollup external deps errors...
-  retval.stderr = retval.stderr || '';
-  retval.stderr = retval.split(/^Treating '\w+' as external dependency\n$/).join('');
-
-  if (retval.code !== 0 || retval.stderr || !PathsExist(options.dist + '.js')) {
-    process.stderr.write(retval.stderr);
-    process.stderr.write(retval.stdout);
-    process.exit(1);
+  if (options.watch) {
+    opts.plugin.push('watchify');
+  } else {
+    opts.transform.unshift('rollupify');
   }
 
-  // rip sourcemap out
-  exorcistHelper(options.dist + '.js');
-  log.info('Wrote ' + options.dist + '.js');
-  log.info('Wrote ' + options.dist + '.js.map');
+  log.debug('running browserify with opts:', opts, 'and files', files);
+  var b = browserify(files, opts);
 
-  return retval;
+  // currently we can't make browserify use incremental cache...
+  // https://github.com/substack/watchify/issues/316
+  if (!options.watch) {
+    browserifyInc(b, {cacheFile: cacheFile});
+  }
+  var bundle = function() {
+    if (arguments.length) {
+      log.info('File changed rebuilding...');
+    } else {
+      log.info('Building...')
+    }
+    return streamToPromise(b
+      .bundle()
+      .pipe(exorcist(options.dist + '.js.map'))
+      .pipe(fs.createWriteStream(options.dist + '.js'))).then(function() {
+        log.info('Wrote: ' + options.dist + '.js');
+        log.info('Wrote: ' + options.dist + '.js.map');
+      });
+  };
+
+  b.on('update', bundle);
+  return bundle();
 };
 
 module.exports = browserifyHelper;
