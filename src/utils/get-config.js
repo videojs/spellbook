@@ -1,6 +1,6 @@
 var fs = require('fs');
 var path = require('path');
-var PathExists = require('./path-exists');
+var PathsExist = require('./paths-exist');
 var findRoot = require('find-root');
 
 var readJSON = function(file) {

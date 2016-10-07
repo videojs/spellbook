@@ -1,18 +1,27 @@
-var PathExists = require('./path-exists');
 var glob = require('glob');
 var path = require('path');
+var PathsExists = require('./paths-exist');
 
-var FilesExist = function(dir, search) {
-  if (!PathExists(dir)) {
-    return [];
-  }
+var GetFiles = function() {
+  var searches = Array.prototype.slice.call(arguments);
+  var files = [];
 
-  var files = glob.sync(path.join(dir, search));
-  if (files.length === 0) {
-    return [];
-  }
+  searches.forEach(function(search) {
+    var fn = function() {
+      if(PathsExists(search)) {
+        return [search];
+      }
+      return glob.sync(search, {ignore: ['**/node_modules/**']});
+    };
+    if (Array.isArray(search)) {
+      fn = function() {
+        return GetFiles.apply(null, search);
+      };
+    }
+    files = files.concat(fn());
+  });
 
   return files;
 };
 
-module.exports = FilesExist;
+module.exports = GetFiles;

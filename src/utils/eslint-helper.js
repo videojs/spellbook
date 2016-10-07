@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 var config = require('./get-config')();
 var path = require('path');
-var PathExists = require('./path-exists');
+var PathsExist = require('./paths-exist');
 
 var eslintHelper = function(program) {
   var files = [];
   program.src.forEach(function(src) {
     // make it recursive
-    if (PathExists(src) && path.extname(src) === '') {
+    if (PathsExist(src) && path.extname(src) === '') {
       src = path.join(src, '**', '*.*');
     }
     files.push(src);

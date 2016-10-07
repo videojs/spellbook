@@ -19,7 +19,7 @@ if (!program.src) {
   program.src = path.join(config.src, 'test');
 }
 
-if(!GetFiles(program.src, path.join('**', '*.test.js'))) {
+if(!GetFiles(path.join(program.src, '**', '*.test.js'))) {
   log.fatal('Source directory ' + program.src + ' does not exist or contains no test.js files!');
   process.exit(1);
 }

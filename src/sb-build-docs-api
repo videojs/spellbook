@@ -24,11 +24,10 @@ if (!program.src) {
   program.src = path.join(config.src, 'js');
 }
 
-if (!GetFiles(program.src, path.join('**', '*.js')).length) {
+if (!GetFiles(path.join(program.src, '**', '*.js'))) {
   log.fatal('Source directory ' + program.src + ' does not exist or contains no js files!');
   process.exit(1);
 }
-
 
 var command = [
   'jsdoc', program.src,
@@ -39,10 +38,10 @@ var command = [
 
 var build = function() {
   Clean(program.dist);
+  log.info('Building...');
   exec(command, {silent: true});
-  log.info('Wrote API docs to ' + program.dist);
+  log.info('Wrote: ' + program.src + ' -> ' + program.dist);
 };
-
 
 if (program.watch) {
   Watch(path.join(program.src, '**', '*.js'), build);

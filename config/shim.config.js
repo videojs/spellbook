@@ -1,4 +1,5 @@
 module.exports = {
   "qunitjs": { exports: "global:QUnit" },
-  "sinon": { exports: "global:sinon"}
+  "sinon": { exports: "global:sinon" },
+  "videojs": { exports: "global:videojs" }
 };

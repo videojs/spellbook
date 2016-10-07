@@ -3,7 +3,7 @@ var GetConfig = require('../src/utils/get-config');
 var path = require('path');
 var fixtureDir = path.join(__dirname, 'fixtures');
 var uuid = require('uuid');
-var PathExists = require('../src/utils/path-exists');
+var PathExists = require('../src/utils/paths-exist');
 var rimraf = require('rimraf');
 shelljs.config.fatal = true;
 

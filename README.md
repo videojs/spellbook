@@ -9,8 +9,7 @@
 
 # TODO
 * js
-  * ignore .js.tmp files during watchify?? (created by rollupify, seem to cause issues?)
-  * fix watchify
+  * use rollup directly
   * fix js-bundlers watch
 * sb-build-css-sass
   * add banner to the minified files
@@ -25,8 +24,6 @@
   * test with --watch arguments
 
 # Future Ideas
-* sb-build-js-browser
-  * sourcemap during watchify
 * sb-build-js-npm
   * noderify npm binaries?
 * sb-create

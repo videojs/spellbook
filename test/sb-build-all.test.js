@@ -2,7 +2,7 @@ var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
-var PathExists = require('../src/utils/path-exists');
+var PathExists = require('../src/utils/paths-exist');
 var glob = require('glob');
 
 var tests = {

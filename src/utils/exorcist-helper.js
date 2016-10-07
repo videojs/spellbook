@@ -1,10 +1,10 @@
 var shelljs = require('shelljs');
-var PathExists = require('./path-exists');
+var PathsExist = require('./paths-exist');
 var log = require('./log');
 var GetPath = require('./get-path');
 
 var exorcistHelper = function(dist) {
-  if (!PathExists(dist)) {
+  if (!PathsExist(dist)) {
     log.error('Source file ' + dist + 'does not exist. Cannot exorcise its sourcemap');
     return;
   }
@@ -12,7 +12,7 @@ var exorcistHelper = function(dist) {
     .exec(GetPath('exorcist') + ' ' + dist + '.map', {silent: true})
     .to(dist);
 
-  if (retval.code !== 0 || retval.stderr || !PathExists(dist) || !PathExists(dist + '.map')) {
+  if (retval.code !== 0 || retval.stderr || !PathsExist(dist) || !PathsExist(dist + '.map')) {
     log.error('exorcist on ' + dist + ' failed with outputs:');
     log.error('stderr:\n' + retval.stderr, 'stdout:\n' + retval.stdout);
     process.exit(1);

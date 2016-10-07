@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var PathExists = require('./utils/path-exists');
+var PathsExist = require('./utils/paths-exist');
 var path = require('path');
 var GetPath = require('./utils/get-path');
 var fs = require('fs');
@@ -43,7 +43,7 @@ var program = CommanderWrapper(function(commander) {
 
 program.bundlers = ['rollup', 'webpack', 'browserify'];
 
-if (!PathExists(config.main)) {
+if (!PathsExist(config.main)) {
   exec('sb-build-js-npm');
 }
 
@@ -51,7 +51,7 @@ var testCache = path.join(config.cache, 'bundles');
 var babelPreset = config.ie8 ? 'babel-preset-ie8.config.js' : 'babel-preset.config.js';
 var promises = [];
 
-if (PathExists(testCache)) {
+if (PathsExist(testCache)) {
   shelljs.rm('-rf', testCache);
 }
 shelljs.mkdir('-p', testCache);

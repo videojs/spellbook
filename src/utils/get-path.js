@@ -1,5 +1,5 @@
 var path = require('path');
-var PathExists = require('./path-exists');
+var PathsExist = require('./paths-exist');
 
 var spell = path.join(__dirname, '..', '..');
 var nodebin = path.join(__dirname, '..', '..', 'node_modules', '.bin');
@@ -12,15 +12,15 @@ var GetPath = function(name) {
   var spellpath = path.join(spellbin, name);
   var confpath = path.join(confdir, name);
 
-  if (PathExists(nodepath)) {
+  if (PathsExist(nodepath)) {
     return nodepath;
   }
 
-  if (PathExists(spellpath)) {
+  if (PathsExist(spellpath)) {
     return spellpath;
   }
 
-  if (PathExists(confpath)) {
+  if (PathsExist(confpath)) {
     return confpath;
   }
 

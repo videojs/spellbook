@@ -23,7 +23,7 @@ if (!program.src) {
   program.src = path.join(config.src, 'docs');
 }
 
-if (!GetFiles(program.src, path.join('**', '*.md'))) {
+if (!GetFiles(path.join(program.src, '**', '*.md'))) {
   log.error('Source directory ' + process.src + ' doesnt exist or contains no md files!');
   process.exit(1);
 }
@@ -37,8 +37,9 @@ var command = [
 
 var build = function() {
   Clean(program.dist)
+  log.info('Building...');
   exec(command, {silent: true});
-  log.info('Wrote manual docs to ' + program.dist);
+  log.info('Wrote: ' + program.src + ' -> ' + program.dist);
 };
 
 if (program.watch) {

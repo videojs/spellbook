@@ -29,6 +29,7 @@ if (!GetFiles(path.join(program.src, '**', '*.json'))) {
 
 var build = function() {
   Clean(program.dist);
+  log.info('Building...');
   shelljs.cp('-r', program.src, program.dist);
   log.info('Wrote i18n to ' + program.dist);
 };

@@ -7,6 +7,7 @@ var log = require('./utils/log');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var GetFiles = require('./utils/get-files');
 var Clean = require('./utils/clean');
+var Watch = require('./utils/watch');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -19,26 +20,28 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!program.src) {
-  program.src = path.join(config.src, 'js', 'index.js');
+  program.src = path.join(config.src, 'js');
 }
 
-if(!GetFiles(program.src, 'index.js')) {
+if(!GetFiles(path.join(program.src, 'index.js'))) {
   log.fatal('Source directory ' + program.src + ' does not exist or contains no index.js!');
   process.exit(1);
 }
 
 Clean(program.dist);
 var distFile = path.join(program.dist, config.name);
-browserifyHelper({
-  dist: distFile,
-  src: program.src,
-  standalone: true,
-  watch: program.watch
-});
+var build = function () {
+  browserifyHelper({
+    dist: distFile,
+    src: path.join(program.src, 'index.js'),
+    standalone: true,
+  });
+};
 
 // we don't want to uglify after watching
-if (!program.watch) {
-
+if (program.watch) {
+  Watch(path.join(program.src, '**', '*.js'), build);
+} else {
   // remove the last newline in the banner
   // uglify adds it for us
   var banner = config.banner;
@@ -56,10 +59,10 @@ if (!program.watch) {
     '--preamble',
     '\'' + banner + '\'',
     '-o',
-   distFile + '.min.js',
+    distFile + '.min.js',
     '--',
-   distFile + '.js'
-], {silent: true});
+    distFile + '.js'
+  ], {silent: true});
   log.info('Wrote ' + distFile + '.min.js');
   log.info('Wrote ' + distFile + '.min.js.map');
 }

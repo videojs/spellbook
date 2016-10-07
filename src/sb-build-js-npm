@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var PathExists = require('./utils/path-exists');
+var PathsExist = require('./utils/paths-exist');
 var path = require('path');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var exec = require('./utils/exec');
@@ -23,7 +23,7 @@ if (!program.src) {
   program.src = path.join(config.src, 'js');
 }
 
-if (!GetFiles(program.src, path.join('**', '*.js'))) {
+if (!GetFiles(path.join(program.src, '**', '*.js'))) {
   log.fatal('Source directory ' + program.src + ' does not exist or contains no js files!');
   process.exit(1);
 }

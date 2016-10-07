@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var PathExists = require('./utils/path-exists');
 var shelljs = require('shelljs');
-var glob = require('glob');
 var path = require('path');
 var log = require('./utils/log');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var GetFiles = require('./utils/get-files');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -19,16 +18,16 @@ if (program.quiet && program.dryRun) {
   process.exit(1);
 }
 
-var files = glob.sync(path.join(config.path, '**',  'npm-debug.log'), {ignore: '**/node_modules/**'});
-files.push(config.dist);
+var fileSearches = [
+  path.join(config.path, '**',  'npm-debug.log'),
+  config.dist
+];
 
 if (program.cache) {
-  files.push(config.cache);
+  fileSearches.push(config.cache);
 }
-files.forEach(function(file) {
-  if (!PathExists(file)) {
-    return;
-  }
+
+GetFiles(fileSearches).forEach(function(file) {
   if (!program.quiet) {
     log.info('removing ' + file);
   }

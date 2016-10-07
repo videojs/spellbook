@@ -3,6 +3,7 @@ var GetConfig = require('./get-config');
 var pkg = require('../../package.json');
 var getRootParent = require('./get-root-parent');
 var os = require("os");
+var util = require('util');
 
 var LOG_LEVELS = {
   none: 0,
@@ -10,7 +11,8 @@ var LOG_LEVELS = {
   error: 2,
   warn:  3,
   info:  4,
-  debug: 5,
+  verbose: 5,
+  debug: 6,
 };
 
 // case insensitive log level number getter
@@ -25,7 +27,7 @@ var levelNumber = function(level) {
     }
   }
   return 0;
-}
+};
 
 var rightPad = function(str, len, char) {
   char = char || ' ';
@@ -86,6 +88,11 @@ var log = function(level, msgs) {
   while(msgs.length) {
     var msg = msgs.shift();
 
+    // allows us to print non-strings
+    if (typeof msg !== 'string') {
+      msg = util.inspect(msg, false, null);
+    }
+
     // skip blank lines
     if (!msg.trim()) {
       continue;
@@ -94,20 +101,19 @@ var log = function(level, msgs) {
     // split on new lines
     // treat them as new log messages
     var lines = msg.split(os.EOL);
-
     if (lines.length > 1) {
-      lines.forEach(function(line) {
-        msgs.unshift(line);
-      });
+      log(level, lines);
       continue;
     }
 
-    // keep long paths out of logs
-    msg = msg.split(path.join(__dirname, '..', '..', 'node_modules', '.bin') + path.sep).join('');
-    msg = msg.split(path.join(__dirname, '..', '..', 'config') + path.sep).join('')
-    msg = msg.split(path.join(__dirname, '..') + path.sep).join('');
-    msg = msg.split(__dirname + path.sep).join('');
-    msg = msg.split(config.path + path.sep).join('');
+    // keep long paths out of logs, but only on debug
+    if (level !== 'debug') {
+      msg = msg.split(path.join(__dirname, '..', '..', 'node_modules', '.bin') + path.sep).join('');
+      msg = msg.split(path.join(__dirname, '..', '..', 'config') + path.sep).join('')
+      msg = msg.split(path.join(__dirname, '..') + path.sep).join('');
+      msg = msg.split(__dirname + path.sep).join('');
+      msg = msg.split(config.path + path.sep).join('');
+    }
 
     console.log(getParent() + '[' + rightPad(level, 5) + ']: ' + msg);
   }

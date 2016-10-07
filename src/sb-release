@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var PathExists = require('./utils/path-exists');
+var PathsExist = require('./utils/paths-exist');
 var path = require('path');
 var GetPath = require('./utils/get-path');
 var glob = require('glob');
@@ -62,7 +62,7 @@ if (!program.newVersion) {
   process.exit(1);
 }
 
-if (!PathExists(path.join(config.path, '.git'))) {
+if (!PathsExist(path.join(config.path, '.git'))) {
   log.fatal('Your project must be a git repository');
   process.exit(1);
 }
@@ -93,7 +93,7 @@ var commands = [
 
 commands.push('git commit -a -m ' + program.newVersion);
 
-var bowerSupport = PathExists(path.join(config.path, 'bower.json'));
+var bowerSupport = PathsExist(path.join(config.path, 'bower.json'));
 
 // If the project supports Bower, perform special extra versioning step.
 if (bowerSupport) {

@@ -24,8 +24,10 @@ if (!program.src) {
   program.src = path.join(config.src, 'css');
 }
 
-var files = GetFiles(program.src, 'index.scss')
-  .concat(GetFiles(program.src, 'index.sass'));
+var files = GetFiles(
+  path.join(program.src, 'index.scss'),
+  path.join(program.src, 'index.sass')
+);
 
 if (!files.length) {
   log.fatal('Source directory ' + program.src + ' does not exist or contains no index.scss/index.sass!');
@@ -51,20 +53,21 @@ var cmd = [
 // cmd.push('--watch');
 var build = function() {
   Clean(program.dist)
+  log.info('Building...');
   exec(cmd, {silent: true});
 
-  log.info('Wrote ' + distFile + '.css');
+  log.info('Wrote: ' + distFile + '.css');
   exec(['cssnano', '--safe', '--sourcemap', distFile + '.css'], {silent: true})
     .to(distFile + '.min.css');
-  log.info('Wrote ' + distFile + '.min.css');
+  log.info('Wrote: ' + distFile + '.min.css');
 
   // has to be done after the min file
   // as cssnano only uses internal maps
   exorcistHelper(distFile + '.css');
-  log.info('Wrote ' + distFile + '.css.map');
+  log.info('Wrote: ' + distFile + '.css.map');
 
   exorcistHelper(distFile + '.min.css');
-  log.info('Wrote ' + distFile + '.min.css.map');
+  log.info('Wrote: ' + distFile + '.min.css.map');
 };
 
 if (program.watch) {

@@ -1,8 +1,8 @@
-var PathExists = require('./path-exists');
+var PathsExist = require('./paths-exist');
 var shelljs = require('shelljs');
 
 var Clean = function(dir) {
-  if (PathExists(dir)) {
+  if (PathsExist(dir)) {
     shelljs.rm('-rf', dir);
   }
 

@@ -2,16 +2,12 @@ var chokidar = require('chokidar');
 var log = require('./log');
 
 var Watch = function(glob, fn) {
-  var func = function() {
-    log.info('rebuilding...');
-    fn();
-  };
-  chokidar.watch(glob)
-    .on('add', func)
-    .on('addDir', func)
-    .on('change', func)
-    .on('unlink', func)
-    .on('unlinkDir', func);
+  chokidar.watch(glob, {ignored: '*.tmp'})
+    .on('add', fn)
+    .on('addDir', fn)
+    .on('change', fn)
+    .on('unlink', fn)
+    .on('unlinkDir', fn);
   log.info('watching ' + glob);
 };
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var PathExists = require('./utils/path-exists');
+var PathsExist = require('./utils/paths-exist');
 var path = require('path');
 var log = require('./utils/log');
 var exec = require('./utils/exec');
@@ -18,7 +18,7 @@ var bundlerDist = path.join(config.dist, 'test', 'rollup.test.js');
 var srcDist = path.join(config.dist, 'browser', config.name + '.js');
 var cssDist = path.join(config.dist, 'browser', config.name + '.css');
 
-if (!PathExists(testDist) || !PathExists(srcDist) || !PathExists(cssDist) || !PathExists(bundlerDist)) {
+if (!PathsExist(testDist) || !PathsExist(srcDist) || !PathsExist(cssDist) || !PathsExist(bundlerDist)) {
   exec('sb-build');
 }
 
