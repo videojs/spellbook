@@ -35,7 +35,6 @@ if (process.env.npm_config_argv) {
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-d, --dry-run', 'print which commands would be run')
-    .option('-q, --quiet', 'dont print any output')
     .arguments('<new-version>')
     .description(''
     + '<newversion> is any valid semver (except the current one) examples:\n'

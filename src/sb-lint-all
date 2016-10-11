@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var RunAll = require('./utils/run-all');
 var CommanderWrapper = require('./utils/commander-wrapper');
-var config = require('./utils/get-config');
+var config = require('./utils/get-config')();
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -10,8 +10,7 @@ var program = CommanderWrapper(function(commander) {
     .option('-f, --fix', 'automatically fix semantic errors were possible');
 });
 
-var commands = [
-];
+var commands = [];
 var args = [];
 
 if (config.js) {
@@ -29,7 +28,6 @@ if (config.docs) {
 if (config.i18n) {
   commands.push(['sb-lint-i18n']);
 }
-
 
 if (program.errors) {
   args.push('--errors');
