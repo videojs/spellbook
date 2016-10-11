@@ -36,6 +36,8 @@ var GetConfig = function (dir) {
 
     ie8: workingPkg.spellbook.ie8 || false,
     logLevel: process.NODE_ENV.SB_LOG_LEVEL || workingPkg.spellbook['log-level'] || 'debug',
+
+    shimVideojs: workingPkg.spellbook['shim-videojs'] || workingPkg.spellbook['shim-video.js'] || true,
     port: workingPkg.spellbook.port || 9999,
     src: workingPkg.spellbook.src || 'src',
     dist: workingPkg.spellbook.dist || 'dist',
