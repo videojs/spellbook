@@ -11,21 +11,36 @@ var path = require('path');
  */
 var CommanderWrapper = function(fn) {
   var startTime = Date.now();
-  log.info('start');
+
   var program = commander
     .version(config.sbVersion)
-    .option('-l, --log-level [level]', 'set the log to a specific level', /debug|fatal|error|info|warn/);
+    .option('-l, --log-level [level]', 'set the log to a specific level [' + Object.keys(log).join('|') + ']', new RegExp(Object.keys(log).join('|')))
+    .option('-q, --quiet', 'dont print any output');
 
   program = fn(program);
 
   if (!program) {
-    console.error('Command ' + path.basename(GetRootParent()) + ' is not returing commander to commander-wrapper!');
+    log.fatal('Command ' + path.basename(GetRootParent()) + ' is not returing commander to commander-wrapper!');
     process.exit(1);
   }
 
   // always finish the log
   var exit = function(code) {
+    // don't print anything on help/version exits
+    for(var i = 0; i < program.rawArgs.length; i++) {
+      var arg = program.rawArgs[i];
+
+      if ((/-h|--help|-V|--version/).test(arg)) {
+        return;
+      }
+    }
+
+    // don't print anything on quiet
+    if (program.quiet) {
+      return;
+    }
     var elapsed = (Date.now() - startTime);
+
     log.info('finished in ' + elapsed + 'ms');
   };
 
@@ -41,7 +56,11 @@ var CommanderWrapper = function(fn) {
 
   if (program.logLevel) {
     process.NODE_ENV.SB_LOG_LEVEL = program.logLevel;
+  } else if (program.quiet) {
+    process.NODE_ENV.SB_LOG_LEVEL = 'none';
   }
+
+  log.info('start');
 
   return program;
 };

@@ -1,79 +1,94 @@
 var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var path = require('path');
-var Helper = require('./test-helper.js');
+var TestHelper = require('./test-helper.js');
 var PathExists = require('../src/utils/paths-exist');
+var binPath = path.join(__dirname, '..', 'src', 'sb-clean') + ' ';
+
+var PathRemoved = function(helper, stdout, p) {
+  var relpath = path.relative(helper.config.path, p)
+    .replace(/^\.\//, '')
+    .replace(/^\//, '');
+
+  var regex = new RegExp('removing ' + relpath);
+
+  assert.ok(regex.test(stdout), 'should have removed ' + relpath);
+};
 
 describe('sb-clean', function() {
-  beforeEach(function() {
-    this.helper = new Helper();
-    this.config = this.helper.setup();
-    this.bin = path.join(__dirname, '..', 'src', 'sb-clean') + ' ';
-  });
-  afterEach(function() {
-    this.helper.cleanup();
-  });
-
   describe('no arguments', function() {
+
     it('should delete nothing if there is nothing to clean', function(done) {
-      shelljs.exec(this.bin, function(code, stdout, stderr) {
-        var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];
+      var helper = new TestHelper();
+
+      shelljs.exec(binPath, function(code, stdout, stderr) {
+        var stdouts = helper.trim(stdout);
+        var stderrs = helper.trim(stderr)
 
         assert.equal(code, 0, 'should return success');
-        assert.equal(stdouts.length, 0, 'should stdout nothing');
+        assert.equal(stdouts.length, 2, 'should stdout start + finish only');
         assert.equal(stderr.length, 0, 'should stderr nothing');
-        done();
+        helper.cleanup(done);
       });
     });
 
     it('should delete the dist folder if it exists', function(done) {
-      var config = this.config;
+      var helper = new TestHelper();
 
-      shelljs.mkdir('-p', config.dist);
-      shelljs.exec(this.bin, function(code, stdout, stderr) {
-        var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];
+      shelljs.mkdir('-p', helper.config.dist);
+      shelljs.exec(binPath, function(code, stdout, stderr) {
+        var stdouts = helper.trim(stdout);
+        var stderrs = helper.trim(stderr)
 
         assert.equal(code, 0, 'should return success');
         assert.equal(stderr.length, 0, 'should stderr nothing');
-        assert.equal(stdouts.length, 1, 'should only print one removal');
-        assert.notEqual(stdouts.indexOf('removing ' + config.dist), -1, 'should stdout correct removal');
-        assert.equal(PathExists(config.dist), false, 'dist should be deleted');
-        done();
+        assert.equal(stdouts.length, 3, 'should only print one removal');
+
+        PathRemoved(helper, stdout, helper.config.dist);
+        assert.equal(PathExists(helper.config.dist), false, 'dist should be deleted');
+
+        helper.cleanup(done);
       });
     });
 
     it('should delete npm-debug.log if it exists', function(done) {
-      var config = this.config;
-      var npmDebug = path.join(config.path, 'npm-debug.log');
+      var helper = new TestHelper();
+      var npmDebug = path.join(helper.config.path, 'npm-debug.log');
 
       shelljs.touch(npmDebug);
-      shelljs.exec(this.bin, function(code, stdout, stderr) {
-        var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];
+      shelljs.exec(binPath, function(code, stdout, stderr) {
+        var stdouts = helper.trim(stdout);
+        var stderrs = helper.trim(stderr)
 
         assert.equal(code, 0, 'should return success');
         assert.equal(stderr.length, 0, 'should stderr nothing');
-        assert.equal(stdouts.length, 1, 'should only print one removal');
-        assert.notEqual(stdouts.indexOf('removing ' + npmDebug), -1, 'should stdout correct removal');
-        assert.equal(PathExists(npmDebug), false, 'dist should be deleted');
-        done();
+        assert.equal(stdouts.length, 3, 'should only print one removal');
+
+        PathRemoved(helper, stdout, npmDebug);
+        assert.equal(PathExists(npmDebug), false, 'npm-debug.log should be deleted');
+
+        helper.cleanup(done);
       });
     });
 
 
     it('should not delete cache, only dist', function(done) {
-      var config = this.config;
+      var helper = new TestHelper();
 
-      shelljs.mkdir('-p', config.dist, config.cache);
-      shelljs.exec(this.bin, function(code, stdout, stderr) {
-        var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];
+      shelljs.mkdir('-p', helper.config.dist, helper.config.cache);
+      shelljs.exec(binPath, function(code, stdout, stderr) {
+        var stdouts = helper.trim(stdout);
+        var stderrs = helper.trim(stderr)
 
         assert.equal(code, 0, 'should return success');
         assert.equal(stderr.length, 0, 'should stderr nothing');
-        assert.equal(stdouts.length, 1, 'should only print one removal');
-        assert.notEqual(stdouts.indexOf('removing ' + config.dist), -1, 'should stdout correct removal');
-        assert.equal(PathExists(config.dist), false, 'dist should be deleted');
-        assert.equal(PathExists(config.cache), true, 'cache should still exist');
-        done();
+        assert.equal(stdouts.length, 3, 'should only print one removal');
+
+        PathRemoved(helper, stdout, helper.config.dist);
+        assert.equal(PathExists(helper.config.dist), false, 'dist should be deleted');
+
+        assert.equal(PathExists(helper.config.cache), true, 'cache should still exist');
+        helper.cleanup(done);
       });
     });
   });
@@ -81,55 +96,63 @@ describe('sb-clean', function() {
   ['-c', '--cache'].forEach(function(option) {
     describe(option, function() {
       it('should delete the dist folder if it exists', function(done) {
-        var config = this.config;
+        var helper = new TestHelper();
 
-        shelljs.mkdir('-p', config.dist);
-        shelljs.exec(this.bin + option, function(code, stdout, stderr) {
-          var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];
+        shelljs.mkdir('-p', helper.config.dist);
+        shelljs.exec(binPath + option, function(code, stdout, stderr) {
+          var stdouts = helper.trim(stdout);
+          var stderrs = helper.trim(stderr)
 
           assert.equal(code, 0, 'should return success');
           assert.equal(stderr.length, 0, 'should not print to stderr');
+          assert.equal(stdouts.length, 3, 'should only print one removal');
 
-          assert.equal(stdouts.length, 1, 'should only print one removal');
-          assert.notEqual(stdouts.indexOf('removing ' + config.dist), -1, 'should stdout correct removal');
-          assert.equal(PathExists(config.dist), false, 'dist should be deleted');
-          done();
+          PathRemoved(helper, stdout, helper.config.dist);
+          assert.equal(PathExists(helper.config.dist), false, 'dist should be deleted');
+
+          helper.cleanup(done);
         });
       });
 
       it('should delete cache and dist', function(done) {
-        var config = this.config;
+        var helper = new TestHelper();
 
-        shelljs.mkdir('-p', config.dist, config.cache);
-        shelljs.exec(this.bin + option, function(code, stdout, stderr) {
-          var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];
+        shelljs.mkdir('-p', helper.config.dist, helper.config.cache);
+        shelljs.exec(binPath + option, function(code, stdout, stderr) {
+          var stdouts = helper.trim(stdout);
+          var stderrs = helper.trim(stderr)
 
           assert.equal(code, 0, 'should return success');
           assert.equal(stderr.length, 0, 'should not print to stderr');
 
-          assert.equal(stdouts.length, 2, 'should print two removals');
-          assert.notEqual(stdouts.indexOf('removing ' + config.dist), -1, 'should stdout dist removal');
-          assert.notEqual(stdouts.indexOf('removing ' + config.cache), -1, 'should stdout cache removal');
-          assert.equal(PathExists(config.dist), false, 'dist should be deleted');
-          assert.equal(PathExists(config.cache), false, 'cache should be deleted');
-          done();
+          assert.equal(stdouts.length, 4, 'should print two removals');
+
+          PathRemoved(helper, stdout, helper.config.dist);
+          PathRemoved(helper, stdout, helper.config.cache);
+
+          assert.equal(PathExists(helper.config.dist), false, 'dist should be deleted');
+          assert.equal(PathExists(helper.config.cache), false, 'cache should be deleted');
+
+          helper.cleanup(done);
         });
       });
 
       it('should delete just cache', function(done) {
-        var config = this.config;
+        var helper = new TestHelper();
 
-        shelljs.mkdir('-p', config.cache);
-        shelljs.exec(this.bin + option, function(code, stdout, stderr) {
-          var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];
+        shelljs.mkdir('-p', helper.config.cache);
+        shelljs.exec(binPath + option, function(code, stdout, stderr) {
+          var stdouts = helper.trim(stdout);
+          var stderrs = helper.trim(stderr)
 
           assert.equal(code, 0, 'should return success');
           assert.equal(stderr.length, 0, 'should not print to stderr');
+          assert.equal(stdouts.length, 3, 'should only print one removal');
 
-          assert.equal(stdouts.length, 1, 'should only print one removal');
-          assert.notEqual(stdouts.indexOf('removing ' + config.cache), -1, 'should stdout cache removal');
-          assert.equal(PathExists(config.cache), false, 'cache should be deleted');
-          done();
+          PathRemoved(helper, stdout, helper.config.cache);
+          assert.equal(PathExists(helper.config.cache), false, 'cache should be deleted');
+
+          helper.cleanup(done);
         });
       });
     });
@@ -138,56 +161,61 @@ describe('sb-clean', function() {
   ['-d', '--dry-run'].forEach(function(option) {
     describe(option, function() {
       it('should not delete the dist folder if it exists', function(done) {
-        var config = this.config;
+        var helper = new TestHelper();
 
-        shelljs.mkdir('-p', config.dist);
-        shelljs.exec(this.bin + option, function(code, stdout, stderr) {
-          var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];
+        shelljs.mkdir('-p', helper.config.dist);
+        shelljs.exec(binPath + option, function(code, stdout, stderr) {
+          var stdouts = helper.trim(stdout);
+          var stderrs = helper.trim(stderr)
 
           assert.equal(code, 0, 'should return success');
           assert.equal(stderr.length, 0, 'should not print to stderr');
+          assert.equal(stdouts.length, 3, 'should print one removals');
 
-          assert.equal(stdouts.length, 1, 'should only print one removal');
-          assert.notEqual(stdouts.indexOf('removing ' + config.dist), -1, 'should stdout removal');
-          assert.equal(PathExists(config.dist), true, 'dist should exist');
-          done();
+          PathRemoved(helper, stdout, helper.config.dist);
+          assert.equal(PathExists(helper.config.dist), true, 'dist should exist');
+
+          helper.cleanup(done);
         });
       });
 
       it('should not delete cache or dist folder', function(done) {
-        var config = this.config;
+        var helper = new TestHelper();
 
-        shelljs.mkdir('-p', config.dist, config.cache);
-        shelljs.exec(this.bin + option, function(code, stdout, stderr) {
-          var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];
+        shelljs.mkdir('-p', helper.config.dist, helper.config.cache);
+        shelljs.exec(binPath + option, function(code, stdout, stderr) {
+          var stdouts = helper.trim(stdout);
+          var stderrs = helper.trim(stderr)
 
           assert.equal(code, 0, 'should return success');
           assert.equal(stderr.length, 0, 'should not print to stderr');
+          assert.equal(stdouts.length, 3, 'should print one removals');
 
-          assert.equal(stdouts.length, 1, 'should only print one removal');
-          assert.notEqual(stdouts.indexOf('removing ' + config.dist), -1, 'should stdout removal');
-          assert.equal(PathExists(config.dist), true, 'dist should exist');
-          assert.equal(PathExists(config.cache), true, 'cache should exist');
-          done();
+          PathRemoved(helper, stdout, helper.config.dist);
+          assert.equal(PathExists(helper.config.dist), true, 'dist should exist');
+
+          helper.cleanup(done);
         });
       });
 
       it('should not delete cache or dist folder with --cache', function(done) {
-        var config = this.config;
+        var helper = new TestHelper();
 
-        shelljs.mkdir('-p', config.dist, config.cache);
-        shelljs.exec(this.bin + '--cache ' + option, function(code, stdout, stderr) {
-          var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];
+        shelljs.mkdir('-p', helper.config.dist, helper.config.cache);
+        shelljs.exec(binPath + '--cache ' + option, function(code, stdout, stderr) {
+          var stdouts = helper.trim(stdout);
+          var stderrs = helper.trim(stderr)
 
           assert.equal(code, 0, 'should return success');
           assert.equal(stderr.length, 0, 'should not print to stderr');
+          assert.equal(stdouts.length, 4, 'should print all removals');
 
-          assert.equal(stdouts.length, 2, 'should print all removals');
-          assert.notEqual(stdouts.indexOf('removing ' + config.dist), -1, 'should stdout removal');
-          assert.notEqual(stdouts.indexOf('removing ' + config.cache), -1, 'should stdout removal');
-          assert.equal(PathExists(config.dist), true, 'dist should exist');
-          assert.equal(PathExists(config.cache), true, 'cache should exist');
-          done();
+          PathRemoved(helper, stdout, helper.config.dist);
+          assert.equal(PathExists(helper.config.dist), true, 'dist should exist');
+
+          PathRemoved(helper, stdout, helper.config.cache);
+          assert.equal(PathExists(helper.config.cache), true, 'cache should exist');
+          helper.cleanup(done);
         });
       });
     });
@@ -196,22 +224,22 @@ describe('sb-clean', function() {
   ['-q', '--quiet'].forEach(function(option) {
     describe(option, function() {
       it('should not print anything when removing', function(done) {
-        var config = this.config;
+        var helper = new TestHelper();
 
-        shelljs.mkdir('-p', config.dist, config.cache);
-        shelljs.exec(this.bin + '--cache ' + option, function(code, stdout, stderr) {
-          var stdouts = stdout.trim() ? stdout.trim().split('\n') : [];
+        shelljs.mkdir('-p', helper.config.dist, helper.config.cache);
+        shelljs.exec(binPath + '--cache ' + option, function(code, stdout, stderr) {
+          var stdouts = helper.trim(stdout);
+          var stderrs = helper.trim(stderr)
 
           assert.equal(code, 0, 'should return success');
           assert.equal(stderr.length, 0, 'should not print to stderr');
 
           assert.equal(stdouts.length, 0, 'should print nothing');
-          assert.equal(PathExists(config.dist), false, 'dist should be removed');
-          assert.equal(PathExists(config.cache), false, 'cache should be removed');
-          done();
+          assert.equal(PathExists(helper.config.dist), false, 'dist should be removed');
+          assert.equal(PathExists(helper.config.cache), false, 'cache should be removed');
+          helper.cleanup(done);
         });
       });
     });
   });
-
 });

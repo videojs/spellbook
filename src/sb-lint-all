@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 var RunAll = require('./utils/run-all');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var config = require('./utils/get-config');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -10,12 +11,25 @@ var program = CommanderWrapper(function(commander) {
 });
 
 var commands = [
-  ['sb-lint-i18n'],
-  ['sb-lint-js'],
-  ['sb-lint-docs-all'],
-  ['sb-lint-css-all'],
 ];
 var args = [];
+
+if (config.js) {
+  commands.push(['sb-lint-js']);
+}
+
+if (config.css) {
+  commands.push(['sb-lint-css-all']);
+}
+
+if (config.docs) {
+  commands.push(['sb-lint-docs-all']);
+}
+
+if (config.i18n) {
+  commands.push(['sb-lint-i18n']);
+}
+
 
 if (program.errors) {
   args.push('--errors');

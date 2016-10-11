@@ -6,7 +6,6 @@ var os = require("os");
 var util = require('util');
 
 var LOG_LEVELS = {
-  none: 0,
   fatal: 1,
   error: 2,
   warn:  3,
@@ -81,7 +80,9 @@ var log = function(level, msgs) {
   var config = GetConfig();
   // skip if the currently set log level
   // is less than this log line
-  if (levelNumber(config.logLevel) < levelNumber(level)) {
+  var currentLevelNumber = levelNumber(level);
+
+  if (levelNumber(config.logLevel) < currentLevelNumber) {
     return;
   }
 
@@ -115,7 +116,14 @@ var log = function(level, msgs) {
       msg = msg.split(config.path + path.sep).join('');
     }
 
-    console.log(getParent() + '[' + rightPad(level, 5) + ']: ' + msg);
+    var fn = console.log;
+
+    // log to stderr on any level less than or equal to warn
+    if (currentLevelNumber <= LOG_LEVELS.warn) {
+      fn = console.error;
+    }
+
+    fn(getParent() + '[' + rightPad(level, 5) + ']: ' + msg);
   }
 };
 

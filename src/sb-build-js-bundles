@@ -52,7 +52,6 @@ var build = function() {
   program.bundlers = ['rollup', 'webpack', 'browserify'];
 
   var testCache = path.join(config.cache, 'bundles');
-  var babelPreset = config.ie8 ? 'babel-preset-ie8.config.js' : 'babel-preset.config.js';
   var promises = [];
 
   log.info('Building...')
@@ -80,7 +79,7 @@ var build = function() {
         '-t', 'rollupify',
         '--no-detect-globals',
         '-x', 'qunitjs',
-        '-t', '[', 'babelify', '--presets', babelPreset, ']',
+        '-t', '[', 'babelify', '--presets', 'babel-preset.config.js', ']',
         '-o', distFile
       ];
     } else if (bundlerName === 'webpack') {

@@ -32,7 +32,6 @@ if (process.env.npm_config_argv) {
   }
 }
 
-
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-d, --dry-run', 'print which commands would be run')
@@ -43,16 +42,6 @@ var program = CommanderWrapper(function(commander) {
     + '  * A valid semver version: X.X.X\n'
     + '  * A valid semver word: major, minor, etc.')
     .action(function(newVersion) {
-      if ((versions.indexOf(newVersion) === -1 && !semver.valid(newVersion)) || newVersion === config.version) {
-        log.fatal('new-version must be valid semver identifier');
-        log.fatal('and it cannot be the current version');
-        process.exit(1);
-      }
-
-      if (versions.indexOf(newVersion) !== -1) {
-        newVersion = semver.inc(config.version, newVersion);
-      }
-
       this.newVersion = newVersion;
     });
 });
@@ -61,6 +50,18 @@ if (!program.newVersion) {
   log.fatal('Must pass in a new-version');
   process.exit(1);
 }
+
+if ((versions.indexOf(program.newVersion) === -1 && !semver.valid(program.newVersion)) ||
+    program.newVersion === config.version) {
+  log.fatal('new-version must be valid semver identifier');
+  log.fatal('and it cannot be the current version');
+  process.exit(1);
+}
+
+if (versions.indexOf(program.newVersion) !== -1) {
+  program.newVersion = semver.inc(config.version, program.newVersion);
+}
+
 
 if (!PathsExist(path.join(config.path, '.git'))) {
   log.fatal('Your project must be a git repository');

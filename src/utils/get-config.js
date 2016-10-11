@@ -34,8 +34,13 @@ var GetConfig = function (dir) {
     main: path.join(appRoot, workingPkg.main),
     jsNextMain: workingPkg['jsnext:main'] ? path.join(appRoot, workingPkg['jsnext:main']) : '',
 
-    ie8: workingPkg.spellbook.ie8 || false,
     logLevel: process.NODE_ENV.SB_LOG_LEVEL || workingPkg.spellbook['log-level'] || 'debug',
+    ie8: workingPkg.spellbook.ie8 || false,
+
+    docs: workingPkg.spellbook.docs || true,
+    css: workingPkg.spellbook.css || true,
+    i18n: workingPkg.spellbook.i18n || true,
+    js: workingPkg.spellbook.js || true,
 
     shimVideojs: workingPkg.spellbook['shim-videojs'] || workingPkg.spellbook['shim-video.js'] || true,
     port: workingPkg.spellbook.port || 9999,

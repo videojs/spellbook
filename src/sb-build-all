@@ -3,6 +3,7 @@ var RunAll = require('./utils/run-all');
 var exec = require('./utils/exec');
 var log = require('./utils/log');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var config = require('./utils/get-config');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -11,12 +12,24 @@ var program = CommanderWrapper(function(commander) {
 
 exec('sb-clean');
 var commands = [
-  ['sb-build-js-all'],
-  ['sb-build-css-all'],
-  ['sb-build-docs-all'],
-  ['sb-build-i18n']
 ];
 var args = []
+
+if (config.js) {
+  commands.push(['sb-build-js-all']);
+}
+
+if (config.css) {
+  commands.push(['sb-build-css-all']);
+}
+
+if (config.docs) {
+  commands.push(['sb-build-docs-all']);
+}
+
+if (config.i18n) {
+  commands.push(['sb-build-i18n-all']);
+}
 
 if (program.watch) {
   args.push('--watch');

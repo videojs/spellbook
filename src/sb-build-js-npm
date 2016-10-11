@@ -28,11 +28,10 @@ if (!GetFiles(path.join(program.src, '**', '*.js'))) {
   process.exit(1);
 }
 
-var babelPreset = config.ie8 ? 'babel-preset-ie8.config.js' : 'babel-preset.config.js';
 var cmd = [
   'babel',
   '-d', program.dist,
-  '--presets', babelPreset,
+  '--presets', 'babel-preset.config.js',
   program.src
 ];
 

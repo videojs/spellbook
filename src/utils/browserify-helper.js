@@ -16,7 +16,6 @@ var browserifyHelper = function(options) {
     shelljs.rm('-rf', options.dist + ext);
   });
 
-  var babelPreset = config.ie8 ? 'babel-preset-ie8.config.js' : 'babel-preset.config.js';
   var files = GetFiles(options.src);
   var cacheFile = path.join(config.cache, 'browserifyinc', path.basename(options.dist) + '.json');
 
@@ -42,7 +41,7 @@ var browserifyHelper = function(options) {
     ],
     transform: [
       /* broken for external shims during watchify... 'rollupify',*/
-      ['babelify', {presets: GetPath(babelPreset)}],
+      ['babelify', {presets: GetPath('babel-preset.config.js')}],
       ['browserify-shim', {global: true}],
       ['browserify-versionify', {global: true}]
     ]

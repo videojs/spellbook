@@ -9,8 +9,7 @@ var GetFiles = require('./utils/get-files');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-d, --dry-run', 'see what would happen when you run clean')
-    .option('-c, --cache', 'clear the  cache folder too')
-    .option('-q, --quiet', 'dont log any output, other than errors');
+    .option('-c, --cache', 'clear the  cache folder too');
 });
 
 if (program.quiet && program.dryRun) {
