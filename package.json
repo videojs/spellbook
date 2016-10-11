@@ -1,8 +1,7 @@
 {
   "name": "videojs-spellbook",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "1.0.1",
+  "description": "An official web project builder for video.js and its plugins",
   "scripts": {
     "clean": "rm -rf test/fixtures/{.git,dist,.sb-cache,npm-debug.log}",
     "pretest": "npm run clean;",
@@ -111,6 +110,10 @@
     "rimraf": "^2.5.4",
     "uuid": "^2.0.3"
   },
-  "author": "",
-  "license": "ISC"
+  "keywords": [
+    "videojs",
+    "videojs-plugin"
+  ],
+  "author": "Brightcove, Inc.",
+  "license": "Apache-2.0"
 }
