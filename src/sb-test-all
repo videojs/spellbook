@@ -1,20 +1,14 @@
 #!/usr/bin/env node
 var RunAll = require('./utils/run-all');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var exec = require('./utils/exec');
 
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'keep the tester running and run as things change');
 });
 
-var testDist = path.join(config.dist, 'test', config.name + '.test.js');
-var bundlerDist = path.join(config.dist, 'test', 'rollup.test.js');
-var srcDist = path.join(config.dist, 'browser', config.name + '.js');
-var cssDist = path.join(config.dist, 'browser', config.name + '.css');
-
-if (!PathsExist(testDist) || !PathsExist(srcDist) || !PathsExist(cssDist) || !PathsExist(bundlerDist)) {
-  exec('sb-build');
-}
+exec('sb-build');
 
 var commands = [
   ['sb-test-karma'],
