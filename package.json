@@ -1,6 +1,6 @@
 {
   "name": "videojs-spellbook",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "An official web project builder for video.js and its plugins",
   "scripts": {
     "clean": "rm -rf test/fixtures/{.git,dist,npm-debug.log}",
