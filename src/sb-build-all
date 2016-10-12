@@ -28,7 +28,7 @@ if (config.docs) {
 }
 
 if (config.i18n) {
-  commands.push(['sb-build-i18n-all']);
+  commands.push(['sb-build-i18n']);
 }
 
 if (program.watch) {

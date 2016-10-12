@@ -32,6 +32,7 @@ program.src.forEach(function(src) {
 
 var command =  [
   'stylelint',
+  '-f', 'verbose',
   '--color',
   '--config', 'stylelint.config.js',
 ].concat(files);
@@ -44,8 +45,12 @@ if (program.fix) {
   command.push('--fix');
 }
 
-exec(command);
+var build = function() {
+  return exec(command);
+};
 
 if (program.watch) {
-  Watch(program.src, command);
+  Watch(program.src, build);
+} else {
+  build();
 }

@@ -27,33 +27,31 @@ var GetConfig = function (dir) {
   process.NODE_ENV = process.NODE_ENV || {};
 
   var config = {
+    // workingPkg information
     name: workingPkg.name,
     version: workingPkg.version,
     path: appRoot,
-    sbVersion: sbPkg.version,
     main: path.join(appRoot, workingPkg.main),
     jsNextMain: workingPkg['jsnext:main'] ? path.join(appRoot, workingPkg['jsnext:main']) : '',
 
-    logLevel: process.NODE_ENV.SB_LOG_LEVEL || workingPkg.spellbook['log-level'] || 'debug',
+    // workingPkg settings
+    logLevel: process.NODE_ENV.SB_LOG_LEVEL || workingPkg.spellbook['log-level'] || 'info',
     ie8: workingPkg.spellbook.ie8 || false,
-
     docs: workingPkg.spellbook.docs || true,
     css: workingPkg.spellbook.css || true,
     i18n: workingPkg.spellbook.i18n || true,
     js: workingPkg.spellbook.js || true,
-
     shimVideojs: workingPkg.spellbook['shim-videojs'] || workingPkg.spellbook['shim-video.js'] || true,
     port: workingPkg.spellbook.port || 9999,
+
     src: workingPkg.spellbook.src || 'src',
     dist: workingPkg.spellbook.dist || 'dist',
-    cache: workingPkg.spellbook.cache || '.sb-cache',
     banner: banner,
   };
 
   // tack on the fullpath
   config.src = path.join(config.path, config.src);
   config.dist = path.join(config.path, config.dist);
-  config.cache = path.join(config.path, config.cache);
   return config;
 };
 

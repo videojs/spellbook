@@ -3,12 +3,12 @@ var GetConfig = require('../src/utils/get-config');
 var path = require('path');
 var fixtureDir = path.join(__dirname, 'fixtures');
 var uuid = require('uuid');
-var PathExists = require('../src/utils/paths-exist');
+var PathsExist = require('../src/utils/paths-exist');
 var rimraf = require('rimraf');
 shelljs.config.fatal = true;
 
 // intialize git
-if (!PathExists(path.join(fixtureDir, '.git'))) {
+if (!PathsExist(path.join(fixtureDir, '.git'))) {
   console.log('doing git setup');
   shelljs.config.silent = true;
   shelljs.pushd(fixtureDir);
@@ -20,7 +20,7 @@ if (!PathExists(path.join(fixtureDir, '.git'))) {
 }
 
 // npm link fixtures
-if (!PathExists(path.join(fixtureDir, 'node_modules'))) {
+if (!PathsExist(path.join(fixtureDir, 'node_modules'))) {
   console.log('doing npm link to spellbook setup');
   shelljs.config.silent = true;
   shelljs.pushd(fixtureDir);

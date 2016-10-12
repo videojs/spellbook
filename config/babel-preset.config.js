@@ -24,4 +24,4 @@ var getBabelConfig = function() {
   return babelConfig;
 };
 
-module.exports = babelConfig();
+module.exports = getBabelConfig();

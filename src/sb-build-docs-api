@@ -2,7 +2,6 @@
 var path = require('path');
 var config = require('./utils/get-config')();
 var GetFiles = require('./utils/get-files');
-var Clean = require('./utils/clean');
 var shelljs = require('shelljs');
 var Watch = require('./utils/watch');
 var exec = require('./utils/exec');
@@ -37,7 +36,9 @@ var command = [
 ];
 
 var build = function() {
-  Clean(program.dist);
+  shelljs.rm('-rf', program.dist);
+  shelljs.mkdir('-p', path.dirname(program.dist));
+
   log.info('Building...');
   exec(command, {silent: true});
   log.info('Wrote: ' + program.src + ' -> ' + program.dist);

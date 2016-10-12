@@ -5,7 +5,6 @@ var config = require('./utils/get-config')();
 var Watch = require('./utils/watch');
 var log = require('./utils/log');
 var GetFiles = require('./utils/get-files');
-var Clean = require('./utils/clean');
 var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
@@ -27,8 +26,10 @@ if (!GetFiles(path.join(program.src, '**', '*.json'))) {
   process.exit(1);
 }
 
+
 var build = function() {
-  Clean(program.dist);
+  shelljs.rm('-rf', program.dist);
+  shelljs.mkdir('-p', path.dirname(program.dist));
   log.info('Building...');
   shelljs.cp('-r', program.src, program.dist);
   log.info('Wrote i18n to ' + program.dist);

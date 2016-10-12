@@ -74,7 +74,6 @@ if (!changelog) {
 }
 
 shelljs.config.silent = true;
-shelljs.pushd(config.path);
 
 // reset config to current package version that npm set
 // var version = semver.

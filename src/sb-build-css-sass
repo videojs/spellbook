@@ -51,10 +51,12 @@ var cmd = [
 // but we don't gain much by using it
 // cmd.push('--watch');
 var build = function() {
+  log.info('Building...');
+
   ['.css', '.css.map', '.css.min.map', '.css.min'].forEach(function(ext) {
     shelljs.rm('-f', distFile + ext);
   });
-  log.info('Building...');
+  shelljs.mkdir('-p', path.dirname(distFile));
   exec(cmd, {silent: true});
 
   log.info('Wrote: ' + distFile + '.css');

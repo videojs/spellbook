@@ -2,15 +2,15 @@ var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
-var PathExists = require('../src/utils/paths-exist');
+var PathsExist = require('../src/utils/paths-exist');
 var glob = require('glob');
 
 var tests = {
   'sb-lint-css-sass': {
     'stderr': 0,
-    'stdout': 4,
+    'stdout': 11,
     'doubleStderr': 0,
-    'doubleStdout': 6,
+    'doubleStdout': 14,
     'dir': 'css',
   },
   'sb-lint-docs-examples': {

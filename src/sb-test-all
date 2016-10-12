@@ -7,6 +7,15 @@ var program = CommanderWrapper(function(commander) {
     .option('-w, --watch', 'keep the tester running and run as things change');
 });
 
+var testDist = path.join(config.dist, 'test', config.name + '.test.js');
+var bundlerDist = path.join(config.dist, 'test', 'rollup.test.js');
+var srcDist = path.join(config.dist, 'browser', config.name + '.js');
+var cssDist = path.join(config.dist, 'browser', config.name + '.css');
+
+if (!PathsExist(testDist) || !PathsExist(srcDist) || !PathsExist(cssDist) || !PathsExist(bundlerDist)) {
+  exec('sb-build');
+}
+
 var commands = [
   ['sb-test-karma'],
 ];

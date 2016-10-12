@@ -5,7 +5,7 @@ var GetPath = require('./get-path');
 
 var exorcistHelper = function(dist) {
   if (!PathsExist(dist)) {
-    log.error('Source file ' + dist + 'does not exist. Cannot exorcise its sourcemap');
+    log.error('Source file ' + dist + ' does not exist. Cannot exorcise its sourcemap');
     return;
   }
   var retval = shelljs.cat(dist)

@@ -36,7 +36,13 @@ module.exports = function(command, options) {
   if (options.async) {
     return new Promise(function(resolve, reject) {
       shelljs.exec(cmd, options, function(code, stdout, stderr) {
-        log.debug(cmd, 'result: ' + code, 'stdout:', stdout, 'stderr:', stderr);
+        log.debug(cmd, 'result: ' + code);
+        if (stdout) {
+          log.debug(stdout);
+        }
+        if (stderr) {
+          log.debug(stderr);
+        }
         var p = {code: code, stdout: stdout, stderr: stderr};
 
         if (options.silent && isError(code, stdout, stderr)) {
@@ -48,7 +54,14 @@ module.exports = function(command, options) {
   }
   var retval = shelljs.exec(cmd, options);
 
-  log.debug(cmd, 'result: ' + retval.code, 'stdout:', retval.stdout, 'stderr:', retval.stderr);
+    log.debug(cmd, 'result: ' + retval.code);
+    if (retval.stdout) {
+      log.debug(retval.stdout);
+    }
+    if (retval.stderr) {
+      log.debug(retval.stderr);
+    }
+
   if (options.silent && isError(retval.code, retval.stdout, retval.stderr)) {
     process.exit(retval.code);
   }

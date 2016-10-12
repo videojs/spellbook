@@ -2,7 +2,7 @@ var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
-var PathExists = require('../src/utils/paths-exist');
+var PathsExist = require('../src/utils/paths-exist');
 var binPath = path.join(__dirname, '..', 'src', 'sb-release') + ' ';
 var versions = {
   'major': '2.0.0',
@@ -181,33 +181,6 @@ describe('sb-release', function() {
           assert.equal(gitTag.stdout, '', 'git tag should be correct');
           assert.equal(changelog.stdout, '\n', 'change log should be correct');
           assert.notEqual(pkg.version, '1.0.1', 'pkg.json should have old version');
-          helper.cleanup(done);
-        });
-      })
-    });
-  });
-  ['--quiet', '-q'].forEach(function(option) {
-    describe(option, function() {
-      it('should not print anything', function(done) {
-        var helper = new TestHelper();
-
-        shelljs.exec(binPath + ' 1.0.1 ' + option, function(code, stdout, stderr) {
-          var stdouts = helper.trim(stdout);
-          var stderrs = helper.trim(stderr)
-
-          assert.equal(code, 0, 'should return success');
-          assert.equal(stderr.length, 0, 'should stderr nothing');
-          assert.equal(stdouts.length, 0, 'should stdout nothing');
-
-          var gitLog = shelljs.exec('git log --oneline -1').grep('1.0.1');
-          var gitTag = shelljs.exec('git tag').grep('1.0.1');
-          var changelog = shelljs.cat(path.join(helper.config.path, 'CHANGELOG.md')).grep('1.0.1')
-          var pkg = JSON.parse(shelljs.cat(path.join(helper.config.path, 'package.json')));
-
-          assert.notEqual(gitLog.stdout.length, 0,'git log should be correct');
-          assert.notEqual(gitTag.stdout.length, 0, 'git tag should be correct');
-          assert.notEqual(changelog.stdout.length, 0, 'change log should be correct');
-          assert.equal(pkg.version, '1.0.1', 'pkg.json should have new version');
           helper.cleanup(done);
         });
       })

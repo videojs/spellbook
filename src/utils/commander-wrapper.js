@@ -1,8 +1,10 @@
 var config = require('./get-config')();
+var pkg = require('../../package.json');
 var log = require('./log');
 var commander = require('commander');
 var GetRootParent = require('./get-root-parent');
 var path = require('path');
+var shelljs = require('shelljs');
 
 /**
  * Wrapper around commander so that:
@@ -13,7 +15,7 @@ var CommanderWrapper = function(fn) {
   var startTime = Date.now();
 
   var program = commander
-    .version(config.sbVersion)
+    .version(pkg.version)
     .option('-l, --log-level [level]', 'set the log to a specific level [' + Object.keys(log).join('|') + ']', new RegExp(Object.keys(log).join('|')))
     .option('-q, --quiet', 'dont print any output');
 
@@ -60,6 +62,7 @@ var CommanderWrapper = function(fn) {
     process.NODE_ENV.SB_LOG_LEVEL = 'none';
   }
 
+  shelljs.cd(config.path);
   log.info('start');
 
   return program;
