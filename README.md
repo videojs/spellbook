@@ -9,7 +9,7 @@
 
 # TODO
 * sb-build-css-sass
-  * add banner to the minified files
+  * add banner to the minified files (switch to postcss + cssnano)
   * update the source map with the line offset of the banner that was added
 * sb-build-css-css
   * support plain css
@@ -21,14 +21,14 @@
   * test with --watch arguments
 
 # Future Ideas
-* make faster
+* make these run faster
   * build-js-bundles
   * build-js-npm
 * js
   * get rollupify to work with watchify
 * sb-build-js-npm
   * noderify npm binaries?
-* sb-create
+* sb-create && sb-upgrade
   * proxy to the generator
 * sb-test
   * get tests to run in nodejs
@@ -42,12 +42,9 @@
     * vhost?
 * sb-docs
   * find an html theme
-* sb-build-js-bundles
-  * concat these right into dist/test/<pkg-name>.js
 * sb-build-js-browser-tests
   * treat code being tested as external so we only build it once
 * general
-  * more configuration
   * noderify when we switch to js instead of using shelljs
 * sb-release
   * support prerelease signifiers (beta, alpha etc)
