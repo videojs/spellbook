@@ -26,6 +26,12 @@ var GetConfig = function (dir) {
   workingPkg.spellbook = workingPkg.spellbook || {};
   process.NODE_ENV = process.NODE_ENV || {};
 
+  if (!workingPkg.main || !workingPkg['jsnext:main']) {
+    console.error('The package in ' + appRoot + ' does not have a main file or jsnext:main file set.');
+    console.error('please set these in your package.json');
+    process.exit(1);
+  }
+
   var config = {
     // workingPkg information
     name: workingPkg.name,
