@@ -20,10 +20,7 @@ var eslintHelper = function(program) {
     '--color',
     '--no-eslintrc',
     '--ignore', 'node_modules',
-    '--plugin', 'json',
-    '--plugin', 'markdown',
-    '--parser-options', '{ecmaVersion:6,sourceType:module,parser:espree}',
-    '--config', path.join(__dirname, '..', '..', 'node_modules', 'eslint-config-videojs', 'eslintrc.json')
+    '--config', 'eslint.config.js'
   ].concat(files);
 
   if (program.errors) {
