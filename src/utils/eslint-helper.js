@@ -2,6 +2,8 @@
 var config = require('./get-config')();
 var path = require('path');
 var PathsExist = require('./paths-exist');
+var exec = require('./exec');
+var Watch = require('./watch');
 
 var eslintHelper = function(program) {
   var files = [];
@@ -14,16 +16,15 @@ var eslintHelper = function(program) {
   });
 
   var command =  [
-    'esw',
+    'eslint',
     '--color',
     '--no-eslintrc',
-    '--ignore node_modules',
-    '-c', 'eslint.config.js',
+    '--ignore', 'node_modules',
+    '--plugin', 'json',
+    '--plugin', 'markdown',
+    '--parser-options', '{ecmaVersion:6,sourceType:module,parser:espree}',
+    '--config', path.join(__dirname, '..', '..', 'node_modules', 'eslint-config-videojs', 'eslintrc.json')
   ].concat(files);
-
-  if (program.watch) {
-    command.push('--watch');
-  }
 
   if (program.errors) {
     command.push('--quiet');
@@ -33,7 +34,15 @@ var eslintHelper = function(program) {
     command.push('--fix');
   }
 
-  return command;
-}
+  var run = function() {
+    exec(command);
+  };
+
+  if (program.watch) {
+    Watch(program.src, run);
+  } else {
+    run();
+  }
+};
 
 module.exports = eslintHelper;

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 var eslintHelper = require('./utils/eslint-helper');
-var exec = require('./utils/exec');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var path = require('path');
 var config = require('./utils/get-config')();
@@ -21,4 +20,4 @@ if (!program.src) {
   program.src = [path.join(config.src, 'docs', '**', '*.md')];
 }
 
-exec(eslintHelper(program));
+eslintHelper(program);
