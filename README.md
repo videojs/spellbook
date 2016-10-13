@@ -21,9 +21,16 @@
   * test with --watch arguments
 
 # Future Ideas
-* make these run faster
-  * build-js-bundles
-  * build-js-npm
+* General
+  * make these run faster
+    * build-js-*
+  * add support for [colors](https://github.com/chalk/chalk), and remove builtin colors from linters
+  * add support for [tab-completion](https://github.com/mklabs/node-tabtab)
+  * add documentation and a [man page](https://github.com/wooorm/remark-man)
+  * convert everything to a promise based api and use [loud rejection](https://github.com/sindresorhus/loud-rejection)
+  * http://docopt.org/
+  * https://programmers.stackexchange.com/questions/307467/what-are-good-habits-for-designing-command-line-arguments
+  * http://eng.localytics.com/exploring-cli-best-practices/
 * js
   * get rollupify to work with watchify
 * sb-build-js-npm
