@@ -7,6 +7,7 @@ var Watch = require('./utils/watch');
 var log = require('./utils/log');
 var exec = require('./utils/exec');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var Promise = require('bluebird');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -22,25 +23,44 @@ if (!program.src) {
   program.src = path.join(config.src, 'docs');
 }
 
-if (!GetFiles(path.join(program.src, '**', '*.md'))) {
-  log.error('Source directory ' + process.src + ' doesnt exist or contains no md files!');
-  process.exit(1);
-}
 
 var command = [
-  'remark', program.src,
+  'remark',
   '--no-config',
-  '--rc-path', 'remark-build.config.js',
-  '--output', program.dist
+  '--use', 'html',
+  '--use', 'toc',
 ];
 
 var build = function() {
   shelljs.rm('-rf', program.dist);
   shelljs.mkdir('-p', program.dist);
 
+  var files = GetFiles(path.join(program.src, '**', '*.md'));
+  if (!files.length) {
+    log.error('Source directory ' + process.src + ' doesnt exist or contains no md files!');
+    process.exit(1);
+  }
+
   log.info('Building...');
-  exec(command, {silent: true});
-  log.info('Wrote: ' + program.src + ' -> ' + program.dist);
+
+  var promises = [];
+
+  // we have to build each file individually, as there is no directory style output
+  // aka src/docs/test/index.md would flatten to dist/docs/manual/index.html
+  // rather than dist/docs/manual/test/index.html
+  files.forEach(function(src) {
+    var dist = src.replace(program.src, program.dist).replace('md', 'html');
+
+    shelljs.mkdir('-p', path.dirname(dist));
+    promises.push(exec(
+      command.concat([src, '--output', dist]),
+      {silent: true, async: true}
+    ));
+  });
+
+  Promise.all(promises).then(function() {
+    log.info('Wrote: ' + program.src + ' -> ' + program.dist);
+  });
 };
 
 if (program.watch) {

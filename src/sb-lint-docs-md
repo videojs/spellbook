@@ -42,9 +42,10 @@ program.src.forEach(function(src) {
 
 var command = [
   'remark',
-  '--rc-path', 'remark-lint.config.js',
+  '--preset', 'lint-recommended',
+  '--use', 'lint',
   '--no-config',
-  '--no-stdout',
+  '--no-stdout', // don't print the file to stdout
 ].concat(files);
 
 if (program.watch) {
