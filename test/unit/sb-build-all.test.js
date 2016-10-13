@@ -5,6 +5,7 @@ var TestHelper = require('./test-helper.js');
 var PathsExist = require(path.join(TestHelper.rootDir, 'src', 'utils', 'paths-exist'));
 var glob = require('glob');
 var pkgName = require(path.join(TestHelper.fixtureDir, 'package.json')).name;
+var parallel = require('mocha.parallel');
 
 var tests = {
   'sb-build-css-sass': {
@@ -59,37 +60,35 @@ var tests = {
   }
 };
 
-describe('build', function() {
+parallel('build', function() {
   Object.keys(tests).forEach(function(binName) {
     var testProps = tests[binName];
     var binFile = path.join('node_modules', '.bin', binName) + ' ';
 
-    describe(binName, function() {
-      it(binName + ' should build default files with no args', function(done) {
-        var helper = new TestHelper();
+    it(binName + ' should build default files with no args', function(done) {
+      var helper = new TestHelper();
 
-        shelljs.exec(binFile, function(code, stdout, stderr) {
-          var stdouts = helper.trim(stdout);
-          var stderrs = helper.trim(stderr);
+      shelljs.exec(binFile, function(code, stdout, stderr) {
+        var stdouts = helper.trim(stdout);
+        var stderrs = helper.trim(stderr);
 
-          assert.equal(code, 0, 'should return 0');
+        assert.equal(code, 0, 'should return 0');
+        assert.equal(
+          PathsExist(path.join(helper.config.dist, testProps.dist)),
+          true,
+          'new dist folder should exist'
+        );
+
+        testProps.files.forEach(function(file) {
           assert.equal(
-            PathsExist(path.join(helper.config.dist, testProps.dist)),
+            PathsExist(path.join(helper.config.dist, testProps.dist, file)),
             true,
-            'new dist folder should exist'
+            'new dist file ' + file + ' should exist'
           );
-
-          testProps.files.forEach(function(file) {
-            assert.equal(
-              PathsExist(path.join(helper.config.dist, testProps.dist, file)),
-              true,
-              'new dist file ' + file + ' should exist'
-            );
-          });
-
-          helper.cleanup(done);
         });
+
+        helper.cleanup(done);
       });
     });
   });
-})
+});

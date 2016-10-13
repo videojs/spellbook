@@ -7,7 +7,6 @@ var uuid = require('uuid');
 var PathsExist = require('../../src/utils/paths-exist');
 var rimraf = require('rimraf');
 
-console.log(fixtureDir);
 // intialize git
 if (!PathsExist(path.join(fixtureDir, '.git'))) {
   console.log('setting up git for fixtures');
@@ -42,15 +41,17 @@ if (PathsExist(path.join(fixtureDir, 'dist'))) {
 
 var TestHelper = function(debug) {
   this.debug = debug || process.env.TRAVIS || false;
-  this.start_ = process.cwd() || path.join(__dirname, '..');
   if (!this.debug) {
     shelljs.config.silent = true;
   } else {
     shelljs.config.silent = false;
   }
 
-  var id = uuid.v4();
-  this.projectDir = path.join(shelljs.tempdir(), id);
+  this.projectDir = fixtureDir;
+  while(PathsExist(this.projectDir)) {
+    var id = uuid.v4();
+    this.projectDir = path.join(shelljs.tempdir(), id);
+  }
 
   shelljs.cp('-R', fixtureDir, this.projectDir);
   shelljs.cd(this.projectDir);
@@ -75,7 +76,7 @@ TestHelper.prototype.trim = function(stdout) {
 };
 
 TestHelper.prototype.cleanup = function(done) {
-  shelljs.cd(this.start_);
+  shelljs.cd(TestHelper.fixtureDir);
   if (this.debug) {
     console.log(this.projectDir);
   }
