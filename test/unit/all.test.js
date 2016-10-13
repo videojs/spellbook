@@ -1,14 +1,14 @@
 var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var path = require('path');
-var pkg = require('../package.json');
-var parallel = require('mocha.parallel');
 var TestHelper = require('./test-helper.js');
+var pkg = require(path.join(TestHelper.rootDir, 'package.json'));
+var parallel = require('mocha.parallel');
 
-shelljs.cd(path.join(__dirname, 'fixtures'));
+shelljs.cd(TestHelper.fixtureDir);
 Object.keys(pkg.bin).forEach(function(key) {
   parallel(key, function() {
-    var binPath = path.join(__dirname, '..', pkg.bin[key]);
+    var binFile = path.join('node_modules', '.bin', key) + ' ';
 
     beforeEach(function() {
       shelljs.config.silent = true;
@@ -20,7 +20,7 @@ Object.keys(pkg.bin).forEach(function(key) {
 
     ['--help', '-h'].forEach(function(option) {
       it('should have ' + option, function(done) {
-        shelljs.exec(binPath + ' ' + option, function(code, stdout, stderr) {
+        shelljs.exec(binFile + option, function(code, stdout, stderr) {
 
           assert.equal(code, 0, 'should return success');
           assert.ok((new RegExp('Usage: ' + key)).test(stdout), 'should print help');
@@ -32,7 +32,7 @@ Object.keys(pkg.bin).forEach(function(key) {
 
     ['--version', '-V'].forEach(function(option) {
       it('should have ' + option, function(done) {
-        shelljs.exec(binPath + ' ' + option, function(code, stdout, stderr) {
+        shelljs.exec(binFile + option, function(code, stdout, stderr) {
           var stdouts = stdout.trim().split('\n');
 
           assert.equal(code, 0, 'should return success');

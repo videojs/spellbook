@@ -2,8 +2,8 @@ var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
-var PathsExist = require('../src/utils/paths-exist');
-var binPath = path.join(__dirname, '..', 'src', 'sb-clean') + ' ';
+var PathsExist = require(path.join(TestHelper.rootDir, 'src', 'utils', 'paths-exist'));
+var binFile = path.join('node_modules', '.bin', 'sb-clean') + ' ';
 
 var PathRemoved = function(helper, stdout, p) {
   var relpath = path.relative(helper.config.path, p)
@@ -21,7 +21,7 @@ describe('sb-clean', function() {
     it('should delete nothing if there is nothing to clean', function(done) {
       var helper = new TestHelper();
 
-      shelljs.exec(binPath, function(code, stdout, stderr) {
+      shelljs.exec(binFile, function(code, stdout, stderr) {
         var stdouts = helper.trim(stdout);
         var stderrs = helper.trim(stderr)
 
@@ -36,7 +36,7 @@ describe('sb-clean', function() {
       var helper = new TestHelper();
 
       shelljs.mkdir('-p', helper.config.dist);
-      shelljs.exec(binPath, function(code, stdout, stderr) {
+      shelljs.exec(binFile, function(code, stdout, stderr) {
         var stdouts = helper.trim(stdout);
         var stderrs = helper.trim(stderr)
 
@@ -56,7 +56,7 @@ describe('sb-clean', function() {
       var npmDebug = path.join(helper.config.path, 'npm-debug.log');
 
       shelljs.touch(npmDebug);
-      shelljs.exec(binPath, function(code, stdout, stderr) {
+      shelljs.exec(binFile, function(code, stdout, stderr) {
         var stdouts = helper.trim(stdout);
         var stderrs = helper.trim(stderr)
 
@@ -77,7 +77,7 @@ describe('sb-clean', function() {
 
       shelljs.mkdir('-p', helper.config.dist);
       shelljs.touch(npmDebug);
-      shelljs.exec(binPath, function(code, stdout, stderr) {
+      shelljs.exec(binFile, function(code, stdout, stderr) {
         var stdouts = helper.trim(stdout);
         var stderrs = helper.trim(stderr)
 
@@ -101,7 +101,7 @@ describe('sb-clean', function() {
         var helper = new TestHelper();
 
         shelljs.mkdir('-p', helper.config.dist);
-        shelljs.exec(binPath + option, function(code, stdout, stderr) {
+        shelljs.exec(binFile + option, function(code, stdout, stderr) {
           var stdouts = helper.trim(stdout);
           var stderrs = helper.trim(stderr)
 
@@ -123,7 +123,7 @@ describe('sb-clean', function() {
         shelljs.mkdir('-p', helper.config.dist);
         shelljs.touch(npmDebug);
 
-        shelljs.exec(binPath + option, function(code, stdout, stderr) {
+        shelljs.exec(binFile + option, function(code, stdout, stderr) {
           var stdouts = helper.trim(stdout);
           var stderrs = helper.trim(stderr)
 

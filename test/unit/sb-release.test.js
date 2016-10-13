@@ -2,8 +2,8 @@ var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
-var PathsExist = require('../src/utils/paths-exist');
-var binPath = path.join(__dirname, '..', 'src', 'sb-release') + ' ';
+var PathsExist = require(path.join(TestHelper.rootDir, 'src', 'utils', 'paths-exist'));
+var binFile = path.join('node_modules', '.bin', 'sb-release') + ' ';
 var versions = {
   'major': '2.0.0',
   'minor': '1.1.0',
@@ -22,7 +22,7 @@ describe('sb-release', function() {
     it('should exit with an error if no args are passed', function(done) {
       var helper = new TestHelper();
 
-      shelljs.exec(binPath, function(code, stdout, stderr) {
+      shelljs.exec(binFile, function(code, stdout, stderr) {
         var stdouts = helper.trim(stdout);
         var stderrs = helper.trim(stderr);
 
@@ -36,7 +36,7 @@ describe('sb-release', function() {
     it('should exit with an error if an invalid version is passed', function(done) {
       var helper = new TestHelper();
 
-      shelljs.exec(binPath + 'foo', function(code, stdout, stderr) {
+      shelljs.exec(binFile + 'foo', function(code, stdout, stderr) {
         var stdouts = helper.trim(stdout);
         var stderrs = helper.trim(stderr);
 
@@ -51,7 +51,7 @@ describe('sb-release', function() {
       var helper = new TestHelper();
 
       shelljs.rm('-rf', path.join(helper.config.path, '.git'));
-      shelljs.exec(binPath + '1.0.1', function(code, stdout, stderr) {
+      shelljs.exec(binFile + '1.0.1', function(code, stdout, stderr) {
         var stdouts = helper.trim(stdout);
         var stderrs = helper.trim(stderr)
 
@@ -66,7 +66,7 @@ describe('sb-release', function() {
       var helper = new TestHelper();
 
       shelljs.rm('-f', path.join(helper.config.path, 'CHANGELOG.md'));
-      shelljs.exec(binPath + '1.0.1', function(code, stdout, stderr) {
+      shelljs.exec(binFile + '1.0.1', function(code, stdout, stderr) {
         var stdouts = helper.trim(stdout);
         var stderrs = helper.trim(stderr)
 
@@ -80,7 +80,7 @@ describe('sb-release', function() {
     it('should exit with an error if version passed is the current version', function(done) {
       var helper = new TestHelper();
 
-      shelljs.exec(binPath + '1.0.0', function(code, stdout, stderr) {
+      shelljs.exec(binFile + '1.0.0', function(code, stdout, stderr) {
         var stdouts = helper.trim(stdout);
         var stderrs = helper.trim(stderr)
 
@@ -106,7 +106,7 @@ describe('sb-release', function() {
     });
   });
 
-  ['npm run version', binPath].forEach(function(bin) {
+  ['npm run version', binFile].forEach(function(bin) {
     describe('Running it with ' + path.basename(bin), function() {
       Object.keys(versions).forEach(function(versionName) {
         var versionNumber = versions[versionName];
@@ -144,7 +144,7 @@ describe('sb-release', function() {
       var helper = new TestHelper();
 
       shelljs.touch(path.join(helper.config.path, 'bower.json'));
-      shelljs.exec(binPath + ' major', function(code, stdout, stderr) {
+      shelljs.exec(binFile + ' major', function(code, stdout, stderr) {
         var stdouts = helper.trim(stdout);
         var stderrs = helper.trim(stderr)
         console.log(stdout, stderr);
@@ -163,7 +163,7 @@ describe('sb-release', function() {
       it('should not change anything', function(done) {
         var helper = new TestHelper();
 
-        shelljs.exec(binPath + ' 1.0.1 ' + option, function(code, stdout, stderr) {
+        shelljs.exec(binFile + ' 1.0.1 ' + option, function(code, stdout, stderr) {
           var stdouts = helper.trim(stdout);
           var stderrs = helper.trim(stderr)
 

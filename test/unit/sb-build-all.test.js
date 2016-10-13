@@ -2,9 +2,9 @@ var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
-var PathsExist = require('../src/utils/paths-exist');
+var PathsExist = require(path.join(TestHelper.rootDir, 'src', 'utils', 'paths-exist'));
 var glob = require('glob');
-var pkgName = require('./fixtures/package.json').name;
+var pkgName = require(path.join(TestHelper.fixtureDir, 'package.json')).name;
 
 var tests = {
   'sb-build-css-sass': {
@@ -62,7 +62,7 @@ var tests = {
 describe('build', function() {
   Object.keys(tests).forEach(function(binName) {
     var testProps = tests[binName];
-    var binFile = path.join(__dirname, '..', 'src', binName) + ' ';
+    var binFile = path.join('node_modules', '.bin', binName) + ' ';
 
     describe(binName, function() {
       it(binName + ' should build default files with no args', function(done) {

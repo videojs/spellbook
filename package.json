@@ -3,9 +3,9 @@
   "version": "1.0.8",
   "description": "An official web project builder for video.js and its plugins",
   "scripts": {
-    "clean": "rm -rf test/fixtures/{.git,dist,npm-debug.log}",
+    "clean": "node -e \"require('shelljs').rm('-rf', 'test/fixtures/.git', 'test/fixturers/dist', 'test/fixtures/node_modules');\"",
     "pretest": "npm run clean;",
-    "test": "mocha test/*.test.js",
+    "test": "mocha 'test/unit/**/*.test.js'",
     "posttest": "npm run clean"
   },
   "bin": {

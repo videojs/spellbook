@@ -2,7 +2,7 @@ var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
-var PathsExist = require('../src/utils/paths-exist');
+var PathsExist = require(path.join(TestHelper.rootDir, 'src', 'utils', 'paths-exist'));
 var glob = require('glob');
 
 var tests = {
@@ -47,7 +47,7 @@ var tests = {
 describe('lint', function() {
   Object.keys(tests).forEach(function(binName) {
     var testProps = tests[binName];
-    var binFile = path.join(__dirname, '..', 'src', binName) + ' ';
+    var binFile = path.join('node_modules', '.bin', binName) + ' ';
 
     describe(binName, function() {
       it(binName + ' should lint default files with no args', function(done) {
