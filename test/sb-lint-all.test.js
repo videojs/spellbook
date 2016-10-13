@@ -15,30 +15,30 @@ var tests = {
   },
   'sb-lint-docs-examples': {
     'stderr': 0,
-    'stdout': 6,
+    'stdout': 7,
     'doubleStderr': 0,
-    'doubleStdout': 9,
+    'doubleStdout': 10,
     'dir': 'docs'
   },
   'sb-lint-docs-md': {
-    'stderr': 4,
+    'stderr': 14,
     'stdout': 2,
-    'doubleStderr': 7,
+    'doubleStderr': 27,
     'doubleStdout': 2,
     'dir': 'docs'
   },
   'sb-lint-i18n': {
     'stderr': 0,
-    'stdout': 7,
+    'stdout': 8,
     'doubleStderr': 0,
-    'doubleStdout': 11,
+    'doubleStdout': 12,
     'dir': 'i18n'
   },
   'sb-lint-js': {
     'stderr': 0,
-    'stdout': 8,
+    'stdout': 9,
     'doubleStderr': 0,
-    'doubleStdout': 13,
+    'doubleStdout': 14,
     'dir': 'js'
   },
 };
