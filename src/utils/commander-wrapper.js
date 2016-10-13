@@ -22,7 +22,7 @@ var CommanderWrapper = function(fn) {
   program = fn(program);
 
   if (!program) {
-    log.fatal('Command ' + path.basename(GetRootParent()) + ' is not returing commander to commander-wrapper!');
+    log.fatal('Command ' + path.basename(GetRootParent().filename) + ' is not returing commander to commander-wrapper!');
     process.exit(1);
   }
 
@@ -63,6 +63,7 @@ var CommanderWrapper = function(fn) {
   }
 
   shelljs.cd(config.path);
+  process.title = path.basename(GetRootParent().filename);
   log.info('start');
 
   return program;
