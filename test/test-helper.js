@@ -29,6 +29,11 @@ if (!PathsExist(path.join(fixtureDir, 'node_modules'))) {
   shelljs.config.silent = false;
 }
 
+// remove dist if it exists
+if (PathsExist(path.join(fixtureDir, 'dist'))) {
+  shelljs.rm('-rf', path.join(fixtureDir, 'dist'));
+}
+
 var TestHelper = function(debug) {
   this.debug = debug || false;
   this.start_ = process.cwd() || path.join(__dirname, '..');
