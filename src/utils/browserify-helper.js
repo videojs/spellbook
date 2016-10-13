@@ -4,7 +4,6 @@ var path = require('path');
 var log = require('./log');
 var GetFiles = require('./get-files');
 var browserify = require('browserify');
-var browserifyInc = require('browserify-incremental');
 var streamToPromise = require('stream-to-promise');
 var GetPath = require('./get-path');
 var exorcist = require('exorcist');
