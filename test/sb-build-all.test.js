@@ -4,42 +4,68 @@ var path = require('path');
 var TestHelper = require('./test-helper.js');
 var PathsExist = require('../src/utils/paths-exist');
 var glob = require('glob');
+var pkgName = require('./fixtures/package.json').name;
 
 var tests = {
   'sb-build-css-sass': {
-    'dir': 'css',
+    src: 'css',
+    dist: 'browser',
+    files: [
+      pkgName + '.css',
+      pkgName + '.css.map',
+      pkgName + '.min.css',
+      pkgName + '.min.css.map'
+    ],
   },
   'sb-build-docs-api': {
-    'dir': 'docs'
+    src: 'js',
+    dist: 'docs/api',
+    files: ['index.html']
   },
   'sb-build-docs-manual': {
-    'dir': 'docs'
+    src: 'docs',
+    dist: 'docs/manual',
+    files: ['index.html']
   },
   'sb-build-i18n': {
-    'dir': 'i18n'
+    src: 'i18n',
+    dist: 'i18n',
+    files: ['index.json']
   },
   'sb-build-js-browser-main': {
-    'dir': 'js'
+    src: 'js',
+    dist: 'browser',
+    files: [
+      pkgName + '.js',
+      pkgName + '.js.map',
+      pkgName + '.min.js',
+      pkgName + '.min.js.map'
+    ],
   },
   'sb-build-js-browser-test': {
-    'dir': 'test'
+    src: 'test',
+    dist: 'test',
+    files: [pkgName + '.test.js']
   },
   'sb-build-js-npm': {
-    'dir': 'js'
+    src: 'js',
+    dist: 'npm',
+    files: ['index.js']
   },
-  'sb-build-js-bundlers': {
-    'dir': 'js'
+  'sb-build-js-bundles': {
+    src: 'js',
+    dist: 'test',
+    files: ['rollup.test.js', 'webpack.test.js', 'browserify.test.js']
   }
 };
 
-// TODO: --fix, --errors
 describe('build', function() {
   Object.keys(tests).forEach(function(binName) {
     var testProps = tests[binName];
     var binFile = path.join(__dirname, '..', 'src', binName) + ' ';
 
     describe(binName, function() {
-      it(binName + ' should lint default files with no args', function(done) {
+      it(binName + ' should build default files with no args', function(done) {
         var helper = new TestHelper();
 
         shelljs.exec(binFile, function(code, stdout, stderr) {
@@ -47,75 +73,23 @@ describe('build', function() {
           var stderrs = helper.trim(stderr);
 
           assert.equal(code, 0, 'should return 0');
-          assert.equal(stderrs.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');
-          assert.equal(stdouts.length, testProps.stdout, 'should stdout ' + testProps.stdout + ' lines');
+          assert.equal(
+            PathsExist(path.join(helper.config.dist, testProps.dist)),
+            true,
+            'new dist folder should exist'
+          );
+
+          testProps.files.forEach(function(file) {
+            assert.equal(
+              PathsExist(path.join(helper.config.dist, testProps.dist, file)),
+              true,
+              'new dist file ' + file + ' should exist'
+            );
+          });
+
           helper.cleanup(done);
         });
       });
-
-      it(binName + ' should lint custom dir', function(done) {
-        var helper = new TestHelper();
-        var newsrc = path.join(helper.config.src, 'newsrc');
-
-        shelljs.mv(path.join(helper.config.src, testProps.dir), newsrc);
-        shelljs.exec(binFile + newsrc, function(code, stdout, stderr) {
-          var stdouts = helper.trim(stdout);
-          var stderrs = helper.trim(stderr);
-
-          assert.equal(code, 0, 'should return 0');
-          assert.equal(stderrs.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');
-          assert.equal(stdouts.length, testProps.stdout, 'should stdout ' + testProps.stdout + ' lines');
-          helper.cleanup(done);
-        });
-      });
-
-      it(binName + ' should lint custom file', function(done) {
-        var helper = new TestHelper();
-        var oldsrc = glob.sync(path.join(helper.config.src, testProps.dir, 'index.*'))[0];
-        var newsrc = path.join(helper.config.src, 'newsrc' + path.extname(oldsrc));
-
-        shelljs.mv(oldsrc, newsrc);
-        shelljs.exec(binFile + newsrc, function(code, stdout, stderr) {
-          var stdouts = helper.trim(stdout);
-          var stderrs = helper.trim(stderr);
-
-          assert.equal(code, 0, 'should return 0');
-          assert.equal(stderrs.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');
-          assert.equal(stdouts.length, testProps.stdout, 'should stdout ' + testProps.stdout + ' lines');
-          helper.cleanup(done);
-        });
-      });
-
-      it(binName + ' should lint two files', function(done) {
-        var helper = new TestHelper();
-        var oldsrc = glob.sync(path.join(helper.config.src, testProps.dir, 'index.*'))[0];
-        var newsrc = path.join(helper.config.src, 'newsrc' + path.extname(oldsrc));
-
-        shelljs.cp(oldsrc, newsrc);
-        shelljs.exec(binFile + newsrc + ' ' + oldsrc, function(code, stdout, stderr) {
-          var stdouts = helper.trim(stdout);
-          var stderrs = helper.trim(stderr);
-
-          assert.equal(code, 0, 'should return 0');
-          assert.equal(stderrs.length, testProps.doubleStderr, 'should stderr ' + testProps.doubleStderr + ' lines');
-          assert.equal(stdouts.length, testProps.doubleStdout, 'should stdout ' + testProps.doubleStdout + ' lines');
-          helper.cleanup(done);
-        });
-      });
-
-      it(binName + ' should lint custom glob', function(done) {
-        var helper = new TestHelper();
-
-        shelljs.exec(binFile + path.join(helper.config.src, testProps.dir, '*.*'), function(code, stdout, stderr) {
-          var stdouts = helper.trim(stdout);
-          var stderrs = helper.trim(stderr);
-
-          assert.equal(code, 0, 'should return 0');
-          assert.equal(stderrs.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');
-          assert.equal(stdouts.length, testProps.stdout, 'should stdout ' + testProps.stdout + ' lines');
-          helper.cleanup(done);
-        });
-      });
-    })
+    });
   });
 })

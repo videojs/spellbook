@@ -16,9 +16,9 @@
 * Unit Tests
   * utils folder
   * check file contents in build tests
-  * test-*
-  * server
-  * test with --watch arguments
+  * sb-test-*
+  * sb-server
+  * sb-watch
 
 # Future Ideas
 * General

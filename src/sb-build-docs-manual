@@ -27,8 +27,7 @@ if (!program.src) {
 var command = [
   'remark',
   '--no-config',
-  '--use', 'html',
-  '--use', 'toc',
+  '--rc-path', 'remark-build.config.js',
 ];
 
 var build = function() {
@@ -49,9 +48,9 @@ var build = function() {
   // aka src/docs/test/index.md would flatten to dist/docs/manual/index.html
   // rather than dist/docs/manual/test/index.html
   files.forEach(function(src) {
-    var dist = src.replace(program.src, program.dist).replace('md', 'html');
+    var dist = path.dirname(src.replace(program.src, program.dist));
 
-    shelljs.mkdir('-p', path.dirname(dist));
+    shelljs.mkdir('-p', dist);
     promises.push(exec(
       command.concat([src, '--output', dist]),
       {silent: true, async: true}
