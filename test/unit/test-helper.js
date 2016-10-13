@@ -41,7 +41,7 @@ if (PathsExist(path.join(fixtureDir, 'dist'))) {
 }
 
 var TestHelper = function(debug) {
-  this.debug = debug || false;
+  this.debug = debug || process.env.TRAVIS || false;
   this.start_ = process.cwd() || path.join(__dirname, '..');
   if (!this.debug) {
     shelljs.config.silent = true;
