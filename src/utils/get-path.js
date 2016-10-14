@@ -17,7 +17,7 @@ var GetPath = function(name) {
   }
 
   if (PathsExist(spellpath)) {
-    return spellpath;
+    return 'node ' + spellpath;
   }
 
   if (PathsExist(confpath)) {

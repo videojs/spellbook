@@ -1,5 +1,4 @@
 var assert = require('chai').assert;
-var shelljs = require('shelljs');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
 var PathsExist = require(path.join(TestHelper.rootDir, 'src', 'utils', 'paths-exist'));
@@ -63,14 +62,15 @@ var tests = {
 parallel('build', function() {
   Object.keys(tests).forEach(function(binName) {
     var testProps = tests[binName];
-    var binFile = path.join('node_modules', '.bin', binName) + ' ';
 
     it(binName + ' should build default files with no args', function(done) {
-      var helper = new TestHelper();
+      var debug = false;
+      if (binName === 'sb-build-js-browser-main') {
+        debug = true;
+      }
+      var helper = new TestHelper(debug);
 
-      shelljs.exec(binFile, function(code, stdout, stderr) {
-        var stdouts = helper.trim(stdout);
-        var stderrs = helper.trim(stderr);
+      helper.exec(binName, function(code, stdout, stderr) {
 
         assert.equal(code, 0, 'should return 0');
         assert.equal(

@@ -11,8 +11,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 exec('sb-clean');
-var commands = [
-];
+var commands = [];
 var args = []
 
 if (config.js) {

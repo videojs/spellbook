@@ -31,7 +31,6 @@ if ('npm_config_username' in process.env || 'npm_package_name' in process.env ||
   }
 }
 
-
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-d, --dry-run', 'print which commands would be run')

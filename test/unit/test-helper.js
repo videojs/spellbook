@@ -6,11 +6,19 @@ var rootDir = path.join(__dirname, '..', '..');
 var uuid = require('uuid');
 var PathsExist = require('../../src/utils/paths-exist');
 var rimraf = require('rimraf');
+var npmRun = require('npm-run');
 
 // intialize git
-if (!process.env.TRAVIS) {
-  shelljs.config.silent = true;
-} else {
+shelljs.config.silent = true;
+
+var sigexit = function() {
+  process.exit(0);
+};
+
+process.on('SIGINT', sigexit);
+process.on('SIGQUIT', sigexit);
+
+if (process.env.TRAVIS) {
   shelljs.exec('git config --global user.email "travis@tester.com"');
   shelljs.exec('git config --global user.name "Travis Tester"');
 }
@@ -40,12 +48,7 @@ if (PathsExist(path.join(fixtureDir, 'dist'))) {
 }
 
 var TestHelper = function(debug) {
-  this.debug = debug || process.env.TRAVIS || false;
-  if (!this.debug) {
-    shelljs.config.silent = true;
-  } else {
-    shelljs.config.silent = false;
-  }
+  this.debug = debug || false;
 
   this.projectDir = fixtureDir;
   while(PathsExist(this.projectDir)) {
@@ -53,20 +56,28 @@ var TestHelper = function(debug) {
     this.projectDir = path.join(shelljs.tempdir(), id);
   }
 
+  if (!this.debug) {
+    shelljs.config.silent = true;
+  } else {
+    shelljs.config.silent = false;
+  }
+
   shelljs.cp('-R', fixtureDir, this.projectDir);
-  shelljs.cd(this.projectDir);
+  // always allow cleanup to happen
+  process.setMaxListeners(1000);
+  process.on('exit', this.cleanup.bind(this));
 
   // make sure that tests can use a fresh config
   // and not the one from the previous cache
-  this.config = GetConfig();
+  this.config = GetConfig(this.projectDir);
   return this;
 };
 
-TestHelper.prototype.trim = function(stdout) {
+var splitString = function(string) {
   var newStdout = [];
 
-  stdout = stdout.trim().split('\n') || [];
-  stdout.forEach(function(s) {
+  string = string.trim().split('\n') || [];
+  string.forEach(function(s) {
     if (!s.trim()) {
       return
     }
@@ -75,19 +86,42 @@ TestHelper.prototype.trim = function(stdout) {
   return newStdout;
 };
 
-TestHelper.prototype.binPath = function(bin) {
-  return path.join(this.config.path, bin) + ' ';
+TestHelper.prototype.exec = function(cmd, args, cb) {
+
+  if (!cb && typeof args === 'function') {
+    cb = args;
+    args = [];
+  }
+  var stdout = '';
+  var stderr = '';
+  if (this.debug) {
+    console.log('running ' + cmd + ' with args ' + args.join(' '));
+    console.log('in dir ' + this.projectDir);
+  }
+  var child = npmRun.spawn(cmd, args, {cwd: this.projectDir}).on('close', function(code) {
+    cb(code, splitString(stdout), splitString(stderr));
+  });
+
+  child.stdout.on('data', function(d) {
+    stdout += d.toString();
+  });
+
+  child.stderr.on('data', function(d) {
+    stderr += d.toString();
+  });
+
+  if (this.debug) {
+    child.stdout.on('data', process.stdout.write.bind(process.stdout));
+    child.stderr.on('data', process.stderr.write.bind(process.stderr));
+  }
+
+  return child;
 };
 
-
 TestHelper.prototype.cleanup = function(done) {
-  shelljs.cd(TestHelper.fixtureDir);
-  if (this.debug) {
-    console.log(this.projectDir);
-  }
   rimraf.sync(this.projectDir);
 
-  if (done) {
+  if (typeof done === 'function') {
     done();
   }
 };

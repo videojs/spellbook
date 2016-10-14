@@ -3,7 +3,7 @@ var shelljs = require('shelljs');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
 var PathsExist = require(path.join(TestHelper.rootDir, 'src', 'utils', 'paths-exist'));
-var binFile = path.join('node_modules', '.bin', 'sb-release') + ' ';
+var binName = 'sb-release';
 var parallel = require('mocha.parallel');
 var versions = {
   'major': '2.0.0',
@@ -22,13 +22,11 @@ parallel('sb-release', function() {
   it('should exit with an error if no args are passed', function(done) {
     var helper = new TestHelper();
 
-    shelljs.exec(helper.binPath(binFile), function(code, stdout, stderr) {
-      var stdouts = helper.trim(stdout);
-      var stderrs = helper.trim(stderr);
+    helper.exec(binName, function(code, stdout, stderr) {
 
       assert.equal(code, 1, 'should return failure');
-      assert.equal(stdouts.length, 2, 'should stdout 2 lines');
-      assert.equal(stderrs.length, 1, 'should stderr an error');
+      assert.equal(stdout.length, 2, 'should stdout 2 lines');
+      assert.equal(stderr.length, 1, 'should stderr an error');
       helper.cleanup(done);
     });
   });
@@ -36,13 +34,11 @@ parallel('sb-release', function() {
   it('should exit with an error if an invalid version is passed', function(done) {
     var helper = new TestHelper();
 
-    shelljs.exec(helper.binPath(binFile) + 'foo', function(code, stdout, stderr) {
-      var stdouts = helper.trim(stdout);
-      var stderrs = helper.trim(stderr);
+    helper.exec(binName, ['foo'], function(code, stdout, stderr) {
 
       assert.equal(code, 1, 'should return failure');
-      assert.equal(stdouts.length, 2, 'should stdout 2 lines');
-      assert.equal(stderrs.length, 2, 'should stderr an error');
+      assert.equal(stdout.length, 2, 'should stdout 2 lines');
+      assert.equal(stderr.length, 2, 'should stderr an error');
       helper.cleanup(done);
     });
   });
@@ -51,13 +47,11 @@ parallel('sb-release', function() {
     var helper = new TestHelper();
 
     shelljs.rm('-rf', path.join(helper.config.path, '.git'));
-    shelljs.exec(helper.binPath(binFile) + '1.0.1', function(code, stdout, stderr) {
-      var stdouts = helper.trim(stdout);
-      var stderrs = helper.trim(stderr)
+    helper.exec(binName, ['1.0.1'], function(code, stdout, stderr) {
 
       assert.equal(code, 1, 'should return failure');
-      assert.equal(stdouts.length, 2, 'should stdout 2 lines');
-      assert.equal(stderrs.length, 1, 'should stderr an error');
+      assert.equal(stdout.length, 2, 'should stdout 2 lines');
+      assert.equal(stderr.length, 1, 'should stderr an error');
       helper.cleanup(done);
     });
   });
@@ -66,13 +60,11 @@ parallel('sb-release', function() {
     var helper = new TestHelper();
 
     shelljs.rm('-f', path.join(helper.config.path, 'CHANGELOG.md'));
-    shelljs.exec(helper.binPath(binFile) + '1.0.1', function(code, stdout, stderr) {
-      var stdouts = helper.trim(stdout);
-      var stderrs = helper.trim(stderr)
+    helper.exec(binName, ['1.0.1'], function(code, stdout, stderr) {
 
       assert.equal(code, 1, 'should return failure');
-      assert.equal(stdouts.length, 2, 'should stdout 2 lines');
-      assert.equal(stderrs.length, 1, 'should stderr an error');
+      assert.equal(stdout.length, 2, 'should stdout 2 lines');
+      assert.equal(stderr.length, 1, 'should stderr an error');
       helper.cleanup(done);
     });
   });
@@ -80,13 +72,11 @@ parallel('sb-release', function() {
   it('should exit with an error if version passed is the current version', function(done) {
     var helper = new TestHelper();
 
-    shelljs.exec(helper.binPath(binFile) + '1.0.0', function(code, stdout, stderr) {
-      var stdouts = helper.trim(stdout);
-      var stderrs = helper.trim(stderr)
+    helper.exec(binName, ['1.0.0'], function(code, stdout, stderr) {
 
       assert.equal(code, 1, 'should return failure');
-      assert.equal(stdouts.length, 2, 'should stdout 2 lines');
-      assert.equal(stderrs.length, 2, 'should stderr an error');
+      assert.equal(stdout.length, 2, 'should stdout 2 lines');
+      assert.equal(stderr.length, 2, 'should stderr an error');
       helper.cleanup(done);
     });
   });
@@ -94,34 +84,31 @@ parallel('sb-release', function() {
   it('should exit with an error if run with npm version', function(done) {
     var helper = new TestHelper();
 
-    shelljs.exec('npm version 1.0.1', function(code, stdout, stderr) {
-      var stdouts = helper.trim(stdout);
-      var stderrs = helper.trim(stderr)
+    helper.exec('npm', ['version',  '1.0.1'], function(code, stdout, stderr) {
 
       assert.equal(code, 1, 'should return failure');
-      assert.equal(stdouts.length, 3, 'should stdout 0 lines');
-      assert.notEqual(stderrs.length, 0, 'should stderr an error');
+      assert.equal(stdout.length, 3, 'should stdout 0 lines');
+      assert.notEqual(stderr.length, 0, 'should stderr an error');
       helper.cleanup(done);
     });
   });
 
-  ['npm run version ', binFile].forEach(function(bin) {
+  ['npm', binName].forEach(function(bin) {
     Object.keys(versions).forEach(function(versionName) {
       var versionNumber = versions[versionName];
 
-      it('should run with ' + bin + versionName, function(done) {
+      it('should run with ' + bin + ' and ' + versionName, function(done) {
         var helper = new TestHelper();
-        if (path.basename(bin) === 'sb-release') {
-          bin = helper.binPath(bin);
+        var args = [];
+
+        if (bin === 'npm') {
+          args = ['run', 'version'];
         }
 
-        shelljs.exec(bin + ' ' + versionName, function(code, stdout, stderr) {
-          var stdouts = helper.trim(stdout);
-          var stderrs = helper.trim(stderr)
-
+        helper.exec(bin, args.concat([versionName]), function(code, stdout, stderr) {
           assert.equal(code, 0, 'should return success');
-          assert.notEqual(stdouts.length, 0, 'should stdout multiple lines');
-          assert.equal(stderr, '', 'should stderr nothing');
+          assert.notEqual(stdout.length, 0, 'should stdout multiple lines');
+          assert.equal(stderr.length, 0, 'should stderr nothing');
 
           shelljs.pushd(helper.config.path);
           var gitLog = shelljs.exec('git log --oneline -1');
@@ -129,7 +116,6 @@ parallel('sb-release', function() {
           var changelog = shelljs.cat(path.join(helper.config.path, 'CHANGELOG.md'));
           var pkg = JSON.parse(shelljs.cat(path.join(helper.config.path, 'package.json')));
           var versionRegex = new RegExp(versionNumber);
-
           shelljs.popd();
 
           assert.isOk(versionRegex.test(gitLog.stdout),'git log should be correct');
@@ -148,13 +134,10 @@ parallel('sb-release', function() {
       var helper = new TestHelper();
 
       shelljs.touch(path.join(helper.config.path, 'bower.json'));
-      shelljs.exec(helper.binPath(binFile) + ' major', function(code, stdout, stderr) {
-        var stdouts = helper.trim(stdout);
-        var stderrs = helper.trim(stderr)
-        console.log(stdout, stderr);
+      helper.exec(binName, ['major'], function(code, stdout, stderr) {
 
         assert.equal(code, 0, 'should return success');
-        assert.equal(stdouts.length, 0, 'should stdout nothing');
+        assert.equal(stdout.length, 0, 'should stdout nothing');
         assert.equal(stderr.length, 0, 'should stderr nothing');
         helper.cleanup(done);
       });
@@ -166,13 +149,11 @@ parallel('sb-release', function() {
     it('should not change anything when run with ' + option, function(done) {
       var helper = new TestHelper();
 
-      shelljs.exec(binFile + ' 1.0.1 ' + option, function(code, stdout, stderr) {
-        var stdouts = helper.trim(stdout);
-        var stderrs = helper.trim(stderr)
+      helper.exec(binName, ['1.0.1', option], function(code, stdout, stderr) {
 
         assert.equal(code, 0, 'should return success');
         assert.equal(stderr.length, 0, 'should stderr nothing');
-        assert.notEqual(stdouts.length, 0, 'should stdout multiple lines');
+        assert.notEqual(stdout.length, 0, 'should stdout multiple lines');
 
         shelljs.pushd(helper.config.path);
         var gitLog = shelljs.exec('git log --oneline -1');
