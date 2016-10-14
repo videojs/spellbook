@@ -22,7 +22,7 @@ parallel('sb-release', function() {
   it('should exit with an error if no args are passed', function(done) {
     var helper = new TestHelper();
 
-    shelljs.exec(binFile, function(code, stdout, stderr) {
+    shelljs.exec(helper.binPath(binFile), function(code, stdout, stderr) {
       var stdouts = helper.trim(stdout);
       var stderrs = helper.trim(stderr);
 
@@ -36,7 +36,7 @@ parallel('sb-release', function() {
   it('should exit with an error if an invalid version is passed', function(done) {
     var helper = new TestHelper();
 
-    shelljs.exec(binFile + 'foo', function(code, stdout, stderr) {
+    shelljs.exec(helper.binPath(binFile) + 'foo', function(code, stdout, stderr) {
       var stdouts = helper.trim(stdout);
       var stderrs = helper.trim(stderr);
 
@@ -51,7 +51,7 @@ parallel('sb-release', function() {
     var helper = new TestHelper();
 
     shelljs.rm('-rf', path.join(helper.config.path, '.git'));
-    shelljs.exec(binFile + '1.0.1', function(code, stdout, stderr) {
+    shelljs.exec(helper.binPath(binFile) + '1.0.1', function(code, stdout, stderr) {
       var stdouts = helper.trim(stdout);
       var stderrs = helper.trim(stderr)
 
@@ -66,7 +66,7 @@ parallel('sb-release', function() {
     var helper = new TestHelper();
 
     shelljs.rm('-f', path.join(helper.config.path, 'CHANGELOG.md'));
-    shelljs.exec(binFile + '1.0.1', function(code, stdout, stderr) {
+    shelljs.exec(helper.binPath(binFile) + '1.0.1', function(code, stdout, stderr) {
       var stdouts = helper.trim(stdout);
       var stderrs = helper.trim(stderr)
 
@@ -80,7 +80,7 @@ parallel('sb-release', function() {
   it('should exit with an error if version passed is the current version', function(done) {
     var helper = new TestHelper();
 
-    shelljs.exec(binFile + '1.0.0', function(code, stdout, stderr) {
+    shelljs.exec(helper.binPath(binFile) + '1.0.0', function(code, stdout, stderr) {
       var stdouts = helper.trim(stdout);
       var stderrs = helper.trim(stderr)
 
@@ -111,6 +111,9 @@ parallel('sb-release', function() {
 
       it('should run with ' + bin + versionName, function(done) {
         var helper = new TestHelper();
+        if (path.basename(bin) === 'sb-release') {
+          bin = helper.binPath(bin);
+        }
 
         shelljs.exec(bin + ' ' + versionName, function(code, stdout, stderr) {
           var stdouts = helper.trim(stdout);
@@ -145,7 +148,7 @@ parallel('sb-release', function() {
       var helper = new TestHelper();
 
       shelljs.touch(path.join(helper.config.path, 'bower.json'));
-      shelljs.exec(binFile + ' major', function(code, stdout, stderr) {
+      shelljs.exec(helper.binPath(binFile) + ' major', function(code, stdout, stderr) {
         var stdouts = helper.trim(stdout);
         var stderrs = helper.trim(stderr)
         console.log(stdout, stderr);

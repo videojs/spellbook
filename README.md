@@ -58,3 +58,6 @@
 * shim
   * when browserify-shim support config passing, use that rather than using browserify-shim in user pkg.json
     * see: https://github.com/thlorenz/browserify-shim/pull/195
+* sb-check
+  * npm-check-update
+  * npm-check

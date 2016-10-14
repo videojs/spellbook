@@ -16,10 +16,11 @@ parallel('sb', function() {
   });
 
   Object.keys(pkg.bin).forEach(function(key) {
-    if (key === 'sb') {
-      return;
-    }
     var name = key.replace(/^sb-/, '').split('-').join(' ');
+
+    if (name === 'sb') {
+      name = '';
+    }
 
     it('should be able to call ' + key + ' through sb ' + name, function(done) {
       shelljs.exec(binFile + name + ' --help', function(code, stdout, stderr) {

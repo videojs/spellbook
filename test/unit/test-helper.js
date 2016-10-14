@@ -75,6 +75,11 @@ TestHelper.prototype.trim = function(stdout) {
   return newStdout;
 };
 
+TestHelper.prototype.binPath = function(bin) {
+  return path.join(this.config.path, bin) + ' ';
+};
+
+
 TestHelper.prototype.cleanup = function(done) {
   shelljs.cd(TestHelper.fixtureDir);
   if (this.debug) {

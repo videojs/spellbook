@@ -20,17 +20,17 @@ var versions = [
 ];
 
 // check if we are being run with npm
-if (process.env.npm_config_argv) {
+if ('npm_config_username' in process.env || 'npm_package_name' in process.env || 'npm_config_heading' in process.env) {
   var npmArgs = JSON.parse(process.env.npm_config_argv);
-  // check if the user is doing npm run version
-  // or npm version
-  if (npmArgs.cooked[0] !== 'run') {
+  // check if the user is doing npm version and error if they are
+  if (npmArgs.cooked[0] === 'version') {
     log.fatal('sb-release does not support npm version <newversion>. Only use it in the following ways');
     log.fatal('* run it directly: `sb-release <newversion>`');
     log.fatal('* use it as an npm script: `npm run version <newversion>`');
     process.exit(1);
   }
 }
+
 
 var program = CommanderWrapper(function(commander) {
   return commander
