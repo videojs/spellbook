@@ -8,31 +8,31 @@ var PathsExist = require('../../src/utils/paths-exist');
 var rimraf = require('rimraf');
 
 // intialize git
+if (!process.env.TRAVIS) {
+  shelljs.config.silent = true;
+} else {
+  shelljs.exec('git config --global user.email "travis@tester.com"');
+  shelljs.exec('git config --global user.name "Travis Tester"');
+}
+
 if (!PathsExist(path.join(fixtureDir, '.git'))) {
   console.log('setting up git for fixtures');
-  shelljs.config.silent = true;
-  if (process.env.TRAVIS) {
-    shelljs.exec('git config --global user.email "travis@tester.com"');
-    shelljs.exec('git config --global user.name "Travis Tester"');
-  }
   shelljs.pushd(fixtureDir);
   shelljs.exec('git init');
   shelljs.exec('git add --all');
   shelljs.exec('git commit -a -m initial');
   shelljs.popd();
-  shelljs.config.silent = false;
 }
 
 // npm link fixtures
 if (!PathsExist(path.join(fixtureDir, 'node_modules'))) {
   console.log('npm linking videojs-spellbook to fixtures');
-  shelljs.config.silent = true;
   shelljs.pushd(fixtureDir);
   shelljs.exec('npm link ' + rootDir);
   shelljs.popd();
-  shelljs.config.silent = false;
 }
 
+shelljs.config.silent = false;
 shelljs.config.fatal = true;
 // remove dist if it exists
 if (PathsExist(path.join(fixtureDir, 'dist'))) {

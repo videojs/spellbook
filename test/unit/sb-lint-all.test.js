@@ -22,9 +22,9 @@ var tests = {
     'dir': 'docs'
   },
   'sb-lint-docs-md': {
-    'stderr': 14,
+    'stderr': 5,
     'stdout': 2,
-    'doubleStderr': 27,
+    'doubleStderr': 9,
     'doubleStdout': 2,
     'dir': 'docs'
   },
