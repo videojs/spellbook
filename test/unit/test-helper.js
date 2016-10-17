@@ -7,6 +7,7 @@ var uuid = require('uuid');
 var PathsExist = require('../../src/utils/paths-exist');
 var rimraf = require('rimraf');
 var npmRun = require('npm-run');
+var fs = require('fs');
 
 // intialize git
 shelljs.config.silent = true;
@@ -32,22 +33,38 @@ if (!PathsExist(path.join(fixtureDir, 'test-pkg-main', '.git'))) {
   shelljs.popd();
 }
 
-// npm link fixtures
+var readJSON = function(file) {
+  return JSON.parse(fs.readFileSync(file, 'utf8'));
+};
+
 if (!PathsExist(path.join(fixtureDir, 'test-pkg-main', 'node_modules'))) {
-  shelljs.pushd(path.join(fixtureDir, 'test-pkg-main'));
-  shelljs.exec('npm link ' + rootDir);
-  console.log('npm linking videojs-spellbook to fixtures/test-pkg-main');
+  var nodeDir = path.join(fixtureDir, 'test-pkg-main', 'node_modules');
+  var binDir = path.join(nodeDir, '.bin');
+
+  shelljs.mkdir('-p', nodeDir);
+  shelljs.mkdir('-p', binDir);
+
+  // mimic npm link
   var pkgsToLink = shelljs.ls('-d', path.join(fixtureDir, '*'));
+  pkgsToLink.push(path.join(__dirname, '..', '..'));
 
   pkgsToLink.forEach(function(folder) {
     if (path.basename(folder) === 'test-pkg-main') {
       return;
     }
-    console.log('npm linking fixtures/' + path.basename(folder) + ' to fixtures/test-pkg-main');
-    shelljs.exec('npm link ' + folder);
-  });
+    var pkg = readJSON(path.join(folder, 'package.json'));
+    console.log('npm linking ' + pkg.name + 'to test-pkg-main');
+    shelljs.ln('-sf', folder, path.join(nodeDir, pkg.name));
 
-  shelljs.popd();
+    if (!pkg.bin) {
+      return;
+    }
+    Object.keys(pkg.bin).forEach(function(binName) {
+      var binPath = pkg.bin[binName];
+
+      shelljs.ln('-sf', path.join(folder, binPath), path.join(binDir, binName));
+    });
+  });
 }
 
 shelljs.config.silent = false;
@@ -59,20 +76,23 @@ if (PathsExist(path.join(fixtureDir, 'test-pkg-main', 'dist'))) {
 
 var TestHelper = function(debug) {
   this.debug = debug || false;
+  this.projectDir = path.join(fixtureDir, 'test-pkg-main');
 
-  this.projectDir = fixtureDir;
   while(PathsExist(this.projectDir)) {
     var id = uuid.v4();
+
     this.projectDir = path.join(shelljs.tempdir(), id);
   }
+  shelljs.cp('-R', path.join(fixtureDir, 'test-pkg-main') + path.sep, this.projectDir);
 
   if (!this.debug) {
     shelljs.config.silent = true;
   } else {
     shelljs.config.silent = false;
+    console.log(this.projectDir);
+    console.log(this.lsProject());
   }
 
-  shelljs.cp('-R', path.join(fixtureDir, 'test-pkg-main'), this.projectDir);
   // always allow cleanup to happen
   process.setMaxListeners(1000);
   process.on('exit', this.cleanup.bind(this));
@@ -97,13 +117,13 @@ var splitString = TestHelper.prototype.trim = function(string) {
 };
 
 TestHelper.prototype.exec = function(cmd, args, cb) {
-
   if (!cb && typeof args === 'function') {
     cb = args;
     args = [];
   }
   var stdout = '';
   var stderr = '';
+
   if (this.debug) {
     console.log('running ' + cmd + ' with args ' + args.join(' '));
     console.log('in dir ' + this.projectDir);
@@ -129,6 +149,11 @@ TestHelper.prototype.exec = function(cmd, args, cb) {
 };
 
 TestHelper.prototype.cleanup = function(done) {
+  if (this.debug && PathsExist(this.projectDir)) {
+    console.log(this.projectDir);
+    console.log(this.lsProject());
+  }
+
   rimraf.sync(this.projectDir);
 
   if (typeof done === 'function') {
@@ -136,7 +161,8 @@ TestHelper.prototype.cleanup = function(done) {
   }
 };
 
-TestHelper.fixtureDir = fixtureDir;
-TestHelper.rootDir = rootDir;
+TestHelper.prototype.lsProject = function() {
+  return shelljs.ls('-RA', this.projectDir).stdout;
+};
 
 module.exports = TestHelper;

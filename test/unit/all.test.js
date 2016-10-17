@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var path = require('path');
 var TestHelper = require('./test-helper.js');
-var pkg = require(path.join(TestHelper.rootDir, 'package.json'));
+var pkg = require('../../package.json');
 var parallel = require('mocha.parallel');
 
 Object.keys(pkg.bin).forEach(function(binName) {

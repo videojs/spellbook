@@ -2,7 +2,7 @@ var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
-var PathsExist = require(path.join(TestHelper.rootDir, 'src', 'utils', 'paths-exist'));
+var PathsExist = require('../../src/utils/paths-exist');
 var binName = 'sb-clean';
 var parallel = require('mocha.parallel');
 

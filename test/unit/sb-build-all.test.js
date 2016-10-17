@@ -1,21 +1,19 @@
 var assert = require('chai').assert;
 var path = require('path');
 var TestHelper = require('./test-helper.js');
-var PathsExist = require(path.join(TestHelper.rootDir, 'src', 'utils', 'paths-exist'));
+var PathsExist = require('../../src/utils/paths-exist');
 var glob = require('glob');
-var pkgName = require(path.join('..', 'fixtures', 'test-pkg-main', 'package.json')).name;
 var parallel = require('mocha.parallel');
-var shelljs = require('shelljs');
 
 var tests = {
   'sb-build-css-sass': {
     src: 'css',
     dist: 'browser',
     files: [
-      pkgName + '.css',
-      pkgName + '.css.map',
-      pkgName + '.min.css',
-      pkgName + '.min.css.map'
+      function(pkgName) { return pkgName + '.css';},
+      function(pkgName) { return pkgName + '.css.map';},
+      function(pkgName) { return pkgName + '.min.css';},
+      function(pkgName) { return pkgName + '.min.css.map';},
     ],
   },
   'sb-build-docs-api': {
@@ -37,16 +35,18 @@ var tests = {
     src: 'js',
     dist: 'browser',
     files: [
-      pkgName + '.js',
-      pkgName + '.js.map',
-      pkgName + '.min.js',
-      pkgName + '.min.js.map'
+      function(pkgName) { return pkgName + '.js';},
+      function(pkgName) { return pkgName + '.js.map';},
+      function(pkgName) { return pkgName + '.min.js';},
+      function(pkgName) { return pkgName + '.min.js.map';},
     ],
   },
   'sb-build-js-browser-test': {
     src: 'test',
     dist: 'test',
-    files: [pkgName + '.test.js']
+    files: [
+      function(pkgName) { return pkgName + '.test.js';}
+    ]
   },
   'sb-build-js-npm': {
     src: 'js',
@@ -65,19 +65,9 @@ parallel('build', function() {
     var testProps = tests[binName];
 
     it(binName + ' should build default files with no args', function(done) {
-      var debug = false;
-      if (binName === 'sb-build-js-browser-main') {
-        debug = true;
-      } else {
-        done();
-      }
-      var helper = new TestHelper(debug);
+      var helper = new TestHelper();
 
       helper.exec(binName, function(code, stdout, stderr) {
-        if (debug) {
-          console.log(helper.trim(shelljs.exec('npm root').stdout));
-          console.log(helper.trim(shelljs.ls('-R', helper.config.path).stdout));
-        }
 
         assert.equal(code, 0, 'should return 0');
         assert.equal(
@@ -87,6 +77,9 @@ parallel('build', function() {
         );
 
         testProps.files.forEach(function(file) {
+          if (typeof file === 'function') {
+            file = file(helper.config.name);
+          }
           assert.equal(
             PathsExist(path.join(helper.config.dist, testProps.dist, file)),
             true,

@@ -6,7 +6,7 @@
     "manual": "node test/unit/test-helper.js",
     "clean": "node -e \"var d='test/fixtures/test-pkg-main';var p=require('path');require('shelljs').rm('-rf', p.join(d, '.git'), p.join(d, 'dist'), p.join(d, 'node_modules'));\"",
     "pretest": "npm run clean;",
-    "test": "mocha 'test/unit/sb-build-all.test.js'",
+    "test": "mocha 'test/unit/**/*.test.js'",
     "posttest": "npm run clean"
   },
   "bin": {
@@ -110,7 +110,7 @@
     "rimraf": "^2.5.4",
     "uuid": "^2.0.3"
   },
-  "browserify-shim": "./config/shim.config.js",
+  "browserify-shim": "config/shim.config.js",
   "keywords": [
     "videojs",
     "videojs-plugin"

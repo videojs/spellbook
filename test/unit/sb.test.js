@@ -2,7 +2,7 @@ var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var TestHelper = require('./test-helper.js');
 var path = require('path');
-var pkg = require(path.join(TestHelper.rootDir, 'package.json'));
+var pkg = require('../../package.json');
 var parallel = require('mocha.parallel');
 
 parallel('sb', function() {
