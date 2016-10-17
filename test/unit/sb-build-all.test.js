@@ -3,8 +3,9 @@ var path = require('path');
 var TestHelper = require('./test-helper.js');
 var PathsExist = require(path.join(TestHelper.rootDir, 'src', 'utils', 'paths-exist'));
 var glob = require('glob');
-var pkgName = require(path.join(TestHelper.fixtureDir, 'package.json')).name;
+var pkgName = require(path.join('..', 'fixtures', 'test-pkg-main', 'package.json')).name;
 var parallel = require('mocha.parallel');
+var shelljs = require('shelljs');
 
 var tests = {
   'sb-build-css-sass': {
@@ -67,10 +68,16 @@ parallel('build', function() {
       var debug = false;
       if (binName === 'sb-build-js-browser-main') {
         debug = true;
+      } else {
+        done();
       }
       var helper = new TestHelper(debug);
 
       helper.exec(binName, function(code, stdout, stderr) {
+        if (debug) {
+          console.log(helper.trim(shelljs.exec('npm root').stdout));
+          console.log(helper.trim(shelljs.ls('-R', helper.config.path).stdout));
+        }
 
         assert.equal(code, 0, 'should return 0');
         assert.equal(

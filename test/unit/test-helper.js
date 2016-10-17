@@ -23,9 +23,9 @@ if (process.env.TRAVIS) {
   shelljs.exec('git config --global user.name "Travis Tester"');
 }
 
-if (!PathsExist(path.join(fixtureDir, '.git'))) {
-  console.log('setting up git for fixtures');
-  shelljs.pushd(fixtureDir);
+if (!PathsExist(path.join(fixtureDir, 'test-pkg-main', '.git'))) {
+  console.log('setting up git for fixtures/test-pkg-main');
+  shelljs.pushd(path.join(fixtureDir, 'test-pkg-main'));
   shelljs.exec('git init');
   shelljs.exec('git add --all');
   shelljs.exec('git commit -a -m initial');
@@ -33,18 +33,28 @@ if (!PathsExist(path.join(fixtureDir, '.git'))) {
 }
 
 // npm link fixtures
-if (!PathsExist(path.join(fixtureDir, 'node_modules'))) {
-  console.log('npm linking videojs-spellbook to fixtures');
-  shelljs.pushd(fixtureDir);
+if (!PathsExist(path.join(fixtureDir, 'test-pkg-main', 'node_modules'))) {
+  shelljs.pushd(path.join(fixtureDir, 'test-pkg-main'));
   shelljs.exec('npm link ' + rootDir);
+  console.log('npm linking videojs-spellbook to fixtures/test-pkg-main');
+  var pkgsToLink = shelljs.ls('-d', path.join(fixtureDir, '*'));
+
+  pkgsToLink.forEach(function(folder) {
+    if (path.basename(folder) === 'test-pkg-main') {
+      return;
+    }
+    console.log('npm linking fixtures/' + path.basename(folder) + ' to fixtures/test-pkg-main');
+    shelljs.exec('npm link ' + folder);
+  });
+
   shelljs.popd();
 }
 
 shelljs.config.silent = false;
 shelljs.config.fatal = true;
 // remove dist if it exists
-if (PathsExist(path.join(fixtureDir, 'dist'))) {
-  shelljs.rm('-rf', path.join(fixtureDir, 'dist'));
+if (PathsExist(path.join(fixtureDir, 'test-pkg-main', 'dist'))) {
+  shelljs.rm('-rf', path.join(fixtureDir, 'test-pkg-main', 'dist'));
 }
 
 var TestHelper = function(debug) {
@@ -62,7 +72,7 @@ var TestHelper = function(debug) {
     shelljs.config.silent = false;
   }
 
-  shelljs.cp('-R', fixtureDir, this.projectDir);
+  shelljs.cp('-R', path.join(fixtureDir, 'test-pkg-main'), this.projectDir);
   // always allow cleanup to happen
   process.setMaxListeners(1000);
   process.on('exit', this.cleanup.bind(this));
@@ -73,13 +83,13 @@ var TestHelper = function(debug) {
   return this;
 };
 
-var splitString = function(string) {
+var splitString = TestHelper.prototype.trim = function(string) {
   var newStdout = [];
 
   string = string.trim().split('\n') || [];
   string.forEach(function(s) {
     if (!s.trim()) {
-      return
+      return;
     }
     newStdout.push(s);
   });

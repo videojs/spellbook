@@ -17,11 +17,10 @@ var versionify = require('browserify-versionify');
 var rollupify = require('rollupify');
 var watchify = require('watchify');
 var Promise = require('bluebird');
+var nodeResolve = require('rollup-plugin-node-resolve');
 
-// dist, src, standalone
+// dist, src, standalone, watch
 var browserifyHelper = function(options) {
-  process.env.BROWSERIFYSHIM_DIAGNOSTICS=1;
-
   ['.js', '.js.map'].forEach(function(ext) {
     shelljs.rm('-rf', options.dist + ext);
   });
@@ -45,10 +44,11 @@ var browserifyHelper = function(options) {
       path.join(config.path, 'node_modules')
     ],
     plugin: [
-      bundleCollapser
+      bundleCollapser,
+      errorify
     ],
     transform: [
-      /* broken for external shims during watchify... 'rollupify',*/
+      [rollupify, {config: {plugins: [nodeResolve({jsnext: true, main: false, browser: false})]}}],
       [shim, {global: true}],
       [babelify, {presets: GetPath('babel-preset.config.js')}],
       [versionify, {global: true}]
@@ -56,12 +56,8 @@ var browserifyHelper = function(options) {
   };
 
   if (options.watch) {
-    opts.plugin.push(errorify);
     opts.plugin.push(watchify);
-  } else {
-    opts.transform.splice(1, 0, rollupify);
   }
-
   log.debug('running browserify with opts:', opts, 'and files', files);
   var b = browserify(files, opts);
 
