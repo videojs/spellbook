@@ -2,8 +2,27 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
+- [Features & Information](#features-&-information)
+  - [JavaScript](#javascript)
+  - [Docs](#docs)
+  - [CSS](#css)
+  - [i18n](#i18n)
+  - [Test](#test)
+  - [Development](#development)
+  - [npm Release management](#npm-release-management)
 - [TODO](#todo)
-- [Something to think about](#something-to-think-about)
+  - [CSS](#css-1)
+  - [General](#general)
+  - [Docs](#docs-1)
+  - [Build](#build)
+- [Future Ideas](#future-ideas)
+  - [JS](#js)
+  - [General](#general-1)
+  - [Test](#test-1)
+  - [CSS](#css-2)
+  - [i18n](#i18n-1)
+  - [Development](#development-1)
+  - [Docs](#docs-2)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -66,67 +85,85 @@
   - auto-reload when files change in `<project-root>/dist/**/*` or `<project-root>/index.html`
   - auto re-run lint/build/test where needed to get the build back up to date
 
+## npm Release management
+1. Release un-released changelog entries with `chg`
+2. update the version in package.json
+3. support/build dists for bower in the tag so they don't clutter the main repo
+4. make a git commit with the version name as the message
+5. tag a git branch
+6. Advise the user on how to push to git, and publish to npm
+
 # TODO
+## CSS
+* add banner to the minified files (switch to postcss + cssnano)
+* update the source map with the line offset of the banner that was added
+* support plain css
 * autoprefixer css support
+
+## General
 * Automatic index file generation
 * generate documentation index file to link to api/manual docs
+* Create a zip file of the source code to upload to github
+
+## Docs
 * make remark-toc generation automatic rather than forcing users to add a section
-* write docs
-* kill sb-build-all binaries with `process.exit(1)` when a child fails to build
+
+## Build
 * windows support
   - must run current executables with `node` rather than directly
-* sb-build-css-sass
-  * add banner to the minified files (switch to postcss + cssnano)
-  * update the source map with the line offset of the banner that was added
-* sb-build-css-css
-  * support plain css
 * Unit Tests
   * utils folder
-  * sb-test-karma
-  * sb-server
-  * test everything with sb-watch
 
 # Future Ideas
-* move js unit tests to `src/test/unit`
-* General
-* jspm support
-* eslint-jsdoc support
-  * make these run faster
-    * build-js-*
-  * add support for [colors](https://github.com/chalk/chalk), and remove builtin colors from linters
-  * add support for [tab-completion](https://github.com/mklabs/node-tabtab)
-  * add documentation and a [man page](https://github.com/wooorm/remark-man)
-  * convert everything to a promise based api and use [loud rejection](https://github.com/sindresorhus/loud-rejection)
-  * http://docopt.org/
-  * https://programmers.stackexchange.com/questions/307467/what-are-good-habits-for-designing-command-line-arguments
-  * http://eng.localytics.com/exploring-cli-best-practices/
-* sb-build-js-npm
-  * noderify npm binaries?
+## JS
+  * move js unit tests to `src/test/unit`
+  * jspm support
+  * eslint-jsdoc support
+  * noderify npm files?
+  * only build the main code bundle once in with `js-browser-main` and include that in `js-browser-test`
+  * jsx support
+  * ts support
+
+## General
+* lint jsdoc examples somehow?
+* test jsdoc examples?
+* test markdown examples?
+* switch to `conventional-changelog` instead of `chg`
+* add support for [colors](https://github.com/chalk/chalk), and remove builtin colors from linters
+* add support for [tab-completion](https://github.com/mklabs/node-tabtab)
+* add documentation and a [man page](https://github.com/wooorm/remark-man)
+* convert everything to a promise based api and use [loud rejection](https://github.com/sindresorhus/loud-rejection)
+* http://docopt.org/
+* https://programmers.stackexchange.com/questions/307467/what-are-good-habits-for-designing-command-line-arguments
+* http://eng.localytics.com/exploring-cli-best-practices/
 * sb-create && sb-upgrade
   * proxy to the generator
 * sb-check
   * proxy to npm-check-update
-* sb-test
-  * get tests to run in nodejs
-  * code coverage
-* sb-build-i18n
-  * does doing a copy on the json make sense?
-* sb-server
-  * localhost:<port> alternative such as <module-name>.dev
-    * hotel?
-    * mehserve?
-    * vhost?
-* sb-docs
-  * find an html theme
-* sb-build-js-browser-tests
-  * treat code being tested as external so we only build it once
-* general
-  * noderify when we switch to js instead of using shelljs
 * sb-release
-  * support prerelease signifiers (beta, alpha etc)
-* shim
-  * when browserify-shim support config passing, use that rather than using browserify-shim in user pkg.json
-    * see: https://github.com/thlorenz/browserify-shim/pull/195
-* sb-check
-  * npm-check-update
-  * npm-check
+* support prerelease signifiers (beta, alpha etc)
+* when browserify-shim support config passing, use that rather than using browserify-shim in user pkg.json
+  * see: https://github.com/thlorenz/browserify-shim/pull/195
+
+## Test
+* get tests to run in nodejs
+* code coverage
+* watch, server, and sb-test-karma unit test
+
+## CSS
+* styl support
+* postcss support
+* less support
+
+## i18n
+* sb-build-i18n
+* does doing a copy on the json make sense?
+
+## Development
+* localhost:<port> alternative such as <module-name>.dev
+  * hotel?
+  * mehserve?
+  * vhost?
+
+## Docs
+* find an html theme
