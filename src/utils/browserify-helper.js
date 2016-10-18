@@ -18,8 +18,9 @@ var rollupify = require('rollupify');
 var watchify = require('watchify');
 var Promise = require('bluebird');
 var nodeResolve = require('rollup-plugin-node-resolve');
+var shimConf = require('../../config/shim.config.js');
 
-// dist, src, standalone, watch
+// dist, src, standalone, watch, internalMap, noRollup
 var browserifyHelper = function(options) {
   ['.js', '.js.map'].forEach(function(ext) {
     shelljs.rm('-rf', options.dist + ext);
@@ -48,12 +49,18 @@ var browserifyHelper = function(options) {
       errorify
     ],
     transform: [
-      [rollupify, {config: {plugins: [nodeResolve({jsnext: true, main: false, browser: false})]}}],
       [shim, {global: true}],
       [babelify, {presets: GetPath('babel-preset.config.js')}],
       [versionify, {global: true}]
     ]
   };
+
+  if (!options.noRollup) {
+    opts.transform.unshift([rollupify, {config: {plugins: [
+      nodeResolve({jsnext: true, main: false, browser: false, skip: Object.keys(shimConf)}),
+    ]}}]);
+  }
+
 
   if (options.watch) {
     opts.plugin.push(watchify);
@@ -63,19 +70,31 @@ var browserifyHelper = function(options) {
 
   var bundle = function() {
     if (arguments.length) {
-      log.info('File changed rebuilding...');
+      log.info('File(s) changed rebuilding...');
     } else {
-      log.info('Building...')
+      log.info('Building...');
     }
-    return streamToPromise(b
-      .bundle()
-      .pipe(exorcist(options.dist + '.js.map'))
-      .pipe(fs.createWriteStream(options.dist + '.js'))).then(function() {
-        log.info('Wrote: ' + options.dist + '.js');
+    var p;
+    if (options.internalMap) {
+      p = streamToPromise(b.bundle()
+        .pipe(fs.createWriteStream(options.dist + '.js'))
+      );
+    } else {
+      p = streamToPromise(b.bundle()
+        .pipe(exorcist(options.dist + '.js.map'))
+        .pipe(fs.createWriteStream(options.dist + '.js')));
+    }
+
+    return p.then(function() {
+      log.info('Wrote: ' + options.dist + '.js');
+      if (!options.internalMap) {
         log.info('Wrote: ' + options.dist + '.js.map');
-      }).catch(function(err) {
-        throw new Error(err);
-      });
+      }
+      return Promise.resolve();
+    }).catch(function(err) {
+      throw new Error(err);
+    });
+
   };
 
   b.on('update', bundle);

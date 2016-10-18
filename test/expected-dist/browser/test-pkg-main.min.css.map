@@ -1,0 +1,13 @@
+{
+  "version": 3,
+  "sources": [
+    "src/css/index.scss"
+  ],
+  "names": [],
+  "mappings": "AAEA,EACM,UAHgB,CAIrB",
+  "file": "dist/browser/test-pkg-main.css",
+  "sourcesContent": [
+    "$primaryColor: #eeccff;\n\np {\n      color: $primaryColor;\n};\n"
+  ],
+  "sourceRoot": ""
+}

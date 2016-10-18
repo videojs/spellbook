@@ -53,7 +53,7 @@ browserifyHelper({
   // uglify adds it for us
   var banner = config.banner;
   banner = config.banner.replace(/\n$/, '');
-  exec([
+  var cmd = [
     'uglifyjs',
     '--compress',
     '--mangle',
@@ -69,7 +69,13 @@ browserifyHelper({
     distFile + '.min.js',
     '--',
     distFile + '.js'
-  ], {silent: true});
+  ];
+
+  if (config.ie8) {
+    cmd.splice(1, 0, '--support-ie8');
+  }
+
+  exec(cmd, {silent: true});
   log.info('Wrote: ' + distFile + '.min.js');
   log.info('Wrote: ' + distFile + '.min.js.map');
 });

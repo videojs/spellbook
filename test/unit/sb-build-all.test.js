@@ -4,6 +4,7 @@ var TestHelper = require('./test-helper.js');
 var PathsExist = require('../../src/utils/paths-exist');
 var glob = require('glob');
 var parallel = require('mocha.parallel');
+var fs = require('fs');
 
 var tests = {
   'sb-build-css-sass': {
@@ -80,10 +81,32 @@ parallel('build', function() {
           if (typeof file === 'function') {
             file = file(helper.config.name);
           }
+          var distFile = path.join(helper.config.dist, testProps.dist, file)
+            .replace(/\/\/# sourceMappingURL.*/, '');
+          var expectedFile = path.join(__dirname, '..', 'expected-dist', testProps.dist, file);
+
           assert.equal(
             PathsExist(path.join(helper.config.dist, testProps.dist, file)),
             true,
             'new dist file ' + file + ' should exist'
+          );
+          // map files are always different
+          // and the api html file contains a date
+          if ((/\.map|\.html/).test(path.extname(file))) {
+            return;
+          }
+          var read = function(path) {
+            // replace internal source maps
+            // webpack uses eval for source maps atm
+            fs.readFileSync(distFile, 'utf8')
+              .replace(/\/\/# sourceMappingURL.*/, '')
+              .replace(/eval.*/, '');
+          };
+
+          assert.equal(
+            read(distFile),
+            read(expectedFile),
+            'file that was build should equal what we expect'
           );
         });
 

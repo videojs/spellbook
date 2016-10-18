@@ -1,0 +1,13 @@
+{
+  "version": 3,
+  "file": "test-pkg-main.css",
+  "sources": [
+    "../../src/css/index.scss"
+  ],
+  "sourcesContent": [
+    "$primaryColor: #eeccff;\n\np {\n      color: $primaryColor;\n};\n"
+  ],
+  "mappings": "AAEA,AAAA,CAAC,AAAC,CACI,KAAK,CAHI,IAAO,CAIrB",
+  "names": [],
+  "sourceRoot": ""
+}

@@ -28,5 +28,6 @@ browserifyHelper({
   dist: path.join(program.dist, config.name + '.test'),
   src: path.join(program.src, '**', '*.test.js'),
   standalone: false,
-  watch: program.watch
+  watch: program.watch,
+  internalMap: true
 });

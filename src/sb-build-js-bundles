@@ -9,28 +9,10 @@ var exec = require('./utils/exec');
 var log = require('./utils/log');
 var Promise = require('bluebird');
 var Watch = require('./utils/watch');
-
-var streamToPromise = require('stream-to-promise');
-var browserify = require('browserify');
-var rollupify = require('rollupify');
-var babelify = require('babelify');
-var shim = require('browserify-shim');
-var webpack = Promise.promisify(require('webpack'));
+var browserifyHelper = require('./utils/browserify-helper');
+var webpack = require('webpack');
 var shimConf = require('../config/shim.config.js');
 
-var es5 = function(bundler) {
-  return [
-    '/**',
-    ' * ' + bundler + ' test ',
-    ' */',
-    'var pkg = require("' + path.join('..', '..', path.relative(config.path, config.main)) + '");',
-    '',
-    'QUnit.module("' + bundler + ' require");',
-    'QUnit.test("' + config.name + ' should be requireable via ' + bundler + '", function(assert) {',
-    '  assert.ok(pkg, "' + config.name + ' is required properly");',
-    '});',
-  ].join('\n');
-};
 var es6 = function(bundler) {
   return [
     '/**',
@@ -50,88 +32,139 @@ var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'keep the tester running and run as things change');
 });
+var dist = path.join(config.dist, 'test');
 
-if (!PathsExist(config.main)) {
-  exec('sb-build-js-npm');
-}
+// always finish the log
+var exit = function(code) {
+  var rmGlob = path.join(dist, '*.start.js');
+
+  log.debug('removing ' + rmGlob);
+  shelljs.rm('-f', rmGlob);
+};
+
+
+process.on('exit', exit);
 
 var build = function() {
   program.bundlers = ['rollup', 'webpack', 'browserify'];
 
   var promises = [];
 
-  log.info('Building...')
+  log.info('Building...');
   program.bundlers.forEach(function(bundlerName) {
-    var srcFile = path.join(config.dist, 'test', bundlerName + '.start.js');
-    var distFile = path.join(config.dist, 'test', bundlerName + '.test.js');
-    var unitTestContents  = es5(bundlerName);
+    var srcFile = path.join(dist, bundlerName + '.start.js');
+    var distFile = path.join(dist, bundlerName + '.test.js');
+    var unitTestContents  = es6(bundlerName);
     var command;
+
+    // cleanup
+    if (PathsExist(srcFile)) {
+      shelljs.rm('-f', srcFile);
+    }
+
+    if (PathsExist(distFile)) {
+      shelljs.rm('-f', distFile);
+    }
 
     if (bundlerName === 'browserify') {
       command = function() {
-        return streamToPromise(browserify([srcFile], {
-            debug: true,
-            transform: [
-              [shim, {global: true}]
-            ]
-          }).external('qunitjs').external('video.js').external('qunit').bundle().pipe(fs.createWriteStream(distFile))
-        );
+        return browserifyHelper({
+          dist: distFile.replace(/\.js$/, ''),
+          src: srcFile,
+          standalone: false,
+          watch: program.watch,
+          internalMap: true,
+          noRollup: true
+        });
       };
     } else if (bundlerName === 'rollup') {
       // rollup only works on es6
-      unitTestContents = es6(bundlerName);
       command = function() {
-        return streamToPromise(browserify([srcFile], {
-            debug: true,
-            transform: [
-              [shim, {global: true}],
-              rollupify,
-              [babelify, {presets: GetPath('babel-preset.config.js')}]
-            ],
-          }).bundle().pipe(fs.createWriteStream(distFile))
-        );
+        return browserifyHelper({
+          dist: distFile.replace(/\.js$/, ''),
+          src: srcFile,
+          standalone: false,
+          watch: program.watch,
+          internalMap: true
+        });
       };
     } else if (bundlerName === 'webpack') {
       command = function() {
         var externals = {};
+        var first = true;
 
         Object.keys(shimConf).forEach(function(k) {
           externals[k] = shimConf[k].exports.replace('global:', '');
         });
 
-        return webpack({
-          context: config.path,
-          entry: srcFile,
-          devtool: 'inline-source-map',
-          externals: externals,
-          output: {
-            filename: path.basename(distFile),
-            path: path.dirname(distFile)
-          },
+        return new Promise(function(resolve, reject) {
+          webpack({
+            watch: program.watch || false,
+            module: {
+              loaders: [{
+                test: /\.js$/,
+                exclude: /node_modules/,
+                cacheDirectory: program.watch || false,
+                loader: 'babel-loader',
+                query: {presets: [GetPath('babel-preset.config.js')]}
+              }]
+            },
+            resolve: {
+              root: [
+                path.join(__dirname, '..', 'node_modules'),
+                path.join(config.path, 'node_modules')
+              ],
+            },
+            resolveLoader: {
+              root: [
+                path.join(__dirname, '..', 'node_modules'),
+                path.join(config.path, 'node_modules')
+              ],
+            },
+            context: config.path,
+            entry: srcFile,
+            // TODO: webpack breaks when we do inline-source-map...
+            devtool: 'eval',
+            externals: externals,
+            output: {
+              filename: path.basename(distFile),
+              path: path.dirname(distFile)
+            },
+          }, function(err, stats) {
+            if(err) {
+              reject(err);
+            }
+            var jsonStats = stats.toJson();
+            if (jsonStats.errors.length) {
+              reject(jsonStats.errors.join(''));
+            }
+            if (jsonStats.warnings.length) {
+              log.warn(jsonStats.warnings.join(''));
+            }
+
+            // TODO: webpack logs twice during first watch
+            if (first && program.watch) {
+              first = false;
+            } else {
+              log.info('Wrote: ' + distFile);
+            }
+            resolve();
+          });
         });
       };
     }
 
     shelljs.mkdir('-p', path.dirname(srcFile));
     shelljs.mkdir('-p', path.dirname(distFile));
-
-    var cleanup = function() {
-      log.debug('removing srcFile ' + srcFile);
-      shelljs.rm('-f', srcFile);
-    };
     fs.writeFileSync(srcFile, unitTestContents);
-    promises.push(command().then(cleanup).catch(cleanup));
+    promises.push(command());
   });
 
   Promise.all(promises).then(function() {
-    program.bundlers.forEach(function(bundlerName) {
-      log.info('Wrote bundle test ' + path.join(config.dist, 'test', bundlerName + '.test.js'));
-    });
+    // done
+  }).catch(function(err) {
+    log.error(err);
   });
 };
 
-if (program.watch) {
-  Watch(path.join(config.dist, 'npm', '**', '*.js'), build);
-} else {
-  build();
-}
+build();

@@ -5,7 +5,7 @@
   "scripts": {
     "manual": "node test/unit/test-helper.js",
     "clean": "node -e \"var d='test/fixtures/test-pkg-main';var p=require('path');require('shelljs').rm('-rf', p.join(d, '.git'), p.join(d, 'dist'), p.join(d, 'node_modules'));\"",
-    "pretest": "npm run clean;",
+    "pretest": "npm run clean",
     "test": "mocha 'test/unit/**/*.test.js'",
     "posttest": "npm run clean"
   },
@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "babel-cli": "^6.14.0",
+    "babel-loader": "^6.2.5",
     "babel-plugin-transform-es3-member-expression-literals": "^6.8.0",
     "babel-plugin-transform-es3-property-literals": "^6.8.0",
     "babel-plugin-transform-object-assign": "^6.8.0",
