@@ -7,13 +7,12 @@ var config = require('./utils/get-config')();
 
 var program = CommanderWrapper(function(commander) {
   return commander
-    .option('-w, --watch', 'watch files for changes and rebuild')
+    .option('-w, --watch', 'watch files for changes and rebuild');
 });
 
 exec('sb-clean');
-var commands = [
-];
-var args = []
+var commands = [];
+var args = [];
 
 if (config.js) {
   commands.push(['sb-build-js-all']);

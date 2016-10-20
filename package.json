@@ -3,8 +3,9 @@
   "version": "1.0.8",
   "description": "An official web project builder for video.js and its plugins",
   "scripts": {
-    "clean": "node -e \"require('shelljs').rm('-rf', 'test/fixtures/.git', 'test/fixturers/dist', 'test/fixtures/node_modules');\"",
-    "pretest": "npm run clean;",
+    "manual": "node test/unit/test-helper.js",
+    "clean": "node -e \"var d='test/fixtures/test-pkg-main';var p=require('path');require('shelljs').rm('-rf', p.join(d, '.git'), p.join(d, 'dist'), p.join(d, 'node_modules'));\"",
+    "pretest": "npm run clean",
     "test": "mocha 'test/unit/**/*.test.js'",
     "posttest": "npm run clean"
   },
@@ -50,6 +51,7 @@
   },
   "dependencies": {
     "babel-cli": "^6.14.0",
+    "babel-loader": "^6.2.5",
     "babel-plugin-transform-es3-member-expression-literals": "^6.8.0",
     "babel-plugin-transform-es3-property-literals": "^6.8.0",
     "babel-plugin-transform-object-assign": "^6.8.0",
@@ -89,6 +91,7 @@
     "remark-lint": "^5.1.0",
     "remark-preset-lint-recommended": "^1.0.0",
     "remark-toc": "^3.1.0",
+    "rollup-plugin-node-resolve": "^2.0.0",
     "rollupify": "^0.3.4",
     "semver": "^5.3.0",
     "shelljs": "^0.7.4",
@@ -102,12 +105,14 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "doctoc": "^1.2.0",
     "mocha": "^3.1.0",
     "mocha.parallel": "^0.13.0",
+    "npm-run": "^4.1.0",
     "rimraf": "^2.5.4",
     "uuid": "^2.0.3"
   },
-  "browserify-shim": "./config/shim.config.js",
+  "browserify-shim": "config/shim.config.js",
   "keywords": [
     "videojs",
     "videojs-plugin"

@@ -1,9 +1,11 @@
+import ReturnMe from 'test-pkg-two';
+
 export default class TestingThing {
   constructor() {
     this.bar = 'bar';
   }
   foo() {
-    return this.bar;
+    return ReturnMe(this.bar);
   }
 }
 

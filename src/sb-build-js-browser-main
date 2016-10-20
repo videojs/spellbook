@@ -5,6 +5,7 @@ var browserifyHelper = require('./utils/browserify-helper');
 var exec = require('./utils/exec');
 var log = require('./utils/log');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var PathsExist = require('./utils/paths-exist');
 var GetFiles = require('./utils/get-files');
 var Watch = require('./utils/watch');
 var shelljs = require('shelljs');
@@ -36,6 +37,9 @@ browserifyHelper({
   watch: program.watch
 }).then(function() {
 
+  if (!PathsExist(distFile + '.js')) {
+    return;
+  }
   // we don't want to uglify after watching
   if (program.watch) {
     return;
@@ -49,7 +53,7 @@ browserifyHelper({
   // uglify adds it for us
   var banner = config.banner;
   banner = config.banner.replace(/\n$/, '');
-  exec([
+  var cmd = [
     'uglifyjs',
     '--compress',
     '--mangle',
@@ -65,7 +69,13 @@ browserifyHelper({
     distFile + '.min.js',
     '--',
     distFile + '.js'
-  ], {silent: true});
+  ];
+
+  if (config.ie8) {
+    cmd.splice(1, 0, '--support-ie8');
+  }
+
+  exec(cmd, {silent: true});
   log.info('Wrote: ' + distFile + '.min.js');
   log.info('Wrote: ' + distFile + '.min.js.map');
 });

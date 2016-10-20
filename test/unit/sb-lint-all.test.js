@@ -2,7 +2,7 @@ var assert = require('chai').assert;
 var shelljs = require('shelljs');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
-var PathsExist = require(path.join(TestHelper.rootDir, 'src', 'utils', 'paths-exist'));
+var PathsExist = require('../../src/utils/paths-exist');
 var glob = require('glob');
 var parallel = require('mocha.parallel');
 
@@ -22,9 +22,9 @@ var tests = {
     'dir': 'docs'
   },
   'sb-lint-docs-md': {
-    'stderr': 14,
+    'stderr': 5,
     'stdout': 2,
-    'doubleStderr': 27,
+    'doubleStderr': 9,
     'doubleStdout': 2,
     'dir': 'docs'
   },
@@ -48,18 +48,15 @@ var tests = {
 parallel('linters', function() {
   Object.keys(tests).forEach(function(binName) {
     var testProps = tests[binName];
-    var binFile = path.join('node_modules', '.bin', binName) + ' ';
 
     it(binName + ' should lint default files with no args', function(done) {
       var helper = new TestHelper();
 
-      shelljs.exec(binFile, function(code, stdout, stderr) {
-        var stdouts = helper.trim(stdout);
-        var stderrs = helper.trim(stderr);
+      helper.exec(binName, function(code, stdout, stderr) {
 
         assert.equal(code, 0, 'should return 0');
-        assert.equal(stderrs.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');
-        assert.equal(stdouts.length, testProps.stdout, 'should stdout ' + testProps.stdout + ' lines');
+        assert.equal(stderr.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');
+        assert.equal(stdout.length, testProps.stdout, 'should stdout ' + testProps.stdout + ' lines');
         helper.cleanup(done);
       });
     });
@@ -69,13 +66,11 @@ parallel('linters', function() {
       var newsrc = path.join(helper.config.src, 'newsrc');
 
       shelljs.mv(path.join(helper.config.src, testProps.dir), newsrc);
-      shelljs.exec(binFile + newsrc, function(code, stdout, stderr) {
-        var stdouts = helper.trim(stdout);
-        var stderrs = helper.trim(stderr);
+      helper.exec(binName, [newsrc], function(code, stdout, stderr) {
 
         assert.equal(code, 0, 'should return 0');
-        assert.equal(stderrs.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');
-        assert.equal(stdouts.length, testProps.stdout, 'should stdout ' + testProps.stdout + ' lines');
+        assert.equal(stderr.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');
+        assert.equal(stdout.length, testProps.stdout, 'should stdout ' + testProps.stdout + ' lines');
         helper.cleanup(done);
       });
     });
@@ -86,13 +81,11 @@ parallel('linters', function() {
       var newsrc = path.join(helper.config.src, 'newsrc' + path.extname(oldsrc));
 
       shelljs.mv(oldsrc, newsrc);
-      shelljs.exec(binFile + newsrc, function(code, stdout, stderr) {
-        var stdouts = helper.trim(stdout);
-        var stderrs = helper.trim(stderr);
+      helper.exec(binName, [newsrc], function(code, stdout, stderr) {
 
         assert.equal(code, 0, 'should return 0');
-        assert.equal(stderrs.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');
-        assert.equal(stdouts.length, testProps.stdout, 'should stdout ' + testProps.stdout + ' lines');
+        assert.equal(stderr.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');
+        assert.equal(stdout.length, testProps.stdout, 'should stdout ' + testProps.stdout + ' lines');
         helper.cleanup(done);
       });
     });
@@ -103,13 +96,11 @@ parallel('linters', function() {
       var newsrc = path.join(helper.config.src, 'newsrc' + path.extname(oldsrc));
 
       shelljs.cp(oldsrc, newsrc);
-      shelljs.exec(binFile + newsrc + ' ' + oldsrc, function(code, stdout, stderr) {
-        var stdouts = helper.trim(stdout);
-        var stderrs = helper.trim(stderr);
+      helper.exec(binName, [newsrc, oldsrc], function(code, stdout, stderr) {
 
         assert.equal(code, 0, 'should return 0');
-        assert.equal(stderrs.length, testProps.doubleStderr, 'should stderr ' + testProps.doubleStderr + ' lines');
-        assert.equal(stdouts.length, testProps.doubleStdout, 'should stdout ' + testProps.doubleStdout + ' lines');
+        assert.equal(stderr.length, testProps.doubleStderr, 'should stderr ' + testProps.doubleStderr + ' lines');
+        assert.equal(stdout.length, testProps.doubleStdout, 'should stdout ' + testProps.doubleStdout + ' lines');
         helper.cleanup(done);
       });
     });
@@ -117,13 +108,11 @@ parallel('linters', function() {
     it(binName + ' should lint custom glob', function(done) {
       var helper = new TestHelper();
 
-      shelljs.exec(binFile + path.join(helper.config.src, testProps.dir, '*.*'), function(code, stdout, stderr) {
-        var stdouts = helper.trim(stdout);
-        var stderrs = helper.trim(stderr);
+      helper.exec(binName, [path.join(helper.config.src, testProps.dir, '*.*')], function(code, stdout, stderr) {
 
         assert.equal(code, 0, 'should return 0');
-        assert.equal(stderrs.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');
-        assert.equal(stdouts.length, testProps.stdout, 'should stdout ' + testProps.stdout + ' lines');
+        assert.equal(stderr.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');
+        assert.equal(stdout.length, testProps.stdout, 'should stdout ' + testProps.stdout + ' lines');
         helper.cleanup(done);
       });
     });

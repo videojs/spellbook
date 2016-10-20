@@ -20,7 +20,14 @@ var RunAll = function(commands, args) {
     promises.push(exec(command, {async: true}));
   });
 
-  return Promise.all(promises);
+  return Promise.all(promises).then(function(retvals) {
+    retvals.forEach(function(retval) {
+      if (retval.code !== 0) {
+        log.fatal('Failed!');
+        process.exit(retval.code);
+      }
+    });
+  });
 };
 
 module.exports = RunAll;

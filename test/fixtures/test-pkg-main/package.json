@@ -1,5 +1,5 @@
 {
-  "name": "test-pkg",
+  "name": "test-pkg-main",
   "version": "1.0.0",
   "description": "",
   "main": "dist/npm/index.js",
@@ -10,7 +10,8 @@
   "author": "Brandon Casey",
   "license": "MIT",
   "devDependencies": {
-    "videojs-spellbook": "*"
+    "videojs-spellbook": "*",
+    "test-pkg-two": "*"
   },
   "browserify-shim": "node_modules/videojs-spellbook/config/shim.config.js",
   "spellbook": {

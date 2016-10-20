@@ -1,21 +1,20 @@
 var assert = require('chai').assert;
-var shelljs = require('shelljs');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
-var PathsExist = require(path.join(TestHelper.rootDir, 'src', 'utils', 'paths-exist'));
+var PathsExist = require('../../src/utils/paths-exist');
 var glob = require('glob');
-var pkgName = require(path.join(TestHelper.fixtureDir, 'package.json')).name;
 var parallel = require('mocha.parallel');
+var fs = require('fs');
 
 var tests = {
   'sb-build-css-sass': {
     src: 'css',
     dist: 'browser',
     files: [
-      pkgName + '.css',
-      pkgName + '.css.map',
-      pkgName + '.min.css',
-      pkgName + '.min.css.map'
+      function(pkgName) { return pkgName + '.css';},
+      function(pkgName) { return pkgName + '.css.map';},
+      function(pkgName) { return pkgName + '.min.css';},
+      function(pkgName) { return pkgName + '.min.css.map';},
     ],
   },
   'sb-build-docs-api': {
@@ -37,16 +36,18 @@ var tests = {
     src: 'js',
     dist: 'browser',
     files: [
-      pkgName + '.js',
-      pkgName + '.js.map',
-      pkgName + '.min.js',
-      pkgName + '.min.js.map'
+      function(pkgName) { return pkgName + '.js';},
+      function(pkgName) { return pkgName + '.js.map';},
+      function(pkgName) { return pkgName + '.min.js';},
+      function(pkgName) { return pkgName + '.min.js.map';},
     ],
   },
   'sb-build-js-browser-test': {
     src: 'test',
     dist: 'test',
-    files: [pkgName + '.test.js']
+    files: [
+      function(pkgName) { return pkgName + '.test.js';}
+    ]
   },
   'sb-build-js-npm': {
     src: 'js',
@@ -63,14 +64,11 @@ var tests = {
 parallel('build', function() {
   Object.keys(tests).forEach(function(binName) {
     var testProps = tests[binName];
-    var binFile = path.join('node_modules', '.bin', binName) + ' ';
 
     it(binName + ' should build default files with no args', function(done) {
       var helper = new TestHelper();
 
-      shelljs.exec(binFile, function(code, stdout, stderr) {
-        var stdouts = helper.trim(stdout);
-        var stderrs = helper.trim(stderr);
+      helper.exec(binName, function(code, stdout, stderr) {
 
         assert.equal(code, 0, 'should return 0');
         assert.equal(
@@ -80,10 +78,35 @@ parallel('build', function() {
         );
 
         testProps.files.forEach(function(file) {
+          if (typeof file === 'function') {
+            file = file(helper.config.name);
+          }
+          var distFile = path.join(helper.config.dist, testProps.dist, file)
+            .replace(/\/\/# sourceMappingURL.*/, '');
+          var expectedFile = path.join(__dirname, '..', 'expected-dist', testProps.dist, file);
+
           assert.equal(
             PathsExist(path.join(helper.config.dist, testProps.dist, file)),
             true,
             'new dist file ' + file + ' should exist'
+          );
+          // map files are always different
+          // and the api html file contains a date
+          if ((/\.map|\.html/).test(path.extname(file))) {
+            return;
+          }
+          var read = function(path) {
+            // replace internal source maps
+            // webpack uses eval for source maps atm
+            fs.readFileSync(distFile, 'utf8')
+              .replace(/\/\/# sourceMappingURL.*/, '')
+              .replace(/eval.*/, '');
+          };
+
+          assert.equal(
+            read(distFile),
+            read(expectedFile),
+            'file that was build should equal what we expect'
           );
         });
 
