@@ -6,7 +6,7 @@
   - [JavaScript](#javascript)
   - [Docs](#docs)
   - [CSS](#css)
-  - [i18n](#i18n)
+  - [lang](#lang)
   - [Test](#test)
   - [Development](#development)
   - [npm Release management](#npm-release-management)
@@ -20,7 +20,7 @@
   - [General](#general-1)
   - [Test](#test-1)
   - [CSS](#css-2)
-  - [i18n](#i18n-1)
+  - [lang](#lang-1)
   - [Development](#development-1)
   - [Docs](#docs-2)
 
@@ -42,7 +42,7 @@
 * ie8 support using a custom `babel` preset and `uglify` `--suport-ie8` flag
 * Generate `webpack`, `browserify`, and `rollup` unit tests in `dist/test/<bundler-name>.test.js`
 * Bundle all manual unit tests in `src/test/**/*.test.js` to `dist/test/<pkg-name>.test.js`
-* transpose `src/js` to `dist/npm` and convert to es5 for npm deployment
+* transpose `src/js` to `dist/es5` and convert to es5 for npm deployment
 * Inclusion of `global`, `qunitjs`, `sinon`, and `video.js` into your project without the need to install it yourself
 * Support for super fast incremental rebuilds of all files using `watchify`
 * Nicer `browserify`/`watchify` error reporting using `errorify`
@@ -62,9 +62,9 @@
 * minfied and unminified dists `dist/browser/<pkg-name>.{css,min.css}`
 * external source maps dists `dist/browser/<pkg-name>.{css.map,min.css.map}`
 
-## i18n
-* lint json `i18n` files in `src/i18n/**/*.json`
-* copy `i18n` files to `dist/i18n`
+## lang
+* lint json `lang` files in `src/lang/**/*.json`
+* copy `lang` files to `dist/lang`
 
 ## Test
 * Automatically run tests on all supported browsers for all files in `dist/test/*.test.js`
@@ -155,8 +155,8 @@
 * postcss support
 * less support
 
-## i18n
-* sb-build-i18n
+## lang
+* sb-build-lang
 * does doing a copy on the json make sense?
 
 ## Development

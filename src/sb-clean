@@ -8,7 +8,7 @@ var GetFiles = require('./utils/get-files');
 
 var program = CommanderWrapper(function(commander) {
   return commander
-    .option('-d, --dry-run', 'see what would happen when you run clean')
+    .option('-d, --dry-run', 'see what would happen when you run clean');
 });
 
 if (program.quiet && program.dryRun) {

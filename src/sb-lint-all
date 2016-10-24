@@ -25,8 +25,8 @@ if (config.docs) {
   commands.push(['sb-lint-docs-all']);
 }
 
-if (config.i18n) {
-  commands.push(['sb-lint-i18n']);
+if (config.lang) {
+  commands.push(['sb-lint-lang']);
 }
 
 if (program.errors) {

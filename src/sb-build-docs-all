@@ -17,4 +17,4 @@ if (program.watch) {
   args.push('--watch');
 }
 
-RunAll(commands, args)
+RunAll(commands, args);

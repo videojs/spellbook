@@ -9,7 +9,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 var commands = [
-  ['sb-build-js-npm'],
+  ['sb-build-js-es5'],
   ['sb-build-js-bundles'],
   ['sb-build-js-browser-all'],
 ];

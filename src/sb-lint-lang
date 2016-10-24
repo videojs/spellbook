@@ -17,7 +17,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!program.src) {
-  program.src = [path.join(config.src, 'i18n', '**', '*.json')];
+  program.src = [path.join(config.src, 'lang', '**', '*.json')];
 }
 
 eslintHelper(program);

@@ -11,7 +11,7 @@ var GetFiles = require('./utils/get-files');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'incremental rebuild')
-    .option('-d, --dist <dir>', 'directory to write output to', path.join(config.dist, 'npm'))
+    .option('-d, --dist <dir>', 'directory to write output to', path.join(config.dist, 'es5'))
     .arguments('<dir>')
     .action(function(src) {
       this.src = src;
@@ -45,5 +45,5 @@ if (program.watch) {
   exec(cmd);
 } else {
   exec(cmd, {silent: true});
-  log.info('Wrote npm dist to ' + program.dist);
+  log.info('Wrote es5 dist to ' + program.dist);
 }

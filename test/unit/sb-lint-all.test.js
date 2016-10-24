@@ -28,12 +28,12 @@ var tests = {
     'doubleStdout': 2,
     'dir': 'docs'
   },
-  'sb-lint-i18n': {
+  'sb-lint-lang': {
     'stderr': 0,
     'stdout': 8,
     'doubleStderr': 0,
     'doubleStdout': 12,
-    'dir': 'i18n'
+    'dir': 'lang'
   },
   'sb-lint-js': {
     'stderr': 0,

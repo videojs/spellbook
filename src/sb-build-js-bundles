@@ -42,7 +42,6 @@ var exit = function(code) {
   shelljs.rm('-f', rmGlob);
 };
 
-
 process.on('exit', exit);
 
 var build = function() {

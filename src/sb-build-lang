@@ -10,7 +10,7 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'watch for changes and copy to dist')
-    .option('-d, --dist <dir>', 'dir to build to', path.join(config.dist, 'i18n'))
+    .option('-d, --dist <dir>', 'dir to build to', path.join(config.dist, 'lang'))
     .arguments('<dir>')
     .action(function(src) {
       this.src = src;
@@ -18,7 +18,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!program.src) {
-  program.src = path.join(config.src, 'i18n');
+  program.src = path.join(config.src, 'lang');
 }
 
 if (!GetFiles(path.join(program.src, '**', '*.json'))) {
@@ -32,7 +32,7 @@ var build = function() {
   shelljs.mkdir('-p', path.dirname(program.dist));
   log.info('Building...');
   shelljs.cp('-r', program.src, program.dist);
-  log.info('Wrote i18n to ' + program.dist);
+  log.info('Wrote lang to ' + program.dist);
 };
 
 if (program.watch) {
