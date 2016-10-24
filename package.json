@@ -1,6 +1,6 @@
 {
   "name": "videojs-spellbook",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "An official web project builder for video.js and its plugins",
   "scripts": {
     "manual": "node test/unit/test-helper.js",
