@@ -35,10 +35,10 @@ var program = CommanderWrapper(function(commander) {
   return commander
     .option('-d, --dry-run', 'print which commands would be run')
     .arguments('<new-version>')
-    .description(''
-    + '<newversion> is any valid semver (except the current one) examples:\n'
-    + '  * A valid semver version: X.X.X\n'
-    + '  * A valid semver word: major, minor, etc.')
+    .description('' +
+      '<newversion> is any valid semver (except the current one) examples:\n' +
+      '  * A valid semver version: X.X.X\n' +
+      '  * A valid semver word: major, minor, etc.')
     .action(function(newVersion) {
       this.newVersion = newVersion;
     });

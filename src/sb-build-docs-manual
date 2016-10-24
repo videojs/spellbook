@@ -23,7 +23,6 @@ if (!program.src) {
   program.src = path.join(config.src, 'docs');
 }
 
-
 var command = [
   'remark',
   '--no-config',

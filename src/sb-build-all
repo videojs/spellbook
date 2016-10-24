@@ -26,8 +26,8 @@ if (config.docs) {
   commands.push(['sb-build-docs-all']);
 }
 
-if (config.i18n) {
-  commands.push(['sb-build-i18n']);
+if (config.lang) {
+  commands.push(['sb-build-lang']);
 }
 
 if (program.watch) {

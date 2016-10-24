@@ -5,8 +5,8 @@ var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'watch for changes and re-lint on change')
     .command('docs', 'lint docs')
-    .command('i18n', 'lint i18n')
+    .command('lang', 'lint lang')
     .command('js', 'lint js')
     .command('css', 'lint css')
-    .command('all', 'lint css', {isDefault: true})
+    .command('all', 'lint css', {isDefault: true});
 });

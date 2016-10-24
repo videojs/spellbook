@@ -27,9 +27,9 @@ var tests = {
     dist: 'docs/manual',
     files: ['index.html']
   },
-  'sb-build-i18n': {
-    src: 'i18n',
-    dist: 'i18n',
+  'sb-build-lang': {
+    src: 'lang',
+    dist: 'lang',
     files: ['index.json']
   },
   'sb-build-js-browser-main': {
@@ -49,9 +49,9 @@ var tests = {
       function(pkgName) { return pkgName + '.test.js';}
     ]
   },
-  'sb-build-js-npm': {
+  'sb-build-js-es5': {
     src: 'js',
-    dist: 'npm',
+    dist: 'es5',
     files: ['index.js']
   },
   'sb-build-js-bundles': {

@@ -4,7 +4,7 @@ var RunAll = require('./utils/run-all');
 
 var program = CommanderWrapper(function(commander) {
   return commander
-    .option('-w, --watch', 'watch files for changes')
+    .option('-w, --watch', 'watch files for changes');
 });
 
 var commands = [
@@ -16,4 +16,4 @@ if (program.watch) {
   args.push('--watch');
 }
 
-RunAll(commands, args)
+RunAll(commands, args);

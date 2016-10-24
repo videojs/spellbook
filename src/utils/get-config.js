@@ -16,12 +16,12 @@ var GetConfig = function (dir) {
   var appRoot = findRoot(dir);
   var workingPkg = readJSON(path.join(appRoot, 'package.json'));
   var sbPkg = readJSON(path.join(__dirname, '..', '..', 'package.json'));
-  var banner = ""
-    + "/**\n"
-    + " * @version "  + workingPkg.version + "\n"
-    + " * @copyright " + workingPkg.author + "\n"
-    + " * @license " + workingPkg.license + "\n"
-    + " */\n";
+  var banner = "" +
+    "/**\n" +
+    " * @version "  + workingPkg.version + "\n" +
+    " * @copyright " + workingPkg.author + "\n" +
+    " * @license " + workingPkg.license + "\n" +
+    " */\n";
 
   workingPkg.spellbook = workingPkg.spellbook || {};
   process.NODE_ENV = process.NODE_ENV || {};
@@ -45,7 +45,7 @@ var GetConfig = function (dir) {
     ie8: workingPkg.spellbook.ie8 || false,
     docs: workingPkg.spellbook.docs || true,
     css: workingPkg.spellbook.css || true,
-    i18n: workingPkg.spellbook.i18n || true,
+    lang: workingPkg.spellbook.lang || true,
     js: workingPkg.spellbook.js || true,
     shimVideojs: workingPkg.spellbook['shim-videojs'] || workingPkg.spellbook['shim-video.js'] || true,
     port: workingPkg.spellbook.port || 9999,
