@@ -1,3 +1,7 @@
+# videojs-spellbook
+[![Build Status](https://travis-ci.org/videojs/spellbook.svg?branch=master)](https://travis-ci.org/videojs/spellbook)
+[![NPM](https://nodei.co/npm/videojs-spellbook.png)](https://nodei.co/npm/videojs-spellbook/)
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
@@ -26,8 +30,8 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# Features & Information
-## JavaScript
+## Features & Information
+### JavaScript
 * es6/es5 support with entry file at `src/js/index.js`
 * Smaller browser dists by using:
   - es6 dependency resolution using `rollupify` and packages with `jsnext:main` in their package.json
@@ -49,7 +53,7 @@
 * Linting of es6 code and es6 examples in documentation
 * license banner insertion at the top of minified dist files
 
-## Docs
+### Docs
 * Generate html documents from all manual documenation in `src/docs`
 * Automatic TOC generation for all manual documenation
 * Manual documentation is generated to `dist/docs/manual`
@@ -57,23 +61,23 @@
 * Lint manual docs for style errors
 * Lint manual doc js examples with eslint
 
-## CSS
+### CSS
 * sass support with entry file at `src/css/index.scss`
 * minfied and unminified dists `dist/browser/<pkg-name>.{css,min.css}`
 * external source maps dists `dist/browser/<pkg-name>.{css.map,min.css.map}`
 
-## lang
+### lang
 * lint json `lang` files in `src/lang/**/*.json`
 * copy `lang` files to `dist/lang`
 
-## Test
+### Test
 * Automatically run tests on all supported browsers for all files in `dist/test/*.test.js`
 * build js files for tests just before testing
 * incremental rebuilds and re-run when javascript has changed
 * integration for manual debuging using --watch
 * integration with the development server
 
-## Development
+### Development
 * Super fast incremental rebuilds where possible
 * Optimizations for node.js 6
 * Proxy karma test runner to development server `http://localhost:9999/test` for easy debugging
@@ -85,7 +89,7 @@
   - auto-reload when files change in `<project-root>/dist/**/*` or `<project-root>/index.html`
   - auto re-run lint/build/test where needed to get the build back up to date
 
-## npm Release management
+### npm Release management
 1. Release un-released changelog entries with `chg`
 2. update the version in package.json
 3. support/build dists for bower in the tag so they don't clutter the main repo
@@ -93,39 +97,37 @@
 5. tag a git branch
 6. Advise the user on how to push to git, and publish to npm
 
-# TODO
-## CSS
+## TODO
+### CSS
 * add banner to the minified files (switch to postcss + cssnano)
 * update the source map with the line offset of the banner that was added
 * support plain css
 * autoprefixer css support
 
-## General
+### General
 * Automatic index file generation
 * generate documentation index file to link to api/manual docs
 * Create a zip file of the source code to upload to github
 
-## Docs
+### Docs
 * make remark-toc generation automatic rather than forcing users to add a section
 
-## Build
+### Build
 * windows support
   - must run current executables with `node` rather than directly
 * Unit Tests
   * utils folder
 
-# Future Ideas
-## JS
-  * move js unit tests to `src/test/unit`
+## Future Ideas
+### JS
   * jspm support
-  * eslint-jsdoc support
   * noderify npm files?
   * only build the main code bundle once in with `js-browser-main` and include that in `js-browser-test`
   * jsx support
   * ts support
 
-## General
-* lint jsdoc examples somehow?
+### General
+* lint jsdoc examples (convert to md using jsdoc2md and lint)
 * test jsdoc examples?
 * test markdown examples?
 * switch to `conventional-changelog` instead of `chg`
@@ -145,25 +147,25 @@
 * when browserify-shim support config passing, use that rather than using browserify-shim in user pkg.json
   * see: https://github.com/thlorenz/browserify-shim/pull/195
 
-## Test
+### Test
 * get tests to run in nodejs
 * code coverage
 * watch, server, and sb-test-karma unit test
 
-## CSS
+### CSS
 * styl support
 * postcss support
 * less support
 
-## lang
+### lang
 * sb-build-lang
 * does doing a copy on the json make sense?
 
-## Development
+### Development
 * localhost:<port> alternative such as <module-name>.dev
   * hotel?
   * mehserve?
   * vhost?
 
-## Docs
+### Docs
 * find an html theme
