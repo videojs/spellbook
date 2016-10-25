@@ -9,6 +9,10 @@
     "test": "mocha 'test/unit/**/*.test.js'",
     "posttest": "npm run clean"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/videojs/spellbook"
+  },
   "bin": {
     "sb": "src/sb",
     "sb-build": "src/sb-build",
