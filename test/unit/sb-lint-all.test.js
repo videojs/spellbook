@@ -37,9 +37,9 @@ var tests = {
   },
   'sb-lint-js-src': {
     'stderr': 0,
-    'stdout': 9,
+    'stdout': 12,
     'doubleStderr': 0,
-    'doubleStdout': 14,
+    'doubleStdout': 20,
     'dir': 'src/js'
   },
   'sb-lint-js-test': {
