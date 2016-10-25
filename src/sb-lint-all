@@ -29,6 +29,10 @@ if (config.lang) {
   commands.push(['sb-lint-lang']);
 }
 
+if (config.test) {
+  commands.push(['sb-lint-test']);
+}
+
 if (program.errors) {
   args.push('--errors');
 }

@@ -1,4 +1,4 @@
-import TestingThing from '../js/index';
+import TestingThing from '../src/js/index';
 import QUnit from 'qunitjs';
 import sinon from 'sinon';
 

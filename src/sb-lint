@@ -3,7 +3,6 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
   return commander
-    .option('-w, --watch', 'watch for changes and re-lint on change')
     .command('docs', 'lint docs')
     .command('lang', 'lint lang')
     .command('js', 'lint js')

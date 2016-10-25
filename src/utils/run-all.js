@@ -1,5 +1,6 @@
 var exec = require('./exec');
 var Promise = require('bluebird');
+var log = require('./log');
 
 var RunAll = function(commands, args) {
   if (typeof commands === 'string') {

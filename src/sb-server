@@ -39,7 +39,7 @@ var karmaProxy = proxy(filter, {
     res.end('' +
       'ERROR: Could not proxy /test to karma server. \n' +
       'It is likely that karma is not started.\n' +
-      'Run `sb-test-karma --watch` to start it and reload the page.\n'
+      'Run `sb-test-browser --watch` to start it and reload the page.\n'
     );
   }
 });
