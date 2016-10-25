@@ -19,7 +19,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!program.src) {
-  program.src = [path.join(config.src, 'css', '**', '*.scss')];
+  program.src = [path.join(config.css.src, '**', '*.scss')];
 }
 
 var files = [];

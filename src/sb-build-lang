@@ -18,7 +18,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!program.src) {
-  program.src = path.join(config.src, 'lang');
+  program.src = config.lang.src;
 }
 
 if (!GetFiles(path.join(program.src, '**', '*.json'))) {

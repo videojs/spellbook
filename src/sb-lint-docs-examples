@@ -17,7 +17,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!program.src) {
-  program.src = [path.join(config.src, 'docs', '**', '*.md')];
+  program.src = [path.join(config.docs.src, '**', '*.md')];
 }
 
 eslintHelper(program);

@@ -1,0 +1,29 @@
+#!/usr/bin/env node
+var exec = require('./utils/exec');
+var CommanderWrapper = require('./utils/commander-wrapper');
+var RunAll = require('./utils/run-all');
+
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch files for changes and re-lint')
+    .option('-e, --errors', 'only log errors')
+    .option('-f, --fix', 'automatically fix semantic errors were possible');
+});
+
+var commands = [
+  ['sb-lint-js-src'],
+  ['sb-lint-js-test'],
+];
+var args = [];
+
+if (program.watch) {
+  args.push('--watch');
+}
+if (program.errors) {
+  args.push('--errors');
+}
+if (program.fix) {
+  args.push('--fix');
+}
+
+RunAll(commands, args);

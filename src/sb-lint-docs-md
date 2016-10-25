@@ -19,7 +19,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!program.src) {
-  program.src = [path.join(config.src, '**', '*.md')];
+  program.src = [path.join(config.docs.src, '**', '*.md')];
 }
 
 // make it glob

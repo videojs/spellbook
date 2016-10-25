@@ -5,20 +5,21 @@ var PathsExist = require('../../src/utils/paths-exist');
 var glob = require('glob');
 var parallel = require('mocha.parallel');
 var fs = require('fs');
+var pkgName = require('../fixtures/test-pkg-main/package.json').name;
 
 var tests = {
   'sb-build-css-sass': {
-    src: 'css',
+    src: 'src/css',
     dist: 'browser',
     files: [
-      function(pkgName) { return pkgName + '.css';},
-      function(pkgName) { return pkgName + '.css.map';},
-      function(pkgName) { return pkgName + '.min.css';},
-      function(pkgName) { return pkgName + '.min.css.map';},
-    ],
+      '.css',
+      '.css.map',
+      '.min.css',
+      '.min.css.map',
+    ].map(function(str) { return pkgName + str; }),
   },
   'sb-build-docs-api': {
-    src: 'js',
+    src: 'src/js',
     dist: 'docs/api',
     files: ['index.html']
   },
@@ -33,29 +34,29 @@ var tests = {
     files: ['index.json']
   },
   'sb-build-js-browser-main': {
-    src: 'js',
+    src: 'src/js',
     dist: 'browser',
     files: [
-      function(pkgName) { return pkgName + '.js';},
-      function(pkgName) { return pkgName + '.js.map';},
-      function(pkgName) { return pkgName + '.min.js';},
-      function(pkgName) { return pkgName + '.min.js.map';},
-    ],
+      '.js',
+      '.js.map',
+      '.min.js',
+      '.min.js.map',
+    ].map(function(str) { return pkgName + str; }),
   },
   'sb-build-js-browser-test': {
     src: 'test',
     dist: 'test',
     files: [
-      function(pkgName) { return pkgName + '.test.js';}
-    ]
+      '.test.js',
+    ].map(function(str) { return pkgName + str; }),
   },
   'sb-build-js-es5': {
-    src: 'js',
+    src: 'src/js',
     dist: 'es5',
     files: ['index.js']
   },
   'sb-build-js-bundles': {
-    src: 'js',
+    src: 'src/js',
     dist: 'test',
     files: ['rollup.test.js', 'webpack.test.js', 'browserify.test.js']
   }
@@ -69,27 +70,16 @@ parallel('build', function() {
       var helper = new TestHelper();
 
       helper.exec(binName, function(code, stdout, stderr) {
+        var dist = path.join(helper.config.dist, testProps.dist);
 
         assert.equal(code, 0, 'should return 0');
-        assert.equal(
-          PathsExist(path.join(helper.config.dist, testProps.dist)),
-          true,
-          'new dist folder should exist'
-        );
+        assert.equal(PathsExist(dist), true, 'new dist folder ' + dist + ' should exist');
 
         testProps.files.forEach(function(file) {
-          if (typeof file === 'function') {
-            file = file(helper.config.name);
-          }
-          var distFile = path.join(helper.config.dist, testProps.dist, file)
-            .replace(/\/\/# sourceMappingURL.*/, '');
+          var distFile = path.join(dist, file);
           var expectedFile = path.join(__dirname, '..', 'expected-dist', testProps.dist, file);
 
-          assert.equal(
-            PathsExist(path.join(helper.config.dist, testProps.dist, file)),
-            true,
-            'new dist file ' + file + ' should exist'
-          );
+          assert.equal(PathsExist(distFile), true, 'new dist file ' + file + ' should exist');
           // map files are always different
           // and the api html file contains a date
           if ((/\.map|\.html/).test(path.extname(file))) {
@@ -103,11 +93,7 @@ parallel('build', function() {
               .replace(/eval.*/, '');
           };
 
-          assert.equal(
-            read(distFile),
-            read(expectedFile),
-            'file that was build should equal what we expect'
-          );
+          assert.equal(read(distFile), read(expectedFile), 'file that was build should equal what we expect');
         });
 
         helper.cleanup(done);
