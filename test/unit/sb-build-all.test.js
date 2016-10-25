@@ -33,7 +33,7 @@ var tests = {
     dist: 'lang',
     files: ['index.json']
   },
-  'sb-build-js-browser-main': {
+  'sb-build-js-browser-src': {
     src: 'src/js',
     dist: 'browser',
     files: [
@@ -50,12 +50,12 @@ var tests = {
       '.test.js',
     ].map(function(str) { return pkgName + str; }),
   },
-  'sb-build-js-es5': {
+  'sb-build-js-node-es5': {
     src: 'src/js',
     dist: 'es5',
     files: ['index.js']
   },
-  'sb-build-js-bundles': {
+  'sb-build-js-browser-bundletests': {
     src: 'src/js',
     dist: 'test',
     files: ['rollup.test.js', 'webpack.test.js', 'browserify.test.js']

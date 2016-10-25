@@ -9,8 +9,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 var commands = [
-  ['sb-build-js-node-all'],
-  ['sb-build-js-browser-all'],
+  ['sb-build-js-node-es5'],
 ];
 var args = [];
 

@@ -6,6 +6,6 @@ var program = CommanderWrapper(function(commander) {
     .option('-w, --watch', 'keep the tester running and run as things change');
 });
 
-log.fatal('Its not currently possible to run qunitjs tests in node...');
-log.fatal('So we are just going to exit');
-process.exit(1);
+log.debug('Its not currently possible to run qunitjs tests in node...');
+log.debug('So we are just going to exit');
+process.exit(0);

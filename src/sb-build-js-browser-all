@@ -8,8 +8,9 @@ var program = CommanderWrapper(function(commander) {
 });
 
 var commands = [
-  ['sb-build-js-browser-main'],
+  ['sb-build-js-browser-src'],
   ['sb-build-js-browser-test']
+  ['sb-build-js-browser-bundletests']
 ];
 var args = [];
 

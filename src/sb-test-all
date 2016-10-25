@@ -14,7 +14,8 @@ if (program.build) {
 }
 
 var commands = [
-  ['sb-test-karma'],
+  ['sb-test-node'],
+  ['sb-test-browser'],
 ];
 var args = [];
 
