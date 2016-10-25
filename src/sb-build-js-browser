@@ -3,8 +3,9 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
   return commander
-    .command('main', 'build main code browser bundle')
-    .command('test', 'build unit test browser bundle')
+    .command('src', 'build src code into a browser bundle')
+    .command('test', 'build unit tests into a browser bundle')
+    .command('bundletests', 'build bundler unit test into browser bundles')
     .command('all', 'build all browser bundles', {isDefault: true});
 });
 

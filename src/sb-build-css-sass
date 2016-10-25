@@ -20,7 +20,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!program.src) {
-  program.src = path.join(config.src, 'css');
+  program.src = config.css.src;
 }
 
 var files = GetFiles(

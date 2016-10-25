@@ -20,7 +20,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!program.src) {
-  program.src = path.join(config.src, 'docs');
+  program.src = config.docs.src;
 }
 
 var command = [

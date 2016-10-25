@@ -13,11 +13,9 @@ var program = CommanderWrapper(function(commander) {
     .action(function(src) {
       this.src = src;
     });
-
 });
 
 if (!program.src) {
-  program.src = [path.join(config.lang.src, '**', '*.json')];
+  program.src = [path.join(config.js.src, '**', '*.js')];
 }
-
 eslintHelper(program);

@@ -43,21 +43,29 @@ var GetConfig = function (dir) {
     // workingPkg settings
     logLevel: process.NODE_ENV.SB_LOG_LEVEL || workingPkg.spellbook['log-level'] || 'info',
     ie8: workingPkg.spellbook.ie8 || false,
-    docs: workingPkg.spellbook.docs || true,
-    css: workingPkg.spellbook.css || true,
-    lang: workingPkg.spellbook.lang || true,
-    js: workingPkg.spellbook.js || true,
     shimVideojs: workingPkg.spellbook['shim-videojs'] || workingPkg.spellbook['shim-video.js'] || true,
-    port: workingPkg.spellbook.port || 9999,
-
-    src: workingPkg.spellbook.src || 'src',
-    dist: workingPkg.spellbook.dist || 'dist',
     banner: banner,
+    dist: path.join(appRoot, 'dist'),
+
+    docs: Object.assign({
+      src: path.join(appRoot, 'docs')
+    }, workingPkg.spellbook.docs || {}),
+    lang: Object.assign({
+      src: path.join(appRoot, 'lang')
+    }, workingPkg.spellbook.lang || {}),
+    test: Object.assign({
+      src: path.join(appRoot, 'test')
+    }, workingPkg.spellbook.lang || {}),
+
+    css: Object.assign({
+      src: path.join(appRoot, 'src', 'css')
+    }, workingPkg.spellbook.css || {}),
+    js: Object.assign({
+      src: path.join(appRoot, 'src', 'js')
+    }, workingPkg.spellbook.js || {})
+
   };
 
-  // tack on the fullpath
-  config.src = path.join(config.path, config.src);
-  config.dist = path.join(config.path, config.dist);
   return config;
 };
 

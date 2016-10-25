@@ -3,9 +3,22 @@ var path = require('path');
 var TestHelper = require('./test-helper.js');
 var pkg = require('../../package.json');
 var parallel = require('mocha.parallel');
+var GetFiles = require('../../src/utils/get-files');
 
-Object.keys(pkg.bin).forEach(function(binName) {
+GetFiles(path.join(__dirname, '..', '..', 'src', '*')).forEach(function(file) {
+  var binName = path.basename(file);
+  // skip utils file, as its a folder
+  if (binName === 'utils') {
+    return;
+  }
+
   parallel(binName, function() {
+    it('should exist in pkg.json', function(done) {
+      var helper = new TestHelper();
+
+      assert.ok(pkg.bin[binName], 'should exist in pkg.json');
+      helper.cleanup(done);
+    });
     ['--help', '-h'].forEach(function(option) {
       it('should have ' + option, function(done) {
         var helper = new TestHelper();
@@ -33,3 +46,4 @@ Object.keys(pkg.bin).forEach(function(binName) {
     });
   });
 });
+

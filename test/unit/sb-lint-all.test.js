@@ -12,7 +12,7 @@ var tests = {
     'stdout': 11,
     'doubleStderr': 0,
     'doubleStdout': 14,
-    'dir': 'css',
+    'dir': 'src/css',
   },
   'sb-lint-docs-examples': {
     'stderr': 0,
@@ -35,12 +35,19 @@ var tests = {
     'doubleStdout': 12,
     'dir': 'lang'
   },
-  'sb-lint-js': {
+  'sb-lint-js-src': {
     'stderr': 0,
-    'stdout': 9,
+    'stdout': 12,
     'doubleStderr': 0,
-    'doubleStdout': 14,
-    'dir': 'js'
+    'doubleStdout': 20,
+    'dir': 'src/js'
+  },
+  'sb-lint-js-test': {
+    'stderr': 0,
+    'stdout': 6,
+    'doubleStderr': 0,
+    'doubleStdout': 8,
+    'dir': 'test'
   },
 };
 
@@ -63,9 +70,9 @@ parallel('linters', function() {
 
     it(binName + ' should lint custom dir', function(done) {
       var helper = new TestHelper();
-      var newsrc = path.join(helper.config.src, 'newsrc');
+      var newsrc = path.join(helper.config.path, 'newsrc');
 
-      shelljs.mv(path.join(helper.config.src, testProps.dir), newsrc);
+      shelljs.mv(path.join(helper.config.path, testProps.dir), newsrc);
       helper.exec(binName, [newsrc], function(code, stdout, stderr) {
 
         assert.equal(code, 0, 'should return 0');
@@ -77,8 +84,8 @@ parallel('linters', function() {
 
     it(binName + ' should lint custom file', function(done) {
       var helper = new TestHelper();
-      var oldsrc = glob.sync(path.join(helper.config.src, testProps.dir, 'index.*'))[0];
-      var newsrc = path.join(helper.config.src, 'newsrc' + path.extname(oldsrc));
+      var oldsrc = glob.sync(path.join(helper.config.path, testProps.dir, 'index.*'))[0];
+      var newsrc = path.join(helper.config.path, 'newsrc' + path.extname(oldsrc));
 
       shelljs.mv(oldsrc, newsrc);
       helper.exec(binName, [newsrc], function(code, stdout, stderr) {
@@ -92,8 +99,8 @@ parallel('linters', function() {
 
     it(binName + ' should lint two files', function(done) {
       var helper = new TestHelper();
-      var oldsrc = glob.sync(path.join(helper.config.src, testProps.dir, 'index.*'))[0];
-      var newsrc = path.join(helper.config.src, 'newsrc' + path.extname(oldsrc));
+      var oldsrc = glob.sync(path.join(helper.config.path, testProps.dir, 'index.*'))[0];
+      var newsrc = path.join(helper.config.path, 'newsrc' + path.extname(oldsrc));
 
       shelljs.cp(oldsrc, newsrc);
       helper.exec(binName, [newsrc, oldsrc], function(code, stdout, stderr) {
@@ -108,7 +115,7 @@ parallel('linters', function() {
     it(binName + ' should lint custom glob', function(done) {
       var helper = new TestHelper();
 
-      helper.exec(binName, [path.join(helper.config.src, testProps.dir, '*.*')], function(code, stdout, stderr) {
+      helper.exec(binName, [path.join(helper.config.path, testProps.dir, '*.*')], function(code, stdout, stderr) {
 
         assert.equal(code, 0, 'should return 0');
         assert.equal(stderr.length, testProps.stderr, 'should stderr ' + testProps.stderr + ' lines');

@@ -53,7 +53,7 @@ if (!PathsExist(path.join(fixtureDir, 'test-pkg-main', 'node_modules'))) {
       return;
     }
     var pkg = readJSON(path.join(folder, 'package.json'));
-    console.log('npm linking ' + pkg.name + 'to test-pkg-main');
+    console.log('npm linking ' + pkg.name + ' to test-pkg-main');
     shelljs.ln('-sf', folder, path.join(nodeDir, pkg.name));
 
     if (!pkg.bin) {
@@ -162,7 +162,10 @@ TestHelper.prototype.cleanup = function(done) {
 };
 
 TestHelper.prototype.lsProject = function() {
-  return shelljs.ls('-RA', this.projectDir).stdout;
+  return shelljs.ls('-RA', this.projectDir)
+    .grep('-v', '.git')
+    .grep('-v', 'node_modules')
+    .stdout;
 };
 
 module.exports = TestHelper;

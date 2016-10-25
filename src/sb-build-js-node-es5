@@ -19,7 +19,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!program.src) {
-  program.src = path.join(config.src, 'js');
+  program.src = config.js.src;
 }
 
 if (!GetFiles(path.join(program.src, '**', '*.js'))) {
