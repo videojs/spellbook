@@ -3,7 +3,6 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
   return commander
-    .command('node', 'run unit tests in nodejs')
     .command('browser', 'run units tests on browser')
     .command('all', 'run all tests', {isDefault: true});
 });

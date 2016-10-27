@@ -20,7 +20,7 @@ var versions = {
 
 parallel('sb-release', function() {
   it('should exit with an error if no args are passed', function(done) {
-    var helper = new TestHelper();
+    var helper = new TestHelper({gitInit: true});
 
     helper.exec(binName, function(code, stdout, stderr) {
 
@@ -32,7 +32,7 @@ parallel('sb-release', function() {
   });
 
   it('should exit with an error if an invalid version is passed', function(done) {
-    var helper = new TestHelper();
+    var helper = new TestHelper({gitInit: true});
 
     helper.exec(binName, ['foo'], function(code, stdout, stderr) {
 
@@ -44,7 +44,7 @@ parallel('sb-release', function() {
   });
 
   it('should exit with an error if there is no .git dir', function(done) {
-    var helper = new TestHelper();
+    var helper = new TestHelper({gitInit: true});
 
     shelljs.rm('-rf', path.join(helper.config.path, '.git'));
     helper.exec(binName, ['1.0.1'], function(code, stdout, stderr) {
@@ -57,7 +57,7 @@ parallel('sb-release', function() {
   });
 
   it('should exit with an error if there is no CHANGELOG', function(done) {
-    var helper = new TestHelper();
+    var helper = new TestHelper({gitInit: true});
 
     shelljs.rm('-f', path.join(helper.config.path, 'CHANGELOG.md'));
     helper.exec(binName, ['1.0.1'], function(code, stdout, stderr) {
@@ -70,7 +70,7 @@ parallel('sb-release', function() {
   });
 
   it('should exit with an error if version passed is the current version', function(done) {
-    var helper = new TestHelper();
+    var helper = new TestHelper({gitInit: true});
 
     helper.exec(binName, ['1.0.0'], function(code, stdout, stderr) {
 
@@ -82,7 +82,7 @@ parallel('sb-release', function() {
   });
 
   it('should exit with an error if run with npm version', function(done) {
-    var helper = new TestHelper();
+    var helper = new TestHelper({gitInit: true});
 
     helper.exec('npm', ['version',  '1.0.1'], function(code, stdout, stderr) {
 
@@ -98,7 +98,7 @@ parallel('sb-release', function() {
       var versionNumber = versions[versionName];
 
       it('should run with ' + bin + ' and ' + versionName, function(done) {
-        var helper = new TestHelper();
+        var helper = new TestHelper({gitInit: true});
         var args = [];
 
         if (bin === 'npm') {
@@ -124,14 +124,14 @@ parallel('sb-release', function() {
           assert.equal(pkg.version, versionNumber, 'pkg.json should be correct');
           helper.cleanup(done);
         });
-      })
+      });
     });
   });
 
     /* TODO: find a way to change the path so we don't do the entire build here
   describe('bower', function() {
     it('should do a release for bower', function(done) {
-      var helper = new TestHelper();
+      var helper = new TestHelper({gitInit: true});
 
       shelljs.touch(path.join(helper.config.path, 'bower.json'));
       helper.exec(binName, ['major'], function(code, stdout, stderr) {
@@ -147,7 +147,7 @@ parallel('sb-release', function() {
 
   ['--dry-run', '-d'].forEach(function(option) {
     it('should not change anything when run with ' + option, function(done) {
-      var helper = new TestHelper();
+      var helper = new TestHelper({gitInit: true});
 
       helper.exec(binName, ['1.0.1', option], function(code, stdout, stderr) {
 
@@ -169,6 +169,6 @@ parallel('sb-release', function() {
         assert.notEqual(pkg.version, '1.0.1', 'pkg.json should be the old value correct');
         helper.cleanup(done);
       });
-    })
+    });
   });
 });

@@ -35,14 +35,14 @@ var tests = {
     'doubleStdout': 12,
     'dir': 'lang'
   },
-  'sb-lint-js-src': {
+  'sb-lint-js': {
     'stderr': 0,
     'stdout': 12,
     'doubleStderr': 0,
     'doubleStdout': 20,
     'dir': 'src/js'
   },
-  'sb-lint-js-test': {
+  'sb-lint-test': {
     'stderr': 0,
     'stdout': 6,
     'doubleStderr': 0,

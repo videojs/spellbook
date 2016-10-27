@@ -6,7 +6,16 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
   return commander
-    .command('src', 'lint src files')
-    .command('test', 'lint test js files')
-    .command('all', 'run all', {isDefault: true});
+    .option('-w, --watch', 'watch files for changes and re-lint')
+    .option('-e, --errors', 'only log errors')
+    .option('-f, --fix', 'fix problems automatically')
+    .arguments('<glob-or-file...>')
+    .action(function(src) {
+      this.src = src;
+    });
 });
+
+if (!program.src) {
+  program.src = [path.join(config.js.src, '**', '*.js')];
+}
+eslintHelper(program);

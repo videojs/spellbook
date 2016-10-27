@@ -3,9 +3,10 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
   return commander
-    .command('docs', 'lint docs')
-    .command('lang', 'lint lang')
-    .command('js', 'lint js')
+    .command('docs', 'lint docs, and js examples in docs')
+    .command('lang', 'lint json lang files')
+    .command('js', 'lint src js')
+    .command('test', 'lint test js')
     .command('css', 'lint css')
     .command('all', 'lint css', {isDefault: true});
 });

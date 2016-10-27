@@ -14,8 +14,12 @@ exec('sb-clean');
 var commands = [];
 var args = [];
 
-if (config.js || config.test) {
+if (config.js) {
   commands.push(['sb-build-js-all']);
+}
+
+if (config.test) {
+  commands.push(['sb-build-test-all']);
 }
 
 if (config.css) {

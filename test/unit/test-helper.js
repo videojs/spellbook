@@ -9,73 +9,38 @@ var rimraf = require('rimraf');
 var npmRun = require('npm-run');
 var fs = require('fs');
 
-// intialize git
-shelljs.config.silent = true;
-
-var sigexit = function() {
-  process.exit(0);
-};
-
-process.on('SIGINT', sigexit);
-process.on('SIGQUIT', sigexit);
-
-if (process.env.TRAVIS) {
-  shelljs.exec('git config --global user.email "travis@tester.com"');
-  shelljs.exec('git config --global user.name "Travis Tester"');
-}
-
-if (!PathsExist(path.join(fixtureDir, 'test-pkg-main', '.git'))) {
-  console.log('setting up git for fixtures/test-pkg-main');
-  shelljs.pushd(path.join(fixtureDir, 'test-pkg-main'));
-  shelljs.exec('git init');
-  shelljs.exec('git add --all');
-  shelljs.exec('git commit -a -m initial');
-  shelljs.popd();
-}
-
-var readJSON = function(file) {
-  return JSON.parse(fs.readFileSync(file, 'utf8'));
-};
-
-if (!PathsExist(path.join(fixtureDir, 'test-pkg-main', 'node_modules'))) {
-  var nodeDir = path.join(fixtureDir, 'test-pkg-main', 'node_modules');
-  var binDir = path.join(nodeDir, '.bin');
-
-  shelljs.mkdir('-p', nodeDir);
-  shelljs.mkdir('-p', binDir);
-
-  // mimic npm link
-  var pkgsToLink = shelljs.ls('-d', path.join(fixtureDir, '*'));
-  pkgsToLink.push(path.join(__dirname, '..', '..'));
-
-  pkgsToLink.forEach(function(folder) {
-    if (path.basename(folder) === 'test-pkg-main') {
-      return;
-    }
-    var pkg = readJSON(path.join(folder, 'package.json'));
-    console.log('npm linking ' + pkg.name + ' to test-pkg-main');
-    shelljs.ln('-sf', folder, path.join(nodeDir, pkg.name));
-
-    if (!pkg.bin) {
-      return;
-    }
-    Object.keys(pkg.bin).forEach(function(binName) {
-      var binPath = pkg.bin[binName];
-
-      shelljs.ln('-sf', path.join(folder, binPath), path.join(binDir, binName));
-    });
-  });
-}
 
 shelljs.config.silent = false;
 shelljs.config.fatal = true;
-// remove dist if it exists
-if (PathsExist(path.join(fixtureDir, 'test-pkg-main', 'dist'))) {
-  shelljs.rm('-rf', path.join(fixtureDir, 'test-pkg-main', 'dist'));
-}
 
-var TestHelper = function(debug) {
-  this.debug = debug || false;
+var TestHelper = function(options) {
+  // allow a ton of process listeners
+  process.setMaxListeners(1000);
+
+  // do a normal exit on ctrl+c or ctrl+\
+  var sigexit = function() {
+    process.exit(0);
+  };
+
+  process.on('SIGINT', sigexit);
+  process.on('SIGQUIT', sigexit);
+
+  // pre-cleanup
+  ['dist', 'node_modules', '.git'].forEach(function(dir) {
+    var d = path.join(fixtureDir, 'test-pkg-main', 'dist');
+
+    if (PathsExist(d)) {
+      shelljs.rm('-rf', d);
+    }
+  });
+
+  options = options || {};
+
+  this.options = {
+    debug: options.debug || false,
+    npmLink: options.npmLink || true,
+    gitInit: options.gitInit || false
+  };
   this.projectDir = path.join(fixtureDir, 'test-pkg-main');
 
   while(PathsExist(this.projectDir)) {
@@ -85,7 +50,7 @@ var TestHelper = function(debug) {
   }
   shelljs.cp('-R', path.join(fixtureDir, 'test-pkg-main') + path.sep, this.projectDir);
 
-  if (!this.debug) {
+  if (!this.options.debug) {
     shelljs.config.silent = true;
   } else {
     shelljs.config.silent = false;
@@ -93,8 +58,15 @@ var TestHelper = function(debug) {
     console.log(this.lsProject());
   }
 
-  // always allow cleanup to happen
-  process.setMaxListeners(1000);
+  if (this.options.npmLink) {
+    this.npmLink(this.projectDir);
+  }
+
+  if (this.options.gitInit) {
+    this.gitInit(this.projectDir);
+  }
+
+  // always cleanup the tmpdir
   process.on('exit', this.cleanup.bind(this));
 
   // make sure that tests can use a fresh config
@@ -124,7 +96,7 @@ TestHelper.prototype.exec = function(cmd, args, cb) {
   var stdout = '';
   var stderr = '';
 
-  if (this.debug) {
+  if (this.options.debug) {
     console.log('running ' + cmd + ' with args ' + args.join(' '));
     console.log('in dir ' + this.projectDir);
   }
@@ -140,7 +112,7 @@ TestHelper.prototype.exec = function(cmd, args, cb) {
     stderr += d.toString();
   });
 
-  if (this.debug) {
+  if (this.options.debug) {
     child.stdout.on('data', process.stdout.write.bind(process.stdout));
     child.stderr.on('data', process.stderr.write.bind(process.stderr));
   }
@@ -149,7 +121,7 @@ TestHelper.prototype.exec = function(cmd, args, cb) {
 };
 
 TestHelper.prototype.cleanup = function(done) {
-  if (this.debug && PathsExist(this.projectDir)) {
+  if (this.options.debug && PathsExist(this.projectDir)) {
     console.log(this.projectDir);
     console.log(this.lsProject());
   }
@@ -166,6 +138,57 @@ TestHelper.prototype.lsProject = function() {
     .grep('-v', '.git')
     .grep('-v', 'node_modules')
     .stdout;
+};
+
+TestHelper.prototype.gitInit = function(dir) {
+  if (process.env.TRAVIS) {
+    shelljs.exec('git config --global user.email "travis@tester.com"');
+    shelljs.exec('git config --global user.name "Travis Tester"');
+  }
+
+  if (PathsExist(path.join(dir, '.git'))) {
+    shelljs.rm('-rf', path.join(dir, '.git'));
+  }
+
+  shelljs.pushd(dir);
+  shelljs.exec('git init');
+  shelljs.exec('git add --all');
+  shelljs.exec('git commit -a -m initial');
+  shelljs.popd();
+};
+
+TestHelper.prototype.npmLink = function(dir) {
+  var nodeDir = path.join(dir, 'node_modules');
+  var binDir = path.join(nodeDir, '.bin');
+
+
+  if (PathsExist(nodeDir)) {
+    shelljs.rm('-rf', nodeDir);
+  }
+
+  shelljs.mkdir('-p', binDir);
+
+  // mimic npm link
+  var pkgsToLink = shelljs.ls('-d', path.join(fixtureDir, '*'));
+  pkgsToLink.push(path.join(__dirname, '..', '..'));
+
+  pkgsToLink.forEach(function(folder) {
+    // skip the main package
+    if (path.basename(folder) === 'test-pkg-main') {
+      return;
+    }
+    var pkg = JSON.parse(fs.readFileSync((path.join(folder, 'package.json'))));
+    shelljs.ln('-sf', folder, path.join(nodeDir, pkg.name));
+
+    if (!pkg.bin) {
+      return;
+    }
+    Object.keys(pkg.bin).forEach(function(binName) {
+      var binPath = pkg.bin[binName];
+
+      shelljs.ln('-sf', path.join(folder, binPath), path.join(binDir, binName));
+    });
+  });
 };
 
 module.exports = TestHelper;
