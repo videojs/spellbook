@@ -4,6 +4,7 @@
   "description": "An official web project builder for video.js and its plugins",
   "scripts": {
     "manual": "node -e 'var t = require(\"./test/unit/test-helper\");d=\"./test/fixtures/test-pkg-main\";t.prototype.gitInit(d);t.prototype.npmLink(d);'",
+    "clean": "node -e \"var d='test/fixtures/test-pkg-main';var p=require('path');require('shelljs').rm('-rf', p.join(d, '.git'), p.join(d, 'dist'), p.join(d, 'node_modules'));\"",
     "test": "mocha 'test/unit/**/*.test.js'"
   },
   "repository": {

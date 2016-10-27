@@ -9,8 +9,8 @@ var program = CommanderWrapper(function(commander) {
 });
 
 var commands = [
-  ['sb-build-js-node-all'],
-  ['sb-build-js-browser-all'],
+  ['sb-build-test-bundlers'],
+  ['sb-build-test-browser'],
 ];
 var args = [];
 

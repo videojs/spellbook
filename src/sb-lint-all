@@ -2,7 +2,7 @@
 var RunAll = require('./utils/run-all');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var config = require('./utils/get-config')();
-var PathsExist = require('./utils/paths-exist')();
+var PathsExist = require('./utils/paths-exist');
 var log = require('./utils/log');
 
 
