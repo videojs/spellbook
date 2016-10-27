@@ -3,7 +3,7 @@ var RunAll = require('./utils/run-all');
 var exec = require('./utils/exec');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var config = require('./utils/get-config')();
-var PathsExist = require('./utils/paths-exist')();
+var PathsExist = require('./utils/paths-exist');
 var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
