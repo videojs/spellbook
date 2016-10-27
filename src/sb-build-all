@@ -16,8 +16,8 @@ var commands = [];
 var args = [];
 
 ['js', 'test', 'css', 'docs', 'lang'].forEach(function(buildName) {
-  if (!config[buildName] || !config[buildName].src) {
-    log.debug(buildName + ' build is turned off in packageg.json.');
+  if (!config[buildName] || !config[buildName].src || config[buildName].build === false) {
+    log.debug(buildName + ' build is turned off in package.json.');
   } else if (!PathsExist(config[buildName].src)) {
     log.debug(buildName + ' build will not run as src dir ' + config[buildName].src + ' does not exist.');
   } else {
