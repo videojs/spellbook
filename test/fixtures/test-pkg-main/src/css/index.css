@@ -1,0 +1,6 @@
+@import './test.css';
+
+.green-text {
+	display: flex;
+	color: green;
+}

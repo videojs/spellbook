@@ -8,6 +8,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 var commands = [
+  ['sb-build-css-css']
   ['sb-build-css-sass']
 ];
 var args = [];

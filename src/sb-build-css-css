@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+var shelljs = require('shelljs');
+var path = require('path');
+var log = require('./utils/log');
+var config = require('./utils/get-config')();
+var GetFiles = require('./utils/get-files');
+var CommanderWrapper = require('./utils/commander-wrapper');
+var postcssHelper = require('./utils/postcss-helper');
+var Watch = require('./utils/watch');
+
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'incremental rebuild')
+    .option('-d, --dist <dist-dir>', 'dir to write output to', path.join(config.dist, 'browser'))
+    .arguments('<dir>')
+    .action(function(src) {
+      this.src = src;
+    });
+});
+
+if (!program.src) {
+  program.src = config.css.src;
+}
+
+var files = GetFiles(path.join(program.src, 'index.css'));
+var distFile = path.join(program.dist, config.name);
+if (!files.length) {
+  log.fatal('Source directory ' + program.src + ' does not exist or contains no index.scss/index.css!');
+  process.exit(1);
+}
+
+
+var build = function() {
+  return postcssHelper({src: files[0], dist: distFile, noMin: program.watch});
+};
+
+if (program.watch) {
+  Watch(path.join(program.src, '**', '*.css'), build);
+} else {
+  build();
+}
