@@ -86,7 +86,7 @@
   - build everything
   - lint everything
   - test everything
-  - auto-reload when files change in `<project-root>/dist/**/*` or `<project-root>/index.html`
+  - auto-reload when files change in `<project-root>/dist/**/*` or `<project-root>/*.html`
   - auto re-run lint/build/test where needed to get the build back up to date
 
 ### npm Release management

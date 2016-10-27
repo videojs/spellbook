@@ -54,5 +54,5 @@ browserSync.create().init({
   ui: program.ui || false,
   open: program.open || false,
   reloadOnRestart: true,
-  files: [path.join(config.path, '**', '*.*')]
+  files: [path.join(config.path, 'dist', '**', '*.*'), path.join(config.path, '*.html')]
 });
