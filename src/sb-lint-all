@@ -2,6 +2,9 @@
 var RunAll = require('./utils/run-all');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var config = require('./utils/get-config')();
+var PathsExist = require('./utils/paths-exist')();
+var log = require('./utils/log');
+
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -13,25 +16,15 @@ var program = CommanderWrapper(function(commander) {
 var commands = [];
 var args = [];
 
-if (config.js) {
-  commands.push(['sb-lint-js']);
-}
-
-if (config.css) {
-  commands.push(['sb-lint-css-all']);
-}
-
-if (config.docs) {
-  commands.push(['sb-lint-docs-all']);
-}
-
-if (config.lang) {
-  commands.push(['sb-lint-lang']);
-}
-
-if (config.test) {
-  commands.push(['sb-lint-test']);
-}
+['js', 'test', 'css', 'docs', 'lang'].forEach(function(buildName) {
+  if (!config[buildName] || !config[buildName].src || config[buildName].lint === false) {
+    log.debug(buildName + ' linter is turned off in package.json.');
+  } else if (!PathsExist(config[buildName].src)) {
+    log.debug(buildName + ' linter will not run as src dir ' + config[buildName].src + ' does not exist.');
+  } else {
+    commands.push(['sb-lint-' + buildName + '-all']);
+  }
+});
 
 if (program.errors) {
   args.push('--errors');
