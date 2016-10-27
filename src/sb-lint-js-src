@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+var config = require('./utils/get-config')();
+var path = require('path');
+var eslintHelper = require('./utils/eslint-helper');
+var CommanderWrapper = require('./utils/commander-wrapper');
+
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch files for changes and re-lint')
+    .option('-e, --errors', 'only log errors')
+    .option('-f, --fix', 'fix problems automatically')
+    .arguments('<glob-or-file...>')
+    .action(function(src) {
+      this.src = src;
+    });
+});
+
+if (!program.src) {
+  program.src = [path.join(config.js.src, '**', '*.js')];
+}
+eslintHelper(program);

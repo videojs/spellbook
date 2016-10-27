@@ -28,7 +28,7 @@ var tests = {
     dist: 'docs/manual',
     files: ['index.html']
   },
-  'sb-build-lang': {
+  'sb-build-lang-copy': {
     src: 'lang',
     dist: 'lang',
     files: ['index.json']

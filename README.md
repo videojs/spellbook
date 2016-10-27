@@ -147,6 +147,9 @@
 * when browserify-shim support config passing, use that rather than using browserify-shim in user pkg.json
   * see: https://github.com/thlorenz/browserify-shim/pull/195
 
+### lint
+* verify that --fix and --errors work for each linter
+
 ### Test
 * get tests to run in nodejs
 * code coverage
@@ -156,10 +159,6 @@
 * styl support
 * postcss support
 * less support
-
-### lang
-* sb-build-lang
-* does doing a copy on the json make sense?
 
 ### Development
 * localhost:<port> alternative such as <module-name>.dev

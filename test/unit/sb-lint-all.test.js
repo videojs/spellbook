@@ -28,21 +28,21 @@ var tests = {
     'doubleStdout': 2,
     'dir': 'docs'
   },
-  'sb-lint-lang': {
+  'sb-lint-lang-src': {
     'stderr': 0,
     'stdout': 8,
     'doubleStderr': 0,
     'doubleStdout': 12,
     'dir': 'lang'
   },
-  'sb-lint-js': {
+  'sb-lint-js-src': {
     'stderr': 0,
     'stdout': 12,
     'doubleStderr': 0,
     'doubleStdout': 20,
     'dir': 'src/js'
   },
-  'sb-lint-test': {
+  'sb-lint-test-src': {
     'stderr': 0,
     'stdout': 6,
     'doubleStderr': 0,
