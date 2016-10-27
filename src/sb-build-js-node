@@ -1,11 +1,49 @@
 #!/usr/bin/env node
+var config = require('./utils/get-config')();
+var PathsExist = require('./utils/paths-exist');
+var path = require('path');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var exec = require('./utils/exec');
+var shelljs = require('shelljs');
+var log = require('./utils/log');
+var GetFiles = require('./utils/get-files');
 
 var program = CommanderWrapper(function(commander) {
   return commander
-    .command('es5', 'build es5 output')
-    .command('all', 'build all possible js outputs', {isDefault: true});
+    .option('-w, --watch', 'incremental rebuild')
+    .option('-d, --dist <dir>', 'directory to write output to', path.join(config.dist, 'es5'))
+    .arguments('<dir>')
+    .action(function(src) {
+      this.src = src;
+    });
 });
 
+if (!program.src) {
+  program.src = config.js.src;
+}
 
+if (!GetFiles(path.join(program.src, '**', '*.js'))) {
+  log.fatal('Source directory ' + program.src + ' does not exist or contains no js files!');
+  process.exit(1);
+}
 
+var cmd = [
+  'babel',
+  '-d', program.dist,
+  '--presets', 'babel-preset.config.js',
+  program.src
+];
+
+if (program.watch) {
+  cmd.push('--watch');
+}
+
+shelljs.rm('-rf', program.dist);
+shelljs.mkdir('-p', path.dirname(program.dist));
+log.info('Building...');
+if (program.watch) {
+  exec(cmd);
+} else {
+  exec(cmd, {silent: true});
+  log.info('Wrote es5 dist to ' + program.dist);
+}

@@ -1,0 +1,42 @@
+#!/usr/bin/env node
+var path = require('path');
+var shelljs = require('shelljs');
+var config = require('./utils/get-config')();
+var Watch = require('./utils/watch');
+var log = require('./utils/log');
+var GetFiles = require('./utils/get-files');
+var CommanderWrapper = require('./utils/commander-wrapper');
+
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'watch for changes and copy to dist')
+    .option('-d, --dist <dir>', 'dir to build to', path.join(config.dist, 'lang'))
+    .arguments('<dir>')
+    .action(function(src) {
+      this.src = src;
+    });
+});
+
+if (!program.src) {
+  program.src = config.lang.src;
+}
+
+if (!GetFiles(path.join(program.src, '**', '*.json'))) {
+  log.fatal('Source directory ' + program.src + ' does not exist or contains no json files!');
+  process.exit(1);
+}
+
+
+var build = function() {
+  shelljs.rm('-rf', program.dist);
+  shelljs.mkdir('-p', path.dirname(program.dist));
+  log.info('Building...');
+  shelljs.cp('-r', program.src, program.dist);
+  log.info('Wrote lang to ' + program.dist);
+};
+
+if (program.watch) {
+  Watch(path.join(program.src, '**', '*.json'), build);
+} else {
+  build();
+}

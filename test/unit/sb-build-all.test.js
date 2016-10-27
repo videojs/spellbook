@@ -28,12 +28,12 @@ var tests = {
     dist: 'docs/manual',
     files: ['index.html']
   },
-  'sb-build-lang': {
+  'sb-build-lang-copy': {
     src: 'lang',
     dist: 'lang',
     files: ['index.json']
   },
-  'sb-build-js-browser-src': {
+  'sb-build-js-browser': {
     src: 'src/js',
     dist: 'browser',
     files: [
@@ -43,19 +43,19 @@ var tests = {
       '.min.js.map',
     ].map(function(str) { return pkgName + str; }),
   },
-  'sb-build-js-browser-test': {
+  'sb-build-test-browser': {
     src: 'test',
     dist: 'test',
     files: [
       '.test.js',
     ].map(function(str) { return pkgName + str; }),
   },
-  'sb-build-js-node-es5': {
+  'sb-build-js-node': {
     src: 'src/js',
     dist: 'es5',
     files: ['index.js']
   },
-  'sb-build-js-browser-bundletests': {
+  'sb-build-test-bundlers': {
     src: 'src/js',
     dist: 'test',
     files: ['rollup.test.js', 'webpack.test.js', 'browserify.test.js']

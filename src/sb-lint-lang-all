@@ -11,7 +11,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 var commands = [
-  ['sb-lint-js-src']
+  ['sb-lint-lang-src']
 ];
 var args = [];
 

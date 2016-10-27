@@ -1,0 +1,12 @@
+#!/usr/bin/env node
+var CommanderWrapper = require('./utils/commander-wrapper');
+
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .command('browser', 'build js tests for the browser')
+    .command('bundlers', 'build js bundler tests for the browser')
+    .command('all', 'build all possible js outputs', {isDefault: true});
+});
+
+
+

@@ -2,6 +2,7 @@
 var RunAll = require('./utils/run-all');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var exec = require('./utils/exec');
+var config = require('./utils/get-config');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -9,12 +10,15 @@ var program = CommanderWrapper(function(commander) {
     .option('-n, --no-build', 'dont build before testing');
 });
 
+if (!config.test) {
+  return;
+}
+
 if (program.build) {
   exec('sb-build');
 }
 
 var commands = [
-  ['sb-test-node'],
   ['sb-test-browser'],
 ];
 var args = [];

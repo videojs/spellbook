@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 var RunAll = require('./utils/run-all');
 var exec = require('./utils/exec');
-var log = require('./utils/log');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var config = require('./utils/get-config')();
+var PathsExist = require('./utils/paths-exist');
+var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -14,21 +15,15 @@ exec('sb-clean');
 var commands = [];
 var args = [];
 
-if (config.js || config.test) {
-  commands.push(['sb-build-js-all']);
-}
-
-if (config.css) {
-  commands.push(['sb-build-css-all']);
-}
-
-if (config.docs) {
-  commands.push(['sb-build-docs-all']);
-}
-
-if (config.lang) {
-  commands.push(['sb-build-lang']);
-}
+['js', 'test', 'css', 'docs', 'lang'].forEach(function(buildName) {
+  if (!config[buildName] || !config[buildName].src || config[buildName].build === false) {
+    log.debug(buildName + ' build is turned off in package.json.');
+  } else if (!PathsExist(config[buildName].src)) {
+    log.debug(buildName + ' build will not run as src dir ' + config[buildName].src + ' does not exist.');
+  } else {
+    commands.push(['sb-build-' + buildName + '-all']);
+  }
+});
 
 if (program.watch) {
   args.push('--watch');
