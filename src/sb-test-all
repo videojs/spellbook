@@ -2,7 +2,7 @@
 var RunAll = require('./utils/run-all');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var exec = require('./utils/exec');
-var config = require('./utils/get-config');
+var config = require('./utils/get-config')();
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -11,7 +11,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!config.test) {
-  return;
+  process.exit(0);
 }
 
 if (program.build) {
@@ -21,7 +21,7 @@ if (program.build) {
 var commands = [
   ['sb-test-browser'],
 ];
-var args = [];
+var args = ['--no-build'];
 
 if (program.watch) {
   args.push('--watch');

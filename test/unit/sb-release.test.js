@@ -18,7 +18,7 @@ var versions = {
   '1.0.5': '1.0.5'
 };
 
-parallel('sb-release', function() {
+parallel('sb-release:invalid', function() {
   it('should exit with an error if no args are passed', function(done) {
     var helper = new TestHelper({gitInit: true});
 
@@ -44,9 +44,8 @@ parallel('sb-release', function() {
   });
 
   it('should exit with an error if there is no .git dir', function(done) {
-    var helper = new TestHelper({gitInit: true});
+    var helper = new TestHelper();
 
-    shelljs.rm('-rf', path.join(helper.config.path, '.git'));
     helper.exec(binName, ['1.0.1'], function(code, stdout, stderr) {
 
       assert.equal(code, 1, 'should return failure');
@@ -92,8 +91,10 @@ parallel('sb-release', function() {
       helper.cleanup(done);
     });
   });
+});
 
-  ['npm', binName].forEach(function(bin) {
+['npm', binName].forEach(function(bin) {
+  parallel('sb-release:versions:' + bin, function() {
     Object.keys(versions).forEach(function(versionName) {
       var versionNumber = versions[versionName];
 
@@ -113,6 +114,7 @@ parallel('sb-release', function() {
           shelljs.pushd(helper.config.path);
           var gitLog = shelljs.exec('git log --oneline -1');
           var gitTag = shelljs.exec('git tag');
+          var gitDiff = shelljs.exec('git diff --name-only v' + versionNumber);
           var changelog = shelljs.cat(path.join(helper.config.path, 'CHANGELOG.md'));
           var pkg = JSON.parse(shelljs.cat(path.join(helper.config.path, 'package.json')));
           var versionRegex = new RegExp(versionNumber);
@@ -122,29 +124,50 @@ parallel('sb-release', function() {
           assert.isOk(versionRegex.test(gitTag.stdout), 'git tag should be correct');
           assert.isOk(versionRegex.test(changelog.stdout), 'change log should be correct');
           assert.equal(pkg.version, versionNumber, 'pkg.json should be correct');
+          assert.equal(gitDiff.length, 0, 'should be no diff between tag and master');
           helper.cleanup(done);
         });
       });
     });
   });
+});
 
-    /* TODO: find a way to change the path so we don't do the entire build here
-  describe('bower', function() {
-    it('should do a release for bower', function(done) {
-      var helper = new TestHelper({gitInit: true});
+parallel('sb-release:bower', function() {
+  it('should do a release for bower', function(done) {
+    var helper = new TestHelper({gitInit: true});
 
-      shelljs.touch(path.join(helper.config.path, 'bower.json'));
-      helper.exec(binName, ['major'], function(code, stdout, stderr) {
+    shelljs.touch(path.join(helper.config.path, 'bower.json'));
+    helper.exec(binName, ['1.0.1'], function(code, stdout, stderr) {
 
-        assert.equal(code, 0, 'should return success');
-        assert.equal(stdout.length, 0, 'should stdout nothing');
-        assert.equal(stderr.length, 0, 'should stderr nothing');
-        helper.cleanup(done);
+      assert.equal(code, 0, 'should return success');
+      assert.notEqual(stdout.length, 0, 'should stdout commands that were run');
+      assert.deepEqual(stderr, [], 'should stderr nothing');
+
+      shelljs.pushd(helper.config.path);
+      var gitLog = shelljs.exec('git log --oneline -1');
+      var gitTag = shelljs.exec('git tag');
+      var gitDiff = shelljs.exec('git diff --name-only v1.0.1');
+      var changelog = shelljs.cat(path.join(helper.config.path, 'CHANGELOG.md'));
+      var pkg = JSON.parse(shelljs.cat(path.join(helper.config.path, 'package.json')));
+      var versionRegex = new RegExp('1.0.1');
+      shelljs.popd();
+
+      assert.isOk(versionRegex.test(gitLog.stdout),'git log should be correct');
+      assert.isOk(versionRegex.test(gitTag.stdout), 'git tag should be correct');
+      assert.isOk(versionRegex.test(changelog.stdout), 'change log should be correct');
+      assert.equal(pkg.version, '1.0.1', 'pkg.json should be correct');
+
+      assert.isOk(gitDiff.length > 0, 'diff should contain dist');
+      helper.trim(gitDiff).forEach(function(file) {
+        assert.ok((/^dist/, file), 'all files should be from dist');
       });
+
+      helper.cleanup(done);
     });
   });
-  */
+});
 
+parallel('sb-release:arguments', function() {
   ['--dry-run', '-d'].forEach(function(option) {
     it('should not change anything when run with ' + option, function(done) {
       var helper = new TestHelper({gitInit: true});

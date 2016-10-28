@@ -15,16 +15,15 @@
   - [Development](#development)
   - [npm Release management](#npm-release-management)
 - [TODO](#todo)
-  - [CSS](#css-1)
   - [General](#general)
   - [Docs](#docs-1)
   - [Build](#build)
 - [Future Ideas](#future-ideas)
   - [JS](#js)
   - [General](#general-1)
+  - [lint](#lint)
   - [Test](#test-1)
-  - [CSS](#css-2)
-  - [lang](#lang-1)
+  - [CSS](#css-1)
   - [Development](#development-1)
   - [Docs](#docs-2)
 
@@ -110,11 +109,10 @@
 ### Build
 * windows support
   - must run current executables with `node` rather than directly
-* Unit Tests
-  * utils folder
 
 ## Future Ideas
 ### JS
+  * add banner to unminified browser bundle
   * jspm support
   * noderify npm files?
   * only build the main code bundle once in with `js-browser-main` and include that in `js-browser-test`

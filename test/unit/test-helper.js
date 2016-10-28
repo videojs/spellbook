@@ -9,7 +9,6 @@ var rimraf = require('rimraf');
 var npmRun = require('npm-run');
 var fs = require('fs');
 
-
 shelljs.config.silent = false;
 shelljs.config.fatal = true;
 
@@ -17,6 +16,13 @@ var TestHelper = function(options) {
   if (typeof options === 'boolean') {
     options = {debug: options};
   }
+  options = options || {};
+  this.options = {
+    debug: options.debug || false,
+    npmLink: options.npmLink || true,
+    gitInit: options.gitInit || false,
+  };
+
   // allow a ton of process listeners
   process.setMaxListeners(1000);
 
@@ -37,13 +43,6 @@ var TestHelper = function(options) {
     }
   });
 
-  options = options || {};
-
-  this.options = {
-    debug: options.debug || false,
-    npmLink: options.npmLink || true,
-    gitInit: options.gitInit || false
-  };
   this.projectDir = path.join(fixtureDir, 'test-pkg-main');
 
   while(PathsExist(this.projectDir)) {

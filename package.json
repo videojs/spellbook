@@ -104,6 +104,7 @@
     "postcss-banner": "^3.0.0",
     "postcss-cli": "^2.6.0",
     "postcss-import": "^8.1.2",
+    "qunitjs": "^2.0.1",
     "remark-cli": "^2.0.0",
     "remark-html": "^5.0.1",
     "remark-lint": "^5.1.0",

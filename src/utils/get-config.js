@@ -16,12 +16,6 @@ var GetConfig = function (dir) {
   var appRoot = findRoot(dir);
   var workingPkg = readJSON(path.join(appRoot, 'package.json'));
   var sbPkg = readJSON(path.join(__dirname, '..', '..', 'package.json'));
-  var banner = "" +
-    "/**\n" +
-    " * @version "  + workingPkg.version + "\n" +
-    " * @copyright " + workingPkg.author + "\n" +
-    " * @license " + workingPkg.license + "\n" +
-    " */\n";
 
   workingPkg.spellbook = workingPkg.spellbook || {};
   process.NODE_ENV = process.NODE_ENV || {};
@@ -45,7 +39,12 @@ var GetConfig = function (dir) {
     ie8: workingPkg.spellbook.ie8 || false,
     browserList: workingPkg.spellbook.browserList || ['> 1%', 'last 4 versions', 'Firefox ESR'],
     shimVideojs: workingPkg.spellbook['shim-videojs'] || workingPkg.spellbook['shim-video.js'] || true,
-    bannerObj: {version: workingPkg.version, copyright: workingPkg.author, license: workingPkg.license},
+    bannerObj: {
+      name: workingPkg.name,
+      version: workingPkg.version,
+      copyright: workingPkg.author,
+      license: workingPkg.license
+    },
     dist: path.join(appRoot, 'dist'),
 
     docs: Object.assign({
