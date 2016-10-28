@@ -115,6 +115,7 @@
 
 ## Future Ideas
 ### JS
+  * add banner to unminified browser bundle
   * jspm support
   * noderify npm files?
   * only build the main code bundle once in with `js-browser-main` and include that in `js-browser-test`
