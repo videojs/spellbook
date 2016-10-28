@@ -1,13 +1,15 @@
 {
   "version": 3,
   "sources": [
-    "src/css/index.scss"
+    "<no source>",
+    "../../src/css/index.css"
   ],
   "names": [],
-  "mappings": "AAEA,EACM,UAHgB,CAIrB",
-  "file": "dist/browser/test-pkg-main.css",
+  "mappings": "AAAA;;;;;GAAA,ACAA,EACI,UAAY,CACf",
+  "file": "test-pkg-main.min.css",
   "sourcesContent": [
-    "$primaryColor: #eeccff;\n\np {\n      color: $primaryColor;\n};\n"
+    null,
+    "p {\n    color: #ecf;\n};\n"
   ],
   "sourceRoot": ""
 }

@@ -33,6 +33,7 @@ var postcssHelper = function(options) {
     'postcss',
     '--map',
     '--use', 'cssnano',
+    '--cssnano.safe', 'true',
     '--output', options.dist + '.min.css',
     options.dist + '.css'
   ];

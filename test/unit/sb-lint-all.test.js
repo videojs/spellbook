@@ -8,8 +8,8 @@ var parallel = require('mocha.parallel');
 
 var tests = {
   'sb-lint-css-css': {
-    lines: 11,
-    doubleLines: 14,
+    lines: 13,
+    doubleLines: 17,
     file: 'src/css/index.css'
   },
   'sb-lint-css-sass': {

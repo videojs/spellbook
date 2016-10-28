@@ -1,2 +1,10 @@
-p{color:#ecf}
+/*!
+ * @name test-pkg-main
+ * @version 1.0.0
+ * @copyright Brandon Casey
+ * @license MIT
+ */
+p {
+    color: #ecf
+};
 /*# sourceMappingURL=test-pkg-main.css.map */
