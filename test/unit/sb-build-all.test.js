@@ -7,60 +7,84 @@ var parallel = require('mocha.parallel');
 var fs = require('fs');
 var pkgName = require('../fixtures/test-pkg-main/package.json').name;
 
-var tests = {
-  'sb-build-css-sass': {
-    src: 'src/css',
-    dist: 'browser',
-    files: [
-      '.css',
-      '.css.map',
-      '.min.css',
-      '.min.css.map',
-    ].map(function(str) { return pkgName + str; }),
-  },
-  'sb-build-docs-api': {
-    src: 'src/js',
-    dist: 'docs/api',
-    files: ['index.html']
-  },
-  'sb-build-docs-manual': {
-    src: 'docs',
-    dist: 'docs/manual',
-    files: ['index.html']
-  },
-  'sb-build-lang-copy': {
-    src: 'lang',
-    dist: 'lang',
-    files: ['index.json']
-  },
-  'sb-build-js-browser': {
-    src: 'src/js',
-    dist: 'browser',
-    files: [
-      '.js',
-      '.js.map',
-      '.min.js',
-      '.min.js.map',
-    ].map(function(str) { return pkgName + str; }),
-  },
-  'sb-build-test-browser': {
-    src: 'test',
-    dist: 'test',
-    files: [
-      '.test.js',
-    ].map(function(str) { return pkgName + str; }),
-  },
-  'sb-build-js-node': {
-    src: 'src/js',
-    dist: 'es5',
-    files: ['index.js']
-  },
-  'sb-build-test-bundlers': {
-    src: 'src/js',
-    dist: 'test',
-    files: ['rollup.test.js', 'webpack.test.js', 'browserify.test.js']
-  }
+var tests = {};
+var prepend = function(array, str) {
+  return array.map(function(s) {
+    return str + s;
+  });
 };
+
+// CSS builds
+['sb-build-css-sass', 'sb-build-css', 'sb-build-css-css', 'sb-build-css-all'].forEach(function(binName) {
+  tests[binName] = {
+    files: prepend(['.css', '.css.map', '.min.css', '.min.css.map'], path.join('dist', 'browser', pkgName)),
+  };
+});
+
+// LANG builds
+['sb-build-lang', 'sb-build-lang-all', 'sb-build-lang-copy',].forEach(function(binName) {
+  tests[binName] = {
+    files: prepend(['index.json', 'de.json', 'en.json', 'sp.json'], (path.join('dist', 'lang') + path.sep))
+  };
+});
+
+// DOC builds
+tests['sb-build-docs-api'] = {
+  files: ['dist/docs/api/index.html']
+};
+tests['sb-build-docs-manual'] = {
+  files: ['dist/docs/manual/index.html']
+};
+
+['sb-build-docs-all', 'sb-build-docs'].forEach(function(binName) {
+  tests[binName] = {
+    files: []
+      .concat(tests['sb-build-docs-api'].files)
+      .concat(tests['sb-build-docs-manual'].files)
+  };
+});
+
+// JS dists
+tests['sb-build-js-browser'] = {
+  files: prepend(['.js', '.js.map', '.min.js', '.min.js.map'], path.join('dist', 'browser', pkgName)),
+};
+tests['sb-build-js-node'] = {
+  files: ['dist/es5/index.js']
+};
+['sb-build-js-all', 'sb-build-js'].forEach(function(binName) {
+  tests[binName] = {
+    files: []
+      .concat(tests['sb-build-js-browser'].files)
+      .concat(tests['sb-build-js-node'].files)
+  };
+});
+
+// TEST builds
+tests['sb-build-test-bundlers'] = {
+  files: prepend(['rollup.test.js','webpack.test.js','browserify.test.js'], path.join('dist', 'test') + path.sep),
+};
+tests['sb-build-test-browser'] = {
+  files: prepend(['.test.js'], path.join('dist', 'test', pkgName)),
+};
+['sb-build-test-all', 'sb-build-test'].forEach(function(binName) {
+  tests[binName] = {
+    files: []
+      .concat(tests['sb-build-test-browser'].files)
+      .concat(tests['sb-build-test-bundlers'].files)
+  };
+});
+
+// build all
+['sb-build', 'sb-build-all'].forEach(function(binName) {
+  tests[binName] = {
+    files: []
+      .concat(tests['sb-build-test-all'].files)
+      .concat(tests['sb-build-js-all'].files)
+      .concat(tests['sb-build-docs-all'].files)
+      .concat(tests['sb-build-css-all'].files)
+      .concat(tests['sb-build-lang-all'].files)
+  };
+});
 
 parallel('build', function() {
   Object.keys(tests).forEach(function(binName) {
@@ -70,14 +94,11 @@ parallel('build', function() {
       var helper = new TestHelper();
 
       helper.exec(binName, function(code, stdout, stderr) {
-        var dist = path.join(helper.config.dist, testProps.dist);
-
         assert.equal(code, 0, 'should return 0');
-        assert.equal(PathsExist(dist), true, 'new dist folder ' + dist + ' should exist');
 
         testProps.files.forEach(function(file) {
-          var distFile = path.join(dist, file);
-          var expectedFile = path.join(__dirname, '..', 'expected-dist', testProps.dist, file);
+          var distFile = path.join(helper.config.path, file);
+          var expectedFile = path.join(__dirname, '..', 'expected-dist', file);
 
           assert.equal(PathsExist(distFile), true, 'new dist file ' + file + ' should exist');
           // map files are always different
