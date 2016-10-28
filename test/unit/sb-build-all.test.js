@@ -7,96 +7,121 @@ var parallel = require('mocha.parallel');
 var fs = require('fs');
 var pkgName = require('../fixtures/test-pkg-main/package.json').name;
 
-var tests = {
-  'sb-build-css-sass': {
-    src: 'src/css',
-    dist: 'browser',
-    files: [
-      '.css',
-      '.css.map',
-      '.min.css',
-      '.min.css.map',
-    ].map(function(str) { return pkgName + str; }),
-  },
-  'sb-build-docs-api': {
-    src: 'src/js',
-    dist: 'docs/api',
-    files: ['index.html']
-  },
-  'sb-build-docs-manual': {
-    src: 'docs',
-    dist: 'docs/manual',
-    files: ['index.html']
-  },
-  'sb-build-lang-copy': {
-    src: 'lang',
-    dist: 'lang',
-    files: ['index.json']
-  },
-  'sb-build-js-browser': {
-    src: 'src/js',
-    dist: 'browser',
-    files: [
-      '.js',
-      '.js.map',
-      '.min.js',
-      '.min.js.map',
-    ].map(function(str) { return pkgName + str; }),
-  },
-  'sb-build-test-browser': {
-    src: 'test',
-    dist: 'test',
-    files: [
-      '.test.js',
-    ].map(function(str) { return pkgName + str; }),
-  },
-  'sb-build-js-node': {
-    src: 'src/js',
-    dist: 'es5',
-    files: ['index.js']
-  },
-  'sb-build-test-bundlers': {
-    src: 'src/js',
-    dist: 'test',
-    files: ['rollup.test.js', 'webpack.test.js', 'browserify.test.js']
-  }
+var prepend = function(array, str) {
+  return array.map(function(s) {
+    return str + s;
+  });
 };
 
-parallel('build', function() {
-  Object.keys(tests).forEach(function(binName) {
-    var testProps = tests[binName];
+var tests = {css: {}, js: {}, test: {}, docs: {}, lang: {}, all: {}};
 
-    it(binName + ' should build default files with no args', function(done) {
-      var helper = new TestHelper();
+// CSS builds
+['sb-build-css-sass', 'sb-build-css', 'sb-build-css-css', 'sb-build-css-all'].forEach(function(binName) {
+  tests.css[binName] = {
+    files: prepend(['.css', '.css.map', '.min.css', '.min.css.map'], path.join('dist', 'browser', pkgName)),
+  };
+});
 
-      helper.exec(binName, function(code, stdout, stderr) {
-        var dist = path.join(helper.config.dist, testProps.dist);
+// LANG builds
+['sb-build-lang', 'sb-build-lang-all', 'sb-build-lang-copy',].forEach(function(binName) {
+  tests.lang[binName] = {
+    files: prepend(['index.json', 'de.json', 'en.json', 'sp.json'], (path.join('dist', 'lang') + path.sep))
+  };
+});
 
-        assert.equal(code, 0, 'should return 0');
-        assert.equal(PathsExist(dist), true, 'new dist folder ' + dist + ' should exist');
+// DOC builds
+tests.docs['sb-build-docs-api'] = {
+  files: ['dist/docs/api/index.html']
+};
+tests.docs['sb-build-docs-manual'] = {
+  files: ['dist/docs/manual/index.html']
+};
 
-        testProps.files.forEach(function(file) {
-          var distFile = path.join(dist, file);
-          var expectedFile = path.join(__dirname, '..', 'expected-dist', testProps.dist, file);
+['sb-build-docs-all', 'sb-build-docs'].forEach(function(binName) {
+  tests.docs[binName] = {
+    files: []
+      .concat(tests.docs['sb-build-docs-api'].files)
+      .concat(tests.docs['sb-build-docs-manual'].files)
+  };
+});
 
-          assert.equal(PathsExist(distFile), true, 'new dist file ' + file + ' should exist');
-          // map files are always different
-          // and the api html file contains a date
-          if ((/\.map|\.html/).test(path.extname(file))) {
-            return;
-          }
-          var read = function(path) {
-            // replace internal source maps
-            // webpack uses eval for source maps atm
-            fs.readFileSync(distFile, 'utf8')
-              .replace(/\/\/# sourceMappingURL.*/, '')
-              .replace(/eval.*/, '');
-          };
+// JS dists
+tests.js['sb-build-js-browser'] = {
+  files: prepend(['.js', '.js.map', '.min.js', '.min.js.map'], path.join('dist', 'browser', pkgName)),
+};
+tests.js['sb-build-js-node'] = {
+  files: ['dist/es5/index.js']
+};
+['sb-build-js-all', 'sb-build-js'].forEach(function(binName) {
+  tests.js[binName] = {
+    files: []
+      .concat(tests.js['sb-build-js-browser'].files)
+      .concat(tests.js['sb-build-js-node'].files)
+  };
+});
 
-          assert.equal(read(distFile), read(expectedFile), 'file that was build should equal what we expect');
+// TEST builds
+tests.test['sb-build-test-bundlers'] = {
+  files: prepend(['rollup.test.js','webpack.test.js','browserify.test.js'], path.join('dist', 'test') + path.sep),
+};
+tests.test['sb-build-test-browser'] = {
+  files: prepend(['.test.js'], path.join('dist', 'test', pkgName)),
+};
+['sb-build-test-all', 'sb-build-test'].forEach(function(binName) {
+  tests.test[binName] = {
+    files: []
+      .concat(tests.test['sb-build-test-browser'].files)
+      .concat(tests.test['sb-build-test-bundlers'].files)
+  };
+});
+
+// build all
+['sb-build', 'sb-build-all'].forEach(function(binName) {
+  tests.all[binName] = {
+    files: []
+      .concat(tests.test['sb-build-test-all'].files)
+      .concat(tests.js['sb-build-js-all'].files)
+      .concat(tests.docs['sb-build-docs-all'].files)
+      .concat(tests.css['sb-build-css-all'].files)
+      .concat(tests.lang['sb-build-lang-all'].files)
+  };
+});
+
+Object.keys(tests).forEach(function(testName) {
+  parallel('build:' + testName, function() {
+
+    Object.keys(tests[testName]).forEach(function(binName) {
+      var testProps = tests[testName][binName];
+
+      it(binName + ' should build default files with no args', function(done) {
+        var helper = new TestHelper();
+
+        helper.exec(binName, function(code, stdout, stderr) {
+          assert.equal(code, 0, 'should return 0');
+
+          testProps.files.forEach(function(file) {
+            var distFile = path.join(helper.config.path, file);
+            var expectedFile = path.join(__dirname, '..', 'expected-dist', file);
+
+            assert.equal(PathsExist(distFile), true, 'new dist file ' + file + ' should exist');
+            // map files are always different
+            // and the api html file contains a date
+            if ((/\.map|\.html/).test(path.extname(file))) {
+              return;
+            }
+            var read = function(path) {
+              // replace internal source maps
+              // webpack uses eval for source maps atm
+              fs.readFileSync(distFile, 'utf8')
+                .replace(/\/\/# sourceMappingURL.*/, '')
+                .replace(/eval.*/, '');
+            };
+
+            assert.equal(read(distFile), read(expectedFile), 'file that was build should equal what we expect');
+          });
+
+          helper.cleanup(done);
         });
-
-        helper.cleanup(done);
       });
     });
   });

@@ -14,6 +14,9 @@ shelljs.config.silent = false;
 shelljs.config.fatal = true;
 
 var TestHelper = function(options) {
+  if (typeof options === 'boolean') {
+    options = {debug: options};
+  }
   // allow a ton of process listeners
   process.setMaxListeners(1000);
 

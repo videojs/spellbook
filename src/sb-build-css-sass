@@ -4,10 +4,12 @@ var path = require('path');
 var log = require('./utils/log');
 var config = require('./utils/get-config')();
 var GetFiles = require('./utils/get-files');
+var PathsExist = require('./utils/paths-exist');
 var exorcistHelper = require('./utils/exorcist-helper');
 var exec = require('./utils/exec');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var Watch = require('./utils/watch');
+var postcssHelper = require('./utils/postcss-helper');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -57,24 +59,18 @@ var build = function() {
     shelljs.rm('-f', distFile + ext);
   });
   shelljs.mkdir('-p', path.dirname(distFile));
-  exec(cmd, {silent: true});
 
-  log.info('Wrote: ' + distFile + '.css');
-  exec(['cssnano', '--safe', '--sourcemap', distFile + '.css'], {silent: true})
-    .to(distFile + '.min.css');
-  log.info('Wrote: ' + distFile + '.min.css');
+  var sassRetval = exec(cmd, {silent: true});
+  if (sassRetval.code !== 0 || !PathsExist(distFile + '.css')) {
+    log.fatal('node-sass failed! This is usually due to a syntax error in your scss!');
+    process.exit(1);
+  }
 
-  // has to be done after the min file
-  // as cssnano only uses internal maps
-  exorcistHelper(distFile + '.css');
-  log.info('Wrote: ' + distFile + '.css.map');
-
-  exorcistHelper(distFile + '.min.css');
-  log.info('Wrote: ' + distFile + '.min.css.map');
+  postcssHelper({src: distFile + '.css', dist: distFile, noMin: program.watch, noStart: true});
 };
 
 if (program.watch) {
-  Watch(path.join(program.src, '**', '*' + path.extname(files[0])), build);
+  Watch(path.join(program.src, '**', '*.' + path.extname(files[0])), build);
 } else {
   build();
 }

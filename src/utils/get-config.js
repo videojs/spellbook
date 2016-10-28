@@ -43,8 +43,9 @@ var GetConfig = function (dir) {
     // workingPkg settings
     logLevel: process.NODE_ENV.SB_LOG_LEVEL || workingPkg.spellbook['log-level'] || 'info',
     ie8: workingPkg.spellbook.ie8 || false,
+    browserList: workingPkg.spellbook.browserList || ['> 1%', 'last 4 versions', 'Firefox ESR'],
     shimVideojs: workingPkg.spellbook['shim-videojs'] || workingPkg.spellbook['shim-video.js'] || true,
-    banner: banner,
+    bannerObj: {version: workingPkg.version, copyright: workingPkg.author, license: workingPkg.license},
     dist: path.join(appRoot, 'dist'),
 
     docs: Object.assign({
@@ -63,7 +64,6 @@ var GetConfig = function (dir) {
     js: Object.assign({
       src: path.join(appRoot, 'src', 'js')
     }, workingPkg.spellbook.js || {})
-
   };
 
   return config;

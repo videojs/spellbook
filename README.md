@@ -65,6 +65,7 @@
 * sass support with entry file at `src/css/index.scss`
 * minfied and unminified dists `dist/browser/<pkg-name>.{css,min.css}`
 * external source maps dists `dist/browser/<pkg-name>.{css.map,min.css.map}`
+* banner insertion at the top of files
 
 ### lang
 * lint json `lang` files in `src/lang/**/*.json`
@@ -98,12 +99,6 @@
 6. Advise the user on how to push to git, and publish to npm
 
 ## TODO
-### CSS
-* add banner to the minified files (switch to postcss + cssnano)
-* update the source map with the line offset of the banner that was added
-* support plain css
-* autoprefixer css support
-
 ### General
 * Automatic index file generation
 * generate documentation index file to link to api/manual docs
@@ -157,7 +152,6 @@
 
 ### CSS
 * styl support
-* postcss support
 * less support
 
 ### Development

@@ -3,6 +3,7 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
   return commander
+    .command('css', 'run vanilla css build')
     .command('sass', 'run sass build')
     .command('all', 'run all commands', {isDefault: true});
 });

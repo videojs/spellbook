@@ -1,16 +1,33 @@
 #!/usr/bin/env node
 var CommanderWrapper = require('./utils/commander-wrapper');
 var RunAll = require('./utils/run-all');
+var PathsExist = require('./utils/paths-exist');
+var log = require('./utils/log');
+var config = require('./utils/get-config')();
+var path = require('path');
 
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'watch files for changes');
 });
 
-var commands = [
-  ['sb-build-css-sass']
-];
+var commands = [];
 var args = [];
+
+if (PathsExist(path.join(config.css.src, 'index.css'))) {
+  commands.push(['sb-build-css-css']);
+}
+
+if (PathsExist(path.join(config.css.src, 'index.scss')) ||
+    PathsExist(path.join(config.css.src, 'index.sass'))) {
+
+  if(commands.length >= 1) {
+    log.warn('building css and sass at the same time is not supported!');
+    log.warn('sass will be ignored');
+  } else {
+    commands.push(['sb-build-css-sass']);
+  }
+}
 
 if (program.watch) {
   args.push('--watch');
