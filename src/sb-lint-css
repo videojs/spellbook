@@ -3,6 +3,7 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
   return commander
+    .command('css', 'lint css files')
     .command('sass', 'lint sass files')
     .command('all', 'run all css lint commands', {isDefault: true});
 });

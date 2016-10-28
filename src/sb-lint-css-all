@@ -10,6 +10,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 var commands = [
+  ['sb-lint-css-css'],
   ['sb-lint-css-sass'],
 ];
 var args = [];

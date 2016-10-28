@@ -19,18 +19,13 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!program.src) {
-  program.src = [
-    path.join(config.css.src, '**', '*.scss'),
-    path.join(config.css.src, '**', '*.sass'),
-  ];
+  program.src = [path.join(config.css.src, '**', '*.css')];
 }
 
 var files = [];
 program.src.forEach(function(src) {
   if (!path.extname(src)) {
-    files.push(path.join(src, '**', '*.scss'));
-    files.push(path.join(src, '**', '*.sass'));
-    return;
+    src = path.join(src, '**', '*.css');
   }
   files.push(src);
 });

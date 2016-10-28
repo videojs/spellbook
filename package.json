@@ -39,6 +39,7 @@
     "sb-lint-css": "src/sb-lint-css",
     "sb-lint-css-all": "src/sb-lint-css-all",
     "sb-lint-css-sass": "src/sb-lint-css-sass",
+    "sb-lint-css-css": "src/sb-lint-css-css",
     "sb-lint-docs": "src/sb-lint-docs",
     "sb-lint-docs-all": "src/sb-lint-docs-all",
     "sb-lint-docs-md": "src/sb-lint-docs-md",
