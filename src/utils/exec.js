@@ -46,7 +46,7 @@ module.exports = function(command, options) {
         var p = {code: code, stdout: stdout, stderr: stderr};
 
         if (options.silent && isError(code, stdout, stderr)) {
-          reject(p)
+          reject(p);
         }
         resolve(p);
       });
