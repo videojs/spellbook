@@ -94,7 +94,7 @@ Object.keys(tests).forEach(function(testName) {
       var testProps = tests[testName][binName];
 
       it(binName + ' should build default files with no args', function(done) {
-        var helper = new TestHelper(true);
+        var helper = new TestHelper();
 
         helper.exec(binName, function(code, stdout, stderr) {
           assert.equal(code, 0, 'should return 0');
