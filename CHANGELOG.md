@@ -2,11 +2,13 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* change i18n -> lang
-* change npm -> es5
-* fix missing semi-colon issues
-* remove --watch from binaries that cannot use it
-* more standard formatting for binary commands
+* BREAKING: change i18n wording and binaries to lang
+* BREAKING: CHANGE npm wording to node and es5
+* BREAKING: remove --watch from binaries that can't use it
+* implement vanilla css linting and building
+* add banners to css/scss files
+* BREAKING: rename karma wording to browser
+* added more -all binaries to future proof this build system
 
 --------------------
 
