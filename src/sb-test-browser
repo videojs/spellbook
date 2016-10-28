@@ -9,8 +9,23 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'keep the tester running and run as things change')
-    .option('-b, --browsers', 'comma seperated list of browsers to run on');
+    .option('-b, --browsers', 'comma seperated list of browsers to run on')
+    .option('-n, --no-build', 'dont build before testing');
 });
+
+var program = CommanderWrapper(function(commander) {
+  return commander
+    .option('-w, --watch', 'keep the tester running and run as things change')
+    .option('-n, --no-build', 'dont build before testing');
+});
+
+if (!config.test) {
+  process.exit(0);
+}
+
+if (program.build) {
+  exec('sb-build');
+}
 
 var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
 var command = [
