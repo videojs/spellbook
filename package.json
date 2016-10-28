@@ -101,6 +101,7 @@
     "karma-qunit": "^1.2.0",
     "karma-safari-launcher": "^1.0.0",
     "node-sass": "^3.10.0",
+    "postcss-banner": "^3.0.0",
     "postcss-cli": "^2.6.0",
     "postcss-import": "^8.1.2",
     "remark-cli": "^2.0.0",
