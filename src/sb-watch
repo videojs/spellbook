@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var RunAll = require('./utils/run-all');
+var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
@@ -9,8 +9,11 @@ var program = CommanderWrapper(function(commander) {
 var commands = [
   ['sb-build-all'],
   ['sb-lint-all'],
-  ['sb-test-all'],
+  ['sb-test-all', '--no-build'],
 ];
-var args = ['--watch'];
+commands = commands.map(function(command) {
+  command.push('--watch');
+  return command;
+});
 
-RunAll(commands, args);
+Run.all(commands, {nonFatal: true});

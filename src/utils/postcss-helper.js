@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 var config = require('./get-config')();
-var path = require('path');
 var PathsExist = require('./paths-exist');
-var exec = require('./exec');
 var Watch = require('./watch');
-var shelljs = require('shelljs');
 var log = require('./log');
 var exorcistHelper = require('./exorcist-helper');
+var Run = require('./run');
 
-// src, dist, noMin, noStart
+var Promise = require('bluebird');
+var shelljs = require('shelljs');
+var path = require('path');
+
+// src, dist, watch, noStart
 var postcssHelper = function(options) {
 
   var banner = '';
@@ -21,10 +23,10 @@ var postcssHelper = function(options) {
     'postcss',
     '--map',
     '--use', 'postcss-banner',
-    '--postcss-banner.banner', '\'' + banner + '\'',
+    '--postcss-banner.banner', banner,
     '--postcss-banner.important', 'true',
     '--use', 'autoprefixer',
-    '--autoprefixer.browsers', '\'' + config.browserList.join(', ') + '\'',
+    '--autoprefixer.browsers', config.browserList.join(', '),
     '--use', 'postcss-import',
     '--output', options.dist + '.css',
     options.src
@@ -50,29 +52,33 @@ var postcssHelper = function(options) {
 
   shelljs.mkdir('-p', path.dirname(options.dist));
 
-  var postcssRetval = exec(postcssCmd, {silent: true});
-  if (postcssRetval.code !== 0 || !PathsExist(options.dist + '.css')) {
-    log.fatal('postcss failed! This is usually due to a syntax error in your css!');
-    process.exit(1);
-  }
-  log.info('Wrote: ' + options.dist + '.css');
-
-  if (!options.noMin) {
-    var cssnanoRetval = exec(cssnanoCmd, {silent: true});
-    if (cssnanoRetval.code !== 0 || !PathsExist(options.dist + '.min.css')) {
-      log.fatal('cssnano failed! not sure why this happened?');
-      process.exit(1);
-    }
-    log.info('Wrote: ' + options.dist + '.min.css');
-
-    exorcistHelper(options.dist + '.min.css');
-    log.info('Wrote: ' + options.dist + '.min.css.map');
-  }
-
+  // NOTE:
   // exorcist has to be done after the min file
   // as cssnano only uses internal maps
-  exorcistHelper(options.dist + '.css');
-  log.info('Wrote: ' + options.dist + '.css.map');
+  Run.one(postcssCmd, {silent: true, toLog: options.watch, nonFatal: options.watch}).then(function(retval) {
+    if (retval.status === 0) {
+      log.info('Wrote: ' + options.dist + '.css');
+    }
+    if (options.watch) {
+      if (retval.status !== 0) {
+        return Promise.reject();
+      }
+      return Promise.resolve();
+    }
+    return Run.one(cssnanoCmd, {silent: true}).then(function() {
+      log.info('Wrote: ' + options.dist + '.min.css');
+      return exorcistHelper(options.dist + '.min.css');
+    });
+  }).then(function() {
+    return exorcistHelper(options.dist + '.css');
+  }).catch(function() {
+    log.error('Build Failed!');
+    if (options.watch) {
+      // do nothing
+      return;
+    }
+    process.exit(1);
+  });
 };
 
 module.exports = postcssHelper;

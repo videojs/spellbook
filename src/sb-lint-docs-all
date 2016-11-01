@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-var RunAll = require('./utils/run-all');
+var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -14,16 +15,18 @@ var commands = [
   ['sb-lint-docs-examples']
 ];
 
-var args = [];
 
-if (program.watch) {
-  args.push('--watch');
-}
-if (program.errors) {
-  args.push('--errors');
-}
-if (program.fix) {
-  args.push('--fix');
-}
+commands = commands.map(function(command) {
+  if (program.watch) {
+    command.push('--watch');
+  }
+  if (program.errors) {
+    command.push('--errors');
+  }
+  if (program.fix) {
+    command.push('--fix');
+  }
+  return command;
+});
 
-RunAll(commands, args);
+Run.all(commands, {failAfter: true});

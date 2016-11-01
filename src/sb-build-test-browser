@@ -4,6 +4,7 @@ var path = require('path');
 var browserifyHelper = require('./utils/browserify-helper');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var GetFiles = require('./utils/get-files');
+var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -24,10 +25,13 @@ if(!GetFiles(path.join(program.src, '**', '*.test.js'))) {
   process.exit(1);
 }
 
+log.info('Building...');
 browserifyHelper({
   dist: path.join(program.dist, config.name + '.test'),
   src: path.join(program.src, '**', '*.test.js'),
   standalone: false,
   watch: program.watch,
-  internalMap: true
+  internalMap: true,
+  // TODO: breaks watch...
+  noRollup: true,
 });

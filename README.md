@@ -43,7 +43,7 @@
 * minfied and unminified dists `dist/browser/<pkg-name>.{js,min.js}`
 * external source maps dists `dist/browser/<pkg-name>.{js.map,min.js.map}`
 * ie8 support using a custom `babel` preset and `uglify` `--suport-ie8` flag
-* Generate `webpack`, `browserify`, and `rollup` unit tests in `dist/test/<bundler-name>.test.js`
+* Generate `webpack`, and `browserify` unit tests in `dist/test/<bundler-name>.test.js`
 * Bundle all manual unit tests in `src/test/**/*.test.js` to `dist/test/<pkg-name>.test.js`
 * transpose `src/js` to `dist/es5` and convert to es5 for npm deployment
 * Inclusion of `global`, `qunitjs`, `sinon`, and `video.js` into your project without the need to install it yourself
@@ -105,6 +105,7 @@
 
 ### Docs
 * make remark-toc generation automatic rather than forcing users to add a section
+* better markdown linting rules, remove the preset we are using
 
 ### Build
 * windows support
@@ -118,6 +119,8 @@
   * only build the main code bundle once in with `js-browser-main` and include that in `js-browser-test`
   * jsx support
   * ts support
+  * add rollup bundler support
+  * fix issues with rollup and --watch
 
 ### General
 * lint jsdoc examples (convert to md using jsdoc2md and lint)

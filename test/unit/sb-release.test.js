@@ -55,19 +55,6 @@ parallel('sb-release:invalid', function() {
     });
   });
 
-  it('should exit with an error if there is no CHANGELOG', function(done) {
-    var helper = new TestHelper({gitInit: true});
-
-    shelljs.rm('-f', path.join(helper.config.path, 'CHANGELOG.md'));
-    helper.exec(binName, ['1.0.1'], function(code, stdout, stderr) {
-
-      assert.equal(code, 1, 'should return failure');
-      assert.equal(stdout.length, 2, 'should stdout 2 lines');
-      assert.equal(stderr.length, 1, 'should stderr an error');
-      helper.cleanup(done);
-    });
-  });
-
   it('should exit with an error if version passed is the current version', function(done) {
     var helper = new TestHelper({gitInit: true});
 
@@ -79,34 +66,28 @@ parallel('sb-release:invalid', function() {
       helper.cleanup(done);
     });
   });
-
-  it('should exit with an error if run with npm version', function(done) {
-    var helper = new TestHelper({gitInit: true});
-
-    helper.exec('npm', ['version',  '1.0.1'], function(code, stdout, stderr) {
-
-      assert.equal(code, 1, 'should return failure');
-      assert.equal(stdout.length, 3, 'should stdout 0 lines');
-      assert.notEqual(stderr.length, 0, 'should stderr an error');
-      helper.cleanup(done);
-    });
-  });
 });
 
-['npm', binName].forEach(function(bin) {
+['npm version', 'npm run release', binName].forEach(function(bin) {
   parallel('sb-release:versions:' + bin, function() {
     Object.keys(versions).forEach(function(versionName) {
       var versionNumber = versions[versionName];
 
       it('should run with ' + bin + ' and ' + versionName, function(done) {
         var helper = new TestHelper({gitInit: true});
+        var command = bin;
         var args = [];
 
-        if (bin === 'npm') {
-          args = ['run', 'version'];
+        if (bin === 'npm run release') {
+          command = 'npm';
+          args = ['run', 'release'];
+        }
+        if (bin === 'npm version') {
+          command = 'npm';
+          args = ['version'];
         }
 
-        helper.exec(bin, args.concat([versionName]), function(code, stdout, stderr) {
+        helper.exec(command, args.concat([versionName]), function(code, stdout, stderr) {
           assert.equal(code, 0, 'should return success');
           assert.notEqual(stdout.length, 0, 'should stdout multiple lines');
           assert.equal(stderr.length, 0, 'should stderr nothing');
@@ -132,7 +113,7 @@ parallel('sb-release:invalid', function() {
   });
 });
 
-parallel('sb-release:bower', function() {
+parallel('sb-release:extra', function() {
   it('should do a release for bower', function(done) {
     var helper = new TestHelper({gitInit: true});
 
@@ -161,6 +142,32 @@ parallel('sb-release:bower', function() {
       helper.trim(gitDiff).forEach(function(file) {
         assert.ok((/^dist/, file), 'all files should be from dist');
       });
+
+      helper.cleanup(done);
+    });
+  });
+  it('should do a release without a changelog', function(done) {
+    var helper = new TestHelper({gitInit: true});
+
+    shelljs.rm(path.join(helper.config.path, 'CHANGELOG.md'));
+    helper.exec(binName, ['1.0.1'], function(code, stdout, stderr) {
+
+      assert.equal(code, 0, 'should return success');
+      assert.notEqual(stdout.length, 0, 'should stdout commands that were run');
+      assert.equal(stderr.length, 1, 'should stderr 1 line about changelog');
+
+      shelljs.pushd(helper.config.path);
+      var gitLog = shelljs.exec('git log --oneline -1');
+      var gitTag = shelljs.exec('git tag');
+      var gitDiff = shelljs.exec('git diff --name-only v1.0.1');
+      var pkg = JSON.parse(shelljs.cat(path.join(helper.config.path, 'package.json')));
+      var versionRegex = new RegExp('1.0.1');
+      shelljs.popd();
+
+      assert.isOk(versionRegex.test(gitLog.stdout),'git log should be correct');
+      assert.isOk(versionRegex.test(gitTag.stdout), 'git tag should be correct');
+      assert.equal(pkg.version, '1.0.1', 'pkg.json should be correct');
+      assert.equal(gitDiff.length, 0, 'should be no diff between tag and master');
 
       helper.cleanup(done);
     });

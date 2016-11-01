@@ -32,7 +32,7 @@ var build = function() {
   shelljs.mkdir('-p', path.dirname(program.dist));
   log.info('Building...');
   shelljs.cp('-r', program.src, program.dist);
-  log.info('Wrote lang to ' + program.dist);
+  log.info('Wrote: ' + program.dist);
 };
 
 if (program.watch) {

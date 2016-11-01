@@ -3,8 +3,9 @@
   "version": "2.0.0",
   "description": "An official web project builder for video.js and its plugins",
   "scripts": {
+    "premanual": "npm run clean",
     "manual": "node -e 'var t = require(\"./test/unit/test-helper\");d=\"./test/fixtures/test-pkg-main\";t.prototype.gitInit(d);t.prototype.npmLink(d);'",
-    "clean": "node -e \"var d='test/fixtures/test-pkg-main';var p=require('path');require('shelljs').rm('-rf', p.join(d, '.git'), p.join(d, 'dist'), p.join(d, 'node_modules'));\"",
+    "clean": "node -e 'require(\"./test/unit/test-helper\").prototype.fixtureClean();'",
     "test": "mocha 'test/unit/**/*.test.js'"
   },
   "repository": {
@@ -13,6 +14,7 @@
   },
   "bin": {
     "sb": "src/sb",
+    "sb-config": "src/sb-config",
     "sb-build": "src/sb-build",
     "sb-build-all": "src/sb-build-all",
     "sb-build-js": "src/sb-build-js",
@@ -101,6 +103,7 @@
     "karma-qunit": "^1.2.0",
     "karma-safari-launcher": "^1.0.0",
     "node-sass": "^3.10.0",
+    "npm-run": "^4.1.0",
     "postcss-banner": "^3.0.0",
     "postcss-cli": "^2.6.0",
     "postcss-import": "^8.1.2",
@@ -115,7 +118,6 @@
     "semver": "^5.3.0",
     "shelljs": "^0.7.4",
     "sinon": "1.10.2",
-    "stream-to-promise": "^2.2.0",
     "stylelint": "^7.2.0",
     "uglify-js": "^2.7.3",
     "video.js": "^5.11.7",

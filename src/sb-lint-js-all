@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var RunAll = require('./utils/run-all');
+var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var config = require('./utils/get-config')();
 
@@ -13,16 +13,19 @@ var program = CommanderWrapper(function(commander) {
 var commands = [
   ['sb-lint-js-src']
 ];
-var args = [];
 
-if (program.errors) {
-  args.push('--errors');
-}
-if (program.watch) {
-  args.push('--watch');
-}
-if (program.fix) {
-  args.push('--fix');
-}
+var commands = commands.map(function(command) {
+  if (program.errors) {
+    command.push('--errors');
+  }
+  if (program.watch) {
+    command.push('--watch');
+  }
+  if (program.fix) {
+    command.push('--fix');
+  }
+  return command;
+});
 
-RunAll(commands, args);
+
+Run.all(commands, {failAfter: true});

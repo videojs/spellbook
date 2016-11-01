@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-var RunAll = require('./utils/run-all');
-var exec = require('./utils/exec');
+var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var config = require('./utils/get-config')();
 var PathsExist = require('./utils/paths-exist');
@@ -11,22 +10,25 @@ var program = CommanderWrapper(function(commander) {
     .option('-w, --watch', 'watch files for changes and rebuild');
 });
 
-exec('sb-clean');
-var commands = [];
-var args = [];
+Run.one('sb-clean').then(function() {
+  var commands = [];
 
-['js', 'test', 'css', 'docs', 'lang'].forEach(function(buildName) {
-  if (!config[buildName] || !config[buildName].src || config[buildName].build === false) {
-    log.debug(buildName + ' build is turned off in package.json.');
-  } else if (!PathsExist(config[buildName].src)) {
-    log.debug(buildName + ' build will not run as src dir ' + config[buildName].src + ' does not exist.');
-  } else {
-    commands.push(['sb-build-' + buildName + '-all']);
+  ['js', 'test', 'css', 'docs', 'lang'].forEach(function(buildName) {
+    if (!config[buildName] || !config[buildName].src || config[buildName].build === false) {
+      log.debug(buildName + ' build is turned off in package.json.');
+    } else if (!PathsExist(config[buildName].src)) {
+      log.debug(buildName + ' build will not run as src dir ' + config[buildName].src + ' does not exist.');
+    } else {
+      commands.push(['sb-build-' + buildName + '-all']);
+    }
+  });
+
+  if (program.watch) {
+    commands = commands.map(function(command) {
+      command.push('--watch');
+      return command;
+    });
   }
+
+  return Run.all(commands);
 });
-
-if (program.watch) {
-  args.push('--watch');
-}
-
-RunAll(commands, args);

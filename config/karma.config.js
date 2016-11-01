@@ -29,7 +29,9 @@ module.exports = function(karmaConfig) {
     }
   }
 
-  files.push(path.join(config.dist, 'browser', config.name + '.css'));
+  if (config.css && config.css.src && PathsExist(config.css.src)) {
+    files.push(path.join(config.dist, 'browser', config.name + '.css'));
+  }
   files.push(path.join(config.dist, 'test', '**', '*.test.js'));
 
   karmaConfig.set({

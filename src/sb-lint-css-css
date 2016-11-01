@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
 var Watch = require('./utils/watch');
-var exec = require('./utils/exec');
+var Run = require('./utils/run');
 var path = require('path');
 var log = require('./utils/log');
 var CommanderWrapper = require('./utils/commander-wrapper');
@@ -46,7 +46,7 @@ if (program.fix) {
 }
 
 var build = function() {
-  return exec(command);
+  return Run.one(command, {toLog: true, nonFatal: program.watch});
 };
 
 if (program.watch) {

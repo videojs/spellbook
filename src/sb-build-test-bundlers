@@ -5,13 +5,13 @@ var path = require('path');
 var GetPath = require('./utils/get-path');
 var fs = require('fs');
 var shelljs = require('shelljs');
-var exec = require('./utils/exec');
 var log = require('./utils/log');
 var Promise = require('bluebird');
 var Watch = require('./utils/watch');
 var browserifyHelper = require('./utils/browserify-helper');
 var webpack = require('webpack');
 var shimConf = require('../config/shim.config.js');
+var Run = require('./utils/run');
 
 var es6 = function(bundler) {
   return [
@@ -45,7 +45,8 @@ var exit = function(code) {
 process.on('exit', exit);
 
 var build = function() {
-  program.bundlers = ['rollup', 'webpack', 'browserify'];
+  // TODO: get rollup to work during watch
+  program.bundlers = [/*'rollup',*/ 'webpack', 'browserify'];
 
   var promises = [];
 
@@ -79,13 +80,23 @@ var build = function() {
     } else if (bundlerName === 'rollup') {
       // rollup only works on es6
       command = function() {
-        return browserifyHelper({
-          dist: distFile.replace(/\.js$/, ''),
-          src: srcFile,
-          standalone: false,
-          watch: program.watch,
-          internalMap: true
-        });
+        // due to a bug with rollupify?
+        // we cannot use watchify
+        var build = function() {
+          return browserifyHelper({
+            dist: distFile.replace(/\.js$/, ''),
+            src: srcFile,
+            standalone: false,
+            watch: false,
+            internalMap: true
+          });
+        };
+        if (program.watch) {
+          Watch(path.join(config.js.src, '**', '*.js'), build);
+          return Promise.resolve();
+        } else {
+          return build();
+        }
       };
     } else if (bundlerName === 'webpack') {
       command = function() {

@@ -6,7 +6,7 @@ var config = require('./utils/get-config')();
 var GetFiles = require('./utils/get-files');
 var PathsExist = require('./utils/paths-exist');
 var exorcistHelper = require('./utils/exorcist-helper');
-var exec = require('./utils/exec');
+var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var Watch = require('./utils/watch');
 var postcssHelper = require('./utils/postcss-helper');
@@ -38,7 +38,7 @@ if (!files.length) {
 // get the dist file with no extension
 var distFile = path.join(program.dist, config.name);
 
-var cmd = [
+var command = [
   'node-sass',
   files[0],
   distFile + '.css',
@@ -51,7 +51,7 @@ var cmd = [
 
 // node-sass does offer --watch,
 // but we don't gain much by using it
-// cmd.push('--watch');
+// command.push('--watch');
 var build = function() {
   log.info('Building...');
 
@@ -60,17 +60,23 @@ var build = function() {
   });
   shelljs.mkdir('-p', path.dirname(distFile));
 
-  var sassRetval = exec(cmd, {silent: true});
-  if (sassRetval.code !== 0 || !PathsExist(distFile + '.css')) {
-    log.fatal('node-sass failed! This is usually due to a syntax error in your scss!');
-    process.exit(1);
-  }
-
-  postcssHelper({src: distFile + '.css', dist: distFile, noMin: program.watch, noStart: true});
+  var sassRetval = Run.one(command, {silent: true, nonFatal: program.watch}).then(function(retval) {
+    if (retval.status !== 0 && program.watch) {
+      log.error('Build Failed!');
+      log.error(JSON.parse(retval.stderr).formatted);
+      return;
+    }
+    return postcssHelper({
+      src: distFile + '.css',
+      dist: distFile,
+      watch: program.watch,
+      noStart: true
+    });
+  });
 };
 
 if (program.watch) {
-  Watch(path.join(program.src, '**', '*.' + path.extname(files[0])), build);
+  Watch(path.join(program.src, '**', '*' + path.extname(files[0])), build);
 } else {
   build();
 }

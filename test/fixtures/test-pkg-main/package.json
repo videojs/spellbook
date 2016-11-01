@@ -5,9 +5,10 @@
   "main": "dist/npm/index.js",
   "jsnext:main": "src/js/index.js",
   "scripts": {
-    "version": "sb-release"
+    "release": "sb-release",
+    "postversion": "sb-release"
   },
-  "author": "Brandon Casey",
+  "author": "Brandon 'Casey <someemail@lol.com> (http://foo.bar.com)",
   "license": "MIT",
   "devDependencies": {
     "videojs-spellbook": "*",

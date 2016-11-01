@@ -12,3 +12,4 @@ QUnit.test('foo fn returns bar', function(assert) {
 
   assert.strictEqual(test.foo(), 'bar', 'bar returns this.bar');
 });
+

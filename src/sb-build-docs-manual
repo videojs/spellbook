@@ -5,7 +5,7 @@ var config = require('./utils/get-config')();
 var GetFiles = require('./utils/get-files');
 var Watch = require('./utils/watch');
 var log = require('./utils/log');
-var exec = require('./utils/exec');
+var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var Promise = require('bluebird');
 
@@ -50,14 +50,11 @@ var build = function() {
     var dist = path.dirname(src.replace(program.src, program.dist));
 
     shelljs.mkdir('-p', dist);
-    promises.push(exec(
-      command.concat([src, '--output', dist]),
-      {silent: true, async: true}
-    ));
+    promises.push(Run.one(command.concat([src, '--output', dist]), {silent: true, write: dist}));
   });
 
   Promise.all(promises).then(function() {
-    log.info('Wrote: ' + program.src + ' -> ' + program.dist);
+    log.info('Wrote: ' + program.dist);
   });
 };
 

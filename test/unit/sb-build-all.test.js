@@ -5,7 +5,7 @@ var PathsExist = require('../../src/utils/paths-exist');
 var glob = require('glob');
 var parallel = require('mocha.parallel');
 var fs = require('fs');
-var pkgName = require('../fixtures/test-pkg-main/package.json').name;
+var tests = {css: {}, js: {}, test: {}, docs: {}, lang: {}, all: {}};
 
 var prepend = function(array, str) {
   return array.map(function(s) {
@@ -13,12 +13,15 @@ var prepend = function(array, str) {
   });
 };
 
-var tests = {css: {}, js: {}, test: {}, docs: {}, lang: {}, all: {}};
-
 // CSS builds
 ['sb-build-css-sass', 'sb-build-css', 'sb-build-css-css', 'sb-build-css-all'].forEach(function(binName) {
   tests.css[binName] = {
-    files: prepend(['.css', '.css.map', '.min.css', '.min.css.map'], path.join('dist', 'browser', pkgName)),
+    files: [
+      function(config) { return path.join('dist', 'browser', config.name + '.css');},
+      function(config) { return path.join('dist', 'browser', config.name + '.css.map');},
+      function(config) { return path.join('dist', 'browser', config.name + '.min.css');},
+      function(config) { return path.join('dist', 'browser', config.name + '.min.css.map');}
+    ]
   };
 });
 
@@ -47,7 +50,13 @@ tests.docs['sb-build-docs-manual'] = {
 
 // JS dists
 tests.js['sb-build-js-browser'] = {
-  files: prepend(['.js', '.js.map', '.min.js', '.min.js.map'], path.join('dist', 'browser', pkgName)),
+  files: [
+    function(config) { return path.join('dist', 'browser', config.name + '.js');},
+    function(config) { return path.join('dist', 'browser', config.name + '.js.map');},
+    function(config) { return path.join('dist', 'browser', config.name + '.min.js');},
+    function(config) { return path.join('dist', 'browser', config.name + '.min.js.map');}
+  ]
+
 };
 tests.js['sb-build-js-node'] = {
   files: ['dist/es5/index.js']
@@ -62,10 +71,12 @@ tests.js['sb-build-js-node'] = {
 
 // TEST builds
 tests.test['sb-build-test-bundlers'] = {
-  files: prepend(['rollup.test.js','webpack.test.js','browserify.test.js'], path.join('dist', 'test') + path.sep),
+  files: prepend([/*'rollup.test.js',*/'webpack.test.js','browserify.test.js'], path.join('dist', 'test') + path.sep),
 };
 tests.test['sb-build-test-browser'] = {
-  files: prepend(['.test.js'], path.join('dist', 'test', pkgName)),
+  files: [
+    function(config) { return path.join('dist', 'test', config.name + '.test.js');}
+  ]
 };
 ['sb-build-test-all', 'sb-build-test'].forEach(function(binName) {
   tests.test[binName] = {
@@ -87,49 +98,57 @@ tests.test['sb-build-test-browser'] = {
   };
 });
 
+// run each binaries test
 Object.keys(tests).forEach(function(testName) {
-  parallel('build:' + testName, function() {
 
+    // run individual dist type tests
     Object.keys(tests[testName]).forEach(function(binName) {
       var testProps = tests[testName][binName];
 
-      it(binName + ' should build default files with no args', function(done) {
-        var helper = new TestHelper();
+      parallel('build:' + testName + ':' + binName, function() {
+        // run with testHelperOptions, such as changing the pkg name to have a scope
+        [
+          {desc: 'run with default settings', options: {changePkg: false}},
+          {desc: 'run with a scoped main file', options: {changePkg: {name: '@scope/test-pkg-main'}}},
+          {desc: 'run with an npm run script', options: {changePkg: {scripts: {build: binName}}}},
+          {desc: 'run with author single quote', options: {changePkg: {author: 'Brandon \' Casey'}}},
+          {desc: 'run with nested author', options: {changePkg: {author: {name: 'Brandon \' Casey', email: 'nope@gmail.com', url: 'nope.com'}}}}
+        ].forEach(function(testOptions) {
+          it(testOptions.desc, function(done) {
+            var command = binName;
+            var helper = new TestHelper(testOptions.options);
+            var args = [];
 
-        helper.exec(binName, function(code, stdout, stderr) {
-          assert.equal(code, 0, 'should return 0');
-
-          testProps.files.forEach(function(file) {
-            var distFile = path.join(helper.config.path, file);
-            var expectedFile = path.join(__dirname, '..', file.replace('dist', 'expected-dist'));
-
-            assert.equal(PathsExist(distFile), true, 'new dist file ' + file + ' should exist');
-            // map files are always different
-            // and the api html file contains a date
-            // webpack has an issue with eval sourcemaps, see sb-build-test-bundles
-            if ((/\.map|\.html/).test(path.extname(file)) || path.basename(file) === 'webpack.test.js' || path.basename(file) === 'browserify.test.js') {
-              return;
+            if (testOptions.options.changePkg.scripts) {
+              command = 'npm';
+              args = ['run', 'build'];
             }
-            var read = function(path) {
-              // replace internal source maps
-              // webpack uses eval for source maps atm
-              return fs.readFileSync(path, 'utf8')
-                .replace(/sourceMappingURL.*/, '')
-                .replace(/eval.*/, '')
-                .replace(/ /g, '')
-                .replace(/\r|\n/g, '')
-                .replace(/;\/\*#$/, '')
-                .replace(/\/\*#$/, '');
 
-            };
+            helper.exec(command, args, function(code, stdout, stderr) {
+              assert.equal(stderr.length, 0, 'no stderr');
+              assert.equal(code, 0, 'should return 0');
 
-            // TODO: get his test to work
-            // assert.equal(read(distFile), read(expectedFile), file + 'that was build should equal what we expect');
+              testProps.files.forEach(function(file) {
+                if (typeof file === 'function') {
+                  file = file(helper.config);
+                }
+                var distFile = path.join(helper.config.path, file);
+                var expectedFile = path.join(__dirname, '..', file.replace('dist', 'expected-dist'));
+
+                assert.equal(PathsExist(distFile), true, file + ' should exist');
+                assert.ok(fs.statSync(distFile).size > 10, file + ' is not 0 size');
+
+                // docs/lang doesn't print individual files
+                if ((/\.html|\.json/).test(path.extname(file))) {
+                  file = path.dirname(file);
+                }
+                assert.ok(new RegExp(file + '\n').test(stdout.join('\n')), file + ' was printed to stdout');
+              });
+
+              helper.cleanup(done);
+            });
           });
-
-          helper.cleanup(done);
         });
       });
-    });
   });
 });

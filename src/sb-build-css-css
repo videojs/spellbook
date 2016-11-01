@@ -29,9 +29,8 @@ if (!files.length) {
   process.exit(1);
 }
 
-
 var build = function() {
-  return postcssHelper({src: files[0], dist: distFile, noMin: program.watch});
+  return postcssHelper({src: files[0], dist: distFile, watch: program.watch});
 };
 
 if (program.watch) {
