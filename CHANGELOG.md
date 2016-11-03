@@ -6,6 +6,18 @@ _(none)_
 
 --------------------
 
+## CHANGELOG.md (2016-11-03)
+* fix issues with --watch
+* use npm-run, rimraf, and mkdirp instead of shelljs
+* dont support rollup in bundlers
+* make sure that all linter return an error code when they fail
+* make sure that nothing dies with an error code while watching
+* added sb-config
+* dont use css in tests if css is off
+* support for special charaters in command line arguments (such as single quote)
+* warn now logs to stdout
+* sb-server now proxies /test and /test/ rather than just /test
+
 ## 2.0.0 (2016-11-03)
 * BREAKING: change i18n wording and binaries to lang
 * BREAKING: CHANGE npm wording to node and es5
