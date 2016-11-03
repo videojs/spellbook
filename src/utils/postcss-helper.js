@@ -5,9 +5,10 @@ var Watch = require('./watch');
 var log = require('./log');
 var exorcistHelper = require('./exorcist-helper');
 var Run = require('./run');
+var mkdirp = require('mkdirp');
+var rimraf = require('rimraf');
 
 var Promise = require('bluebird');
-var shelljs = require('shelljs');
 var path = require('path');
 
 // src, dist, watch, noStart
@@ -46,11 +47,11 @@ var postcssHelper = function(options) {
     log.info('Building...');
 
     ['.css', '.css.map', '.css.min.map', '.css.min'].forEach(function(ext) {
-      shelljs.rm('-f', options.dist + ext);
+      rimraf.sync(options.dist + ext);
     });
   }
 
-  shelljs.mkdir('-p', path.dirname(options.dist));
+  mkdirp.sync(path.dirname(options.dist));
 
   // NOTE:
   // exorcist has to be done after the min file

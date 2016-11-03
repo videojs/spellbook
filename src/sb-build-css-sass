@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-var shelljs = require('shelljs');
 var path = require('path');
 var log = require('./utils/log');
 var config = require('./utils/get-config')();
@@ -10,6 +9,8 @@ var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var Watch = require('./utils/watch');
 var postcssHelper = require('./utils/postcss-helper');
+var rimraf = require('rimraf');
+var mkdirp = require('mkdirp');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -56,9 +57,9 @@ var build = function() {
   log.info('Building...');
 
   ['.css', '.css.map', '.css.min.map', '.css.min'].forEach(function(ext) {
-    shelljs.rm('-f', distFile + ext);
+    rimraf.sync(distFile + ext);
   });
-  shelljs.mkdir('-p', path.dirname(distFile));
+  mkdirp.sync(path.dirname(distFile));
 
   var sassRetval = Run.one(command, {silent: true, nonFatal: program.watch}).then(function(retval) {
     if (retval.status !== 0 && program.watch) {

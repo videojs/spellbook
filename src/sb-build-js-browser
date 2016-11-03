@@ -8,7 +8,7 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 var PathsExist = require('./utils/paths-exist');
 var GetFiles = require('./utils/get-files');
 var Watch = require('./utils/watch');
-var shelljs = require('shelljs');
+var rimraf = require('rimraf');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -43,7 +43,7 @@ browserifyHelper({
   }
   // clean
   ['min.js', 'min.js.map'].forEach(function(ext) {
-    shelljs.rm('-rf', distFile + ext);
+    rimraf.sync(distFile + ext);
   });
 
   // remove the last newline in the banner
@@ -81,4 +81,3 @@ browserifyHelper({
     log.info('Wrote: ' + distFile + '.min.js.map');
   });
 });
-

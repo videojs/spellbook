@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var PathsExist = require('./utils/paths-exist');
 var path = require('path');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var Run = require('./utils/run');
-var shelljs = require('shelljs');
 var log = require('./utils/log');
 var GetFiles = require('./utils/get-files');
+var rimraf = require('rimraf');
+var mkdirp = require('mkdirp');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -38,8 +38,8 @@ if (program.watch) {
   command.push('--watch');
 }
 
-shelljs.rm('-rf', program.dist);
-shelljs.mkdir('-p', path.dirname(program.dist));
-log.info('Building...');
+rimraf.sync(program.dist);
+mkdirp.sync(path.dirname(program.dist));
 
+log.info('Building...');
 Run.one(command, {toLog: true});

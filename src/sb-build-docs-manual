@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 var path = require('path');
-var shelljs = require('shelljs');
 var config = require('./utils/get-config')();
 var GetFiles = require('./utils/get-files');
 var Watch = require('./utils/watch');
@@ -8,6 +7,9 @@ var log = require('./utils/log');
 var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var Promise = require('bluebird');
+var PathsExist = require('./utils/paths-exist');
+var rimraf = require('rimraf');
+var mkdirp = require('mkdirp');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -30,8 +32,8 @@ var command = [
 ];
 
 var build = function() {
-  shelljs.rm('-rf', program.dist);
-  shelljs.mkdir('-p', program.dist);
+  rimraf.sync(program.dist);
+  mkdirp.sync(program.dist);
 
   var files = GetFiles(path.join(program.src, '**', '*.md'));
   if (!files.length) {
@@ -49,7 +51,7 @@ var build = function() {
   files.forEach(function(src) {
     var dist = path.dirname(src.replace(program.src, program.dist));
 
-    shelljs.mkdir('-p', dist);
+    mkdirp.sync(dist);
     promises.push(Run.one(command.concat([src, '--output', dist]), {silent: true, write: dist}));
   });
 

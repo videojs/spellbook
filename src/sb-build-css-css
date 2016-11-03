@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-var shelljs = require('shelljs');
 var path = require('path');
 var log = require('./utils/log');
 var config = require('./utils/get-config')();

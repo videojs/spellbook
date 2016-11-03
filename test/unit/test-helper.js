@@ -8,6 +8,7 @@ var PathsExist = require('../../src/utils/paths-exist');
 var rimraf = require('rimraf');
 var npmRun = require('npm-run');
 var fs = require('fs');
+var mkdirp = require('mkdirp');
 
 shelljs.config.silent = false;
 shelljs.config.fatal = true;
@@ -146,7 +147,7 @@ TestHelper.prototype.gitInit = function(dir) {
   }
 
   if (PathsExist(path.join(dir, '.git'))) {
-    shelljs.rm('-rf', path.join(dir, '.git'));
+    rimraf.sync(path.join(dir, '.git'));
   }
 
   shelljs.pushd(dir);
@@ -171,10 +172,10 @@ TestHelper.prototype.npmLink = function(dir) {
 
 
   if (PathsExist(nodeDir)) {
-    shelljs.rm('-rf', nodeDir);
+    rimraf.sync(nodeDir);
   }
 
-  shelljs.mkdir('-p', binDir);
+  mkdirp.sync(binDir);
 
   // mimic npm link
   var pkgsToLink = shelljs.ls('-d', path.join(fixtureDir, '*'));
@@ -201,11 +202,11 @@ TestHelper.prototype.npmLink = function(dir) {
 
 TestHelper.prototype.fixtureClean = function() {
   // pre-cleanup
-  ['bower.json', 'dist', 'node_modules', '.git'].forEach(function(dir) {
+  ['bower.json', 'npm-debug.log', 'dist', 'node_modules', '.git'].forEach(function(dir) {
     var d = path.join(fixtureDir, 'test-pkg-main', dir);
 
     if (PathsExist(d)) {
-      shelljs.rm('-rf', d);
+      rimraf.sync(d);
     }
   });
 };

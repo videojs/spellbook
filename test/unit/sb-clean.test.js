@@ -5,6 +5,7 @@ var TestHelper = require('./test-helper.js');
 var PathsExist = require('../../src/utils/paths-exist');
 var binName = 'sb-clean';
 var parallel = require('mocha.parallel');
+var mkdirp = require('mkdirp');
 
 var PathRemoved = function(helper, stdout, p) {
   var relpath = path.relative(helper.config.path, p)
@@ -32,7 +33,7 @@ parallel('sb-clean:defaults', function() {
   it('should delete the dist folder if it exists', function(done) {
     var helper = new TestHelper();
 
-    shelljs.mkdir('-p', helper.config.dist);
+    mkdirp.sync(helper.config.dist);
     helper.exec(binName, function(code, stdout, stderr) {
 
       assert.equal(code, 0, 'should return success');
@@ -65,7 +66,7 @@ parallel('sb-clean:defaults', function() {
     var helper = new TestHelper();
     var npmDebug = path.join(helper.config.path, 'npm-debug.log');
 
-    shelljs.mkdir('-p', helper.config.dist);
+    mkdirp.sync(helper.config.dist);
     shelljs.touch(npmDebug);
     helper.exec(binName, function(code, stdout, stderr) {
       assert.equal(code, 0, 'should return success');
@@ -87,7 +88,7 @@ parallel('sb-clean:dry-run', function() {
     it(option + ': should not delete the dist folder if it exists', function(done) {
       var helper = new TestHelper();
 
-      shelljs.mkdir('-p', helper.config.dist);
+      mkdirp.sync(helper.config.dist);
       helper.exec(binName, [option], function(code, stdout, stderr) {
 
         assert.equal(code, 0, 'should return success');
@@ -105,7 +106,7 @@ parallel('sb-clean:dry-run', function() {
       var helper = new TestHelper();
       var npmDebug = path.join(helper.config.path, 'npm-debug.log');
 
-      shelljs.mkdir('-p', helper.config.dist);
+      mkdirp.sync(helper.config.dist);
       shelljs.touch(npmDebug);
 
       helper.exec(binName, [option], function(code, stdout, stderr) {

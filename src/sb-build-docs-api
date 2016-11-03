@@ -2,11 +2,12 @@
 var path = require('path');
 var config = require('./utils/get-config')();
 var GetFiles = require('./utils/get-files');
-var shelljs = require('shelljs');
 var Watch = require('./utils/watch');
 var Run = require('./utils/run');
 var log = require('./utils/log');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var mkdirp = require('mkdirp');
+var rimraf = require('rimraf');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -36,8 +37,8 @@ var command = [
 ];
 
 var build = function() {
-  shelljs.rm('-rf', program.dist);
-  shelljs.mkdir('-p', path.dirname(program.dist));
+  rimraf.sync(program.dist);
+  mkdirp.sync(path.dirname(program.dist));
 
   log.info('Building...');
   Run.one(command, {silent: true, nonFatal: program.watch, write: path.join(program.dist, 'index.html')}).then(function(retval) {

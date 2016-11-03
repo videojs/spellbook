@@ -1,5 +1,6 @@
 var assert = require('chai').assert;
 var shelljs = require('shelljs');
+var mkdirp = require('mkdirp');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
 var PathsExist = require('../../src/utils/paths-exist');
@@ -108,7 +109,7 @@ parallel('linters:single', function() {
       var helper = new TestHelper();
       var newsrc = path.join(helper.config.path, 'newsrc');
 
-      shelljs.mkdir('-p', newsrc);
+      mkdirp.sync(newsrc);
       shelljs.mv(path.join(helper.config.path, testProps.file), newsrc);
       helper.exec(binName, [newsrc], function(code, stdout, stderr) {
         var lines = stderr.length + stdout.length;
@@ -192,4 +193,3 @@ parallel('linters:multiple', function() {
     });
   });
 });
-

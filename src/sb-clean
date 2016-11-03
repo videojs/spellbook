@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var shelljs = require('shelljs');
 var path = require('path');
 var log = require('./utils/log');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var GetFiles = require('./utils/get-files');
+var rimraf = require('rimraf');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -26,6 +26,6 @@ GetFiles(fileSearches).forEach(function(file) {
     log.info('removing ' + file);
   }
   if (!program.dryRun) {
-    shelljs.rm('-rf', file);
+    rimraf.sync(file);
   }
 });

@@ -4,7 +4,6 @@ var PathsExist = require('./utils/paths-exist');
 var path = require('path');
 var GetPath = require('./utils/get-path');
 var fs = require('fs');
-var shelljs = require('shelljs');
 var log = require('./utils/log');
 var Promise = require('bluebird');
 var Watch = require('./utils/watch');
@@ -12,6 +11,8 @@ var browserifyHelper = require('./utils/browserify-helper');
 var webpack = require('webpack');
 var shimConf = require('../config/shim.config.js');
 var Run = require('./utils/run');
+var mkdirp = require('mkdirp');
+var rimraf = require('rimraf');
 
 var es6 = function(bundler) {
   return [
@@ -39,7 +40,7 @@ var exit = function(code) {
   var rmGlob = path.join(dist, '*.start.js');
 
   log.debug('removing ' + rmGlob);
-  shelljs.rm('-f', rmGlob);
+  rimraf.sync(rmGlob);
 };
 
 process.on('exit', exit);
@@ -58,13 +59,8 @@ var build = function() {
     var command;
 
     // cleanup
-    if (PathsExist(srcFile)) {
-      shelljs.rm('-f', srcFile);
-    }
-
-    if (PathsExist(distFile)) {
-      shelljs.rm('-f', distFile);
-    }
+    rimraf.sync(srcFile);
+    rimraf.sync(distFile);
 
     if (bundlerName === 'browserify') {
       command = function() {
@@ -164,8 +160,8 @@ var build = function() {
       };
     }
 
-    shelljs.mkdir('-p', path.dirname(srcFile));
-    shelljs.mkdir('-p', path.dirname(distFile));
+    mkdirp.sync(path.dirname(srcFile));
+    mkdirp.sync(path.dirname(distFile));
     fs.writeFileSync(srcFile, unitTestContents);
     promises.push(command());
   });

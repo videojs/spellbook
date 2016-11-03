@@ -1,5 +1,4 @@
 var config = require('./get-config')();
-var shelljs = require('shelljs');
 var path = require('path');
 var log = require('./log');
 var GetFiles = require('./get-files');
@@ -8,6 +7,8 @@ var GetPath = require('./get-path');
 var PathsExist = require('./paths-exist');
 var exorcist = require('exorcist');
 var fs = require('fs');
+var mkdirp = require('mkdirp');
+var rimraf = require('rimraf');
 
 var bundleCollapser = require('bundle-collapser/plugin');
 var errorify = require('errorify');
@@ -23,7 +24,7 @@ var shimConf = require('../../config/shim.config.js');
 // dist, src, standalone, watch, internalMap, noRollup
 var browserifyHelper = function(options) {
   ['.js', '.js.map'].forEach(function(ext) {
-    shelljs.rm('-rf', options.dist + ext);
+    rimraf.sync(options.dist + ext);
   });
   var files = GetFiles(options.src);
 
@@ -32,7 +33,7 @@ var browserifyHelper = function(options) {
     process.exit(1);
   }
 
-  shelljs.mkdir('-p', path.dirname(options.dist));
+  mkdirp.sync(path.dirname(options.dist));
 
   var opts = {
     basedir: config.path,
