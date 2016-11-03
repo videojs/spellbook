@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 2.0.2 (2016-11-03)
+* fix node6 karma tests
+
 ## CHANGELOG.md (2016-11-03)
 * fix issues with --watch
 * use npm-run, rimraf, and mkdirp instead of shelljs
