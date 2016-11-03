@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var CommanderWrapper = require('./utils/commander-wrapper');
-var RunAll = require('./utils/run-all');
+var Run = require('./utils/run');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -11,10 +11,12 @@ var commands = [
   ['sb-build-docs-api'],
   ['sb-build-docs-manual']
 ];
-var args = [];
 
 if (program.watch) {
-  args.push('--watch');
+  commands = commands.map(function(command) {
+    command.push('--watch');
+    return command;
+  });
 }
 
-RunAll(commands, args);
+Run.all(commands);

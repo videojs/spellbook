@@ -4,7 +4,6 @@ var log = require('./log');
 var commander = require('commander');
 var GetRootParent = require('./get-root-parent');
 var path = require('path');
-var shelljs = require('shelljs');
 
 /**
  * Wrapper around commander so that:
@@ -62,7 +61,7 @@ var CommanderWrapper = function(fn) {
     process.NODE_ENV.SB_LOG_LEVEL = 'none';
   }
 
-  shelljs.cd(config.path);
+  process.chdir(config.path);
   process.title = path.basename(GetRootParent().filename);
   log.info('start');
 

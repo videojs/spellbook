@@ -26,9 +26,35 @@ var GetConfig = function (dir) {
     process.exit(1);
   }
 
+  var name = workingPkg.name.replace(/^@.+\//, '');
+  var author = workingPkg.author || '';
+
+  if (Array.isArray(workingPkg.author)) {
+    console.error('Author cannot be an array in package.json, as this is invalid, going to use first author');
+    console.error('See: https://docs.npmjs.com/files/package.json#people-fields-author-contributors');
+    workingPkg.author = workingPkg.author[0];
+  }
+
+  if (typeof workingPkg.author === 'object') {
+    if (!workingPkg.author.name) {
+      console.error('author must have a name key or be a string in package.json!');
+      console.error('See: https://docs.npmjs.com/files/package.json#people-fields-author-contributors');
+      process.exit(1);
+    }
+    author = workingPkg.author.name;
+    if (workingPkg.author.email) {
+      author += ' <' + workingPkg.author.email + '>';
+
+    }
+    if (workingPkg.author.url) {
+      author += ' (' + workingPkg.author.url + ')';
+    }
+  }
+
   var config = {
     // workingPkg information
-    name: workingPkg.name,
+    name: name,
+    scope: workingPkg.name.replace(name, '').replace(/\/$/, ''),
     version: workingPkg.version,
     path: appRoot,
     main: path.join(appRoot, workingPkg.main),
@@ -40,10 +66,10 @@ var GetConfig = function (dir) {
     browserList: workingPkg.spellbook.browserList || ['> 1%', 'last 4 versions', 'Firefox ESR'],
     shimVideojs: workingPkg.spellbook['shim-videojs'] || workingPkg.spellbook['shim-video.js'] || true,
     bannerObj: {
-      name: workingPkg.name,
-      version: workingPkg.version,
-      copyright: workingPkg.author,
-      license: workingPkg.license
+      name: workingPkg.name || '',
+      version: workingPkg.version || '',
+      author: author,
+      license: workingPkg.license || ''
     },
     dist: path.join(appRoot, 'dist'),
 

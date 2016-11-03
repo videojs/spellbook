@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-var RunAll = require('./utils/run-all');
 var CommanderWrapper = require('./utils/commander-wrapper');
-var exec = require('./utils/exec');
+var Run = require('./utils/run');
 var config = require('./utils/get-config')();
+var Promise = require('bluebird');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -14,17 +14,27 @@ if (!config.test) {
   process.exit(0);
 }
 
+var buildPromise;
 if (program.build) {
-  exec('sb-build');
+  buildPromise = Run.one('sb-build');
+} else {
+  buildPromise = Promise.resolve();
 }
 
 var commands = [
   ['sb-test-browser'],
 ];
-var args = ['--no-build'];
 
-if (program.watch) {
-  args.push('--watch');
-}
+commands.map(function(command) {
+  command.push('--no-build');
 
-RunAll(commands, args);
+  if (program.watch) {
+    command.push('--watch');
+  }
+
+  return command;
+});
+
+buildPromise.then(function() {
+  Run.all(commands, {failAfter: true});
+});

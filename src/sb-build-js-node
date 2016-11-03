@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var PathsExist = require('./utils/paths-exist');
 var path = require('path');
 var CommanderWrapper = require('./utils/commander-wrapper');
-var exec = require('./utils/exec');
-var shelljs = require('shelljs');
+var Run = require('./utils/run');
 var log = require('./utils/log');
 var GetFiles = require('./utils/get-files');
+var rimraf = require('rimraf');
+var mkdirp = require('mkdirp');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -27,7 +27,7 @@ if (!GetFiles(path.join(program.src, '**', '*.js'))) {
   process.exit(1);
 }
 
-var cmd = [
+var command = [
   'babel',
   '-d', program.dist,
   '--presets', 'babel-preset.config.js',
@@ -35,15 +35,11 @@ var cmd = [
 ];
 
 if (program.watch) {
-  cmd.push('--watch');
+  command.push('--watch');
 }
 
-shelljs.rm('-rf', program.dist);
-shelljs.mkdir('-p', path.dirname(program.dist));
+rimraf.sync(program.dist);
+mkdirp.sync(path.dirname(program.dist));
+
 log.info('Building...');
-if (program.watch) {
-  exec(cmd);
-} else {
-  exec(cmd, {silent: true});
-  log.info('Wrote es5 dist to ' + program.dist);
-}
+Run.one(command, {toLog: true});

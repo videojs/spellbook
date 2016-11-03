@@ -17,14 +17,14 @@ var program = CommanderWrapper(function(commander) {
 /* proxy /test to karma server */
 var filter = function (pathname, req) {
   // always re-write /test
-  if (pathname.match('^/test')) {
+  if ((/^\/test\/?$/).test(pathname)) {
     return true;
   }
 
   // skip proxy for non-karma requests
   // ar karma proxy requests should only happen
   // from /test
-  if (!req.headers.referer || url.parse(req.headers.referer).pathname !== '/test') {
+  if (!req.headers.referer || !(/^\/test\/?/).test(url.parse(req.headers.referer).pathname)) {
     return false;
   }
 
@@ -32,7 +32,12 @@ var filter = function (pathname, req) {
 };
 var karmaProxy = proxy(filter, {
   target: 'http://localhost:9876',
-  pathRewrite: {'^/test': 'debug.html' },
+  pathRewrite: function(path, req) {
+    var newpath = path
+      .replace(/^\/test\/?$/, '/debug.html')
+      .replace(/^\/test\//, '/');
+    return newpath;
+  },
   ws: true,
   logLevel: 'error',
   onError: function(err, req, res) {
@@ -53,6 +58,7 @@ browserSync.create().init({
   ghostMode: program.sync || false,
   ui: program.ui || false,
   open: program.open || false,
+  reloadDebounce: 100,
   reloadOnRestart: true,
   files: [path.join(config.path, 'dist', '**', '*.*'), path.join(config.path, '*.html')]
 });

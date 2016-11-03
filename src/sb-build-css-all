@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var CommanderWrapper = require('./utils/commander-wrapper');
-var RunAll = require('./utils/run-all');
+var Run = require('./utils/run');
 var PathsExist = require('./utils/paths-exist');
 var log = require('./utils/log');
 var config = require('./utils/get-config')();
@@ -12,8 +12,6 @@ var program = CommanderWrapper(function(commander) {
 });
 
 var commands = [];
-var args = [];
-
 if (PathsExist(path.join(config.css.src, 'index.css'))) {
   commands.push(['sb-build-css-css']);
 }
@@ -30,7 +28,10 @@ if (PathsExist(path.join(config.css.src, 'index.scss')) ||
 }
 
 if (program.watch) {
-  args.push('--watch');
+  commands = commands.map(function(command) {
+    command.push('--watch');
+    return command;
+  });
 }
 
-RunAll(commands, args);
+Run.all(commands);

@@ -20,3 +20,5 @@ if (failBoat === true) {
 
 ## Echo
 ### Foo
+
+[bar]: http://nope.com

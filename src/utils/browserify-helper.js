@@ -1,13 +1,14 @@
 var config = require('./get-config')();
-var shelljs = require('shelljs');
 var path = require('path');
 var log = require('./log');
 var GetFiles = require('./get-files');
 var browserify = require('browserify');
-var streamToPromise = require('stream-to-promise');
 var GetPath = require('./get-path');
+var PathsExist = require('./paths-exist');
 var exorcist = require('exorcist');
 var fs = require('fs');
+var mkdirp = require('mkdirp');
+var rimraf = require('rimraf');
 
 var bundleCollapser = require('bundle-collapser/plugin');
 var errorify = require('errorify');
@@ -23,7 +24,7 @@ var shimConf = require('../../config/shim.config.js');
 // dist, src, standalone, watch, internalMap, noRollup
 var browserifyHelper = function(options) {
   ['.js', '.js.map'].forEach(function(ext) {
-    shelljs.rm('-rf', options.dist + ext);
+    rimraf.sync(options.dist + ext);
   });
   var files = GetFiles(options.src);
 
@@ -32,10 +33,11 @@ var browserifyHelper = function(options) {
     process.exit(1);
   }
 
-  shelljs.mkdir('-p', path.dirname(options.dist));
+  mkdirp.sync(path.dirname(options.dist));
 
   var opts = {
     basedir: config.path,
+    delay: 500,
     debug: true,
     standalone: (options.standalone ? config.name : false),
     cache: {},
@@ -56,11 +58,13 @@ var browserifyHelper = function(options) {
   };
 
   if (!options.noRollup) {
-    opts.transform.unshift([rollupify, {config: {plugins: [
-      nodeResolve({jsnext: true, main: false, browser: false, skip: Object.keys(shimConf)}),
-    ]}}]);
+    opts.transform.unshift([rollupify, {config: {
+      plugins: [
+        nodeResolve({jsnext: true, main: false, browser: false, skip: Object.keys(shimConf)}),
+      ],
+      external: Object.keys(shimConf),
+    }}]);
   }
-
 
   if (options.watch) {
     opts.plugin.push(watchify);
@@ -71,30 +75,36 @@ var browserifyHelper = function(options) {
   var bundle = function() {
     if (arguments.length) {
       log.info('File(s) changed rebuilding...');
-    } else {
-      log.info('Building...');
-    }
-    var p;
-    if (options.internalMap) {
-      p = streamToPromise(b.bundle()
-        .pipe(fs.createWriteStream(options.dist + '.js'))
-      );
-    } else {
-      p = streamToPromise(b.bundle()
-        .pipe(exorcist(options.dist + '.js.map'))
-        .pipe(fs.createWriteStream(options.dist + '.js')));
     }
 
-    return p.then(function() {
+    return new Promise(function(resolve, reject) {
+      var _bundle = b.bundle();
+      _bundle.on('end', function() {
+        resolve();
+      });
+      b.pipeline.on('error', function(error) {
+        reject(error);
+      });
+
+      if (!options.internalMap) {
+        _bundle.pipe(exorcist(options.dist + '.js.map'));
+      }
+      _bundle.pipe(fs.createWriteStream(options.dist + '.js'));
+    }).then(function(error) {
+      if (error) {
+        throw new Error(error);
+      }
+      if (!PathsExist(options.dist + '.js')) {
+        throw new Error('file' + options.dist + '.js was not written by browserify!');
+      }
       log.info('Wrote: ' + options.dist + '.js');
       if (!options.internalMap) {
         log.info('Wrote: ' + options.dist + '.js.map');
       }
       return Promise.resolve();
     }).catch(function(err) {
-      throw new Error(err);
+      log.error(err.stack);
     });
-
   };
 
   b.on('update', bundle);

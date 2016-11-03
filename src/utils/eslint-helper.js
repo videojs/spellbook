@@ -2,7 +2,7 @@
 var config = require('./get-config')();
 var path = require('path');
 var PathsExist = require('./paths-exist');
-var exec = require('./exec');
+var Run = require('./run');
 var Watch = require('./watch');
 
 var eslintHelper = function(program) {
@@ -32,7 +32,7 @@ var eslintHelper = function(program) {
   }
 
   var run = function() {
-    exec(command);
+    Run.one(command, {toLog: true, nonFatal: program.watch});
   };
 
   if (program.watch) {

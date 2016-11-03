@@ -10,6 +10,7 @@ var program = CommanderWrapper(function(commander) {
     .command('server', 'alias for start')
     .command('test', 'run unit tests')
     .command('lint', 'run eslint with the standard config over files')
+    .command('config', 'print out the current configuration object that Spellbook is using')
     .command('release', 'release a new version of your package');
 });
 

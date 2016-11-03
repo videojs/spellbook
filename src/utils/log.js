@@ -22,7 +22,7 @@ var levelNumber = function(level) {
 
   for(var l in LOG_LEVELS) {
     if ((new RegExp(l, 'i')).test(level)) {
-      return LOG_LEVELS[l]
+      return LOG_LEVELS[l];
     }
   }
   return 0;
@@ -110,7 +110,7 @@ var log = function(level, msgs) {
     // keep long paths out of logs, but only on debug
     if (level !== 'debug') {
       msg = msg.split(path.join(__dirname, '..', '..', 'node_modules', '.bin') + path.sep).join('');
-      msg = msg.split(path.join(__dirname, '..', '..', 'config') + path.sep).join('')
+      msg = msg.split(path.join(__dirname, '..', '..', 'config') + path.sep).join('');
       msg = msg.split(path.join(__dirname, '..') + path.sep).join('');
       msg = msg.split(__dirname + path.sep).join('');
       msg = msg.split(config.path + path.sep).join('');
@@ -119,7 +119,7 @@ var log = function(level, msgs) {
     var fn = console.log;
 
     // log to stderr on any level less than or equal to warn
-    if (currentLevelNumber <= LOG_LEVELS.warn) {
+    if (currentLevelNumber <= LOG_LEVELS.error) {
       fn = console.error;
     }
 

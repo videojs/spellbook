@@ -6,6 +6,8 @@ var Watch = require('./utils/watch');
 var log = require('./utils/log');
 var GetFiles = require('./utils/get-files');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var mkdirp = require('mkdirp');
+var rimraf = require('rimraf');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -28,11 +30,11 @@ if (!GetFiles(path.join(program.src, '**', '*.json'))) {
 
 
 var build = function() {
-  shelljs.rm('-rf', program.dist);
-  shelljs.mkdir('-p', path.dirname(program.dist));
+  rimraf.sync(program.dist);
+  mkdirp.sync(path.dirname(program.dist));
   log.info('Building...');
   shelljs.cp('-r', program.src, program.dist);
-  log.info('Wrote lang to ' + program.dist);
+  log.info('Wrote: ' + program.dist);
 };
 
 if (program.watch) {

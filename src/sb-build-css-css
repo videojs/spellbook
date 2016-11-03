@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-var shelljs = require('shelljs');
 var path = require('path');
 var log = require('./utils/log');
 var config = require('./utils/get-config')();
@@ -29,9 +28,8 @@ if (!files.length) {
   process.exit(1);
 }
 
-
 var build = function() {
-  return postcssHelper({src: files[0], dist: distFile, noMin: program.watch});
+  return postcssHelper({src: files[0], dist: distFile, watch: program.watch});
 };
 
 if (program.watch) {

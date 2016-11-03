@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var config = require('./utils/get-config')();
 
 var program = CommanderWrapper(function(commander) {
   return commander;
 });
 
-Run.all(['sb-watch', 'sb-server']);
+console.log(JSON.stringify(config, null, 2));

@@ -1,5 +1,6 @@
 var assert = require('chai').assert;
 var shelljs = require('shelljs');
+var mkdirp = require('mkdirp');
 var path = require('path');
 var TestHelper = require('./test-helper.js');
 var PathsExist = require('../../src/utils/paths-exist');
@@ -8,38 +9,38 @@ var parallel = require('mocha.parallel');
 
 var tests = {
   'sb-lint-css-css': {
-    lines: 13,
-    doubleLines: 17,
+    lines: 14,
+    doubleLines: 18,
     file: 'src/css/index.css'
   },
   'sb-lint-css-sass': {
-    lines: 11,
-    doubleLines: 14,
+    lines: 12,
+    doubleLines: 15,
     file: 'src/css/index.scss'
   },
   'sb-lint-docs-examples': {
-    lines: 7,
-    doubleLines: 10,
-    file: 'docs/index.md'
-  },
-  'sb-lint-docs-md': {
-    lines: 7,
+    lines: 8,
     doubleLines: 11,
     file: 'docs/index.md'
   },
+  'sb-lint-docs-md': {
+    lines: 9,
+    doubleLines: 14,
+    file: 'docs/index.md'
+  },
   'sb-lint-lang-src': {
-    lines: 8,
-    doubleLines: 12,
+    lines: 9,
+    doubleLines: 13,
     file: 'lang/index.json'
   },
   'sb-lint-js-src': {
-    lines: 12,
-    doubleLines: 20,
+    lines: 13,
+    doubleLines: 21,
     file: 'src/js/index.js'
   },
   'sb-lint-test-src': {
-    lines: 6,
-    doubleLines: 8,
+    lines: 7,
+    doubleLines: 9,
     file: 'test/index.test.js'
   },
 };
@@ -98,7 +99,7 @@ parallel('linters:single', function() {
       helper.exec(binName, function(code, stdout, stderr) {
         var lines = stderr.length + stdout.length;
 
-        assert.equal(code, 0, 'should return 0');
+        assert.notEqual(code, 0, 'should not return 0');
         assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
         helper.cleanup(done);
       });
@@ -108,12 +109,12 @@ parallel('linters:single', function() {
       var helper = new TestHelper();
       var newsrc = path.join(helper.config.path, 'newsrc');
 
-      shelljs.mkdir('-p', newsrc);
+      mkdirp.sync(newsrc);
       shelljs.mv(path.join(helper.config.path, testProps.file), newsrc);
       helper.exec(binName, [newsrc], function(code, stdout, stderr) {
         var lines = stderr.length + stdout.length;
 
-        assert.equal(code, 0, 'should return 0');
+        assert.notEqual(code, 0, 'should not return 0');
         assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
         helper.cleanup(done);
       });
@@ -128,7 +129,7 @@ parallel('linters:single', function() {
       helper.exec(binName, [newsrc], function(code, stdout, stderr) {
         var lines = stderr.length + stdout.length;
 
-        assert.equal(code, 0, 'should return 0');
+        assert.notEqual(code, 0, 'should not return 0');
         assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
         helper.cleanup(done);
       });
@@ -143,7 +144,7 @@ parallel('linters:single', function() {
       helper.exec(binName, [newsrc, oldsrc], function(code, stdout, stderr) {
         var lines = stderr.length + stdout.length;
 
-        assert.equal(code, 0, 'should return 0');
+        assert.notEqual(code, 0, 'should not return 0');
         assert.equal(lines, testProps.doubleLines, 'should print ' + testProps.doubleLines + ' lines');
         helper.cleanup(done);
       });
@@ -160,7 +161,7 @@ parallel('linters:single', function() {
       helper.exec(binName, [], function(code, stdout, stderr) {
         var lines = stderr.length + stdout.length;
 
-        assert.equal(code, 0, 'should return 0');
+        assert.notEqual(code, 0, 'should return 0');
         assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
         helper.cleanup(done);
       });
@@ -176,7 +177,7 @@ parallel('linters:multiple', function() {
       var helper = new TestHelper();
 
       helper.exec(binName, function(code, stdout, stderr) {
-        var lines = stderr.length + stdout.length - 2;
+        var lines = stderr.length + stdout.length - 3;
 
         // -all binaries will have two less lines than
         // non-all binaies because the non -all ones
@@ -185,11 +186,10 @@ parallel('linters:multiple', function() {
           lines -= 2;
         }
 
-        assert.equal(code, 0, 'should return 0');
+        assert.notEqual(code, 0, 'should not return 0');
         assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
         helper.cleanup(done);
       });
     });
   });
 });
-
