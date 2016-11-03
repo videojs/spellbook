@@ -10,22 +10,35 @@ module.exports = function(karmaConfig) {
     detectBrowsers = false;
   }
 
-  var nodeDir = path.join('node_modules', 'videojs-spellbook', 'node_modules');
-  var files = [
-    path.join(nodeDir, 'sinon', 'pkg', 'sinon.js'),
-    path.join(nodeDir, 'sinon', 'pkg', 'sinon-ie.js'),
-  ];
+  var files = [];
+  var sbNodeDir = path.join('node_modules', 'videojs-spellbook', 'node_modules');
+  var nodeDir = path.join('node_modules');
+  var sinonDir = path.join('sinon', 'pkg');
+
+  if (PathsExist(path.join(nodeDir, sinonDir))) {
+    files.push(path.join(nodeDir, sinonDir, 'sinon.js'));
+    files.push(path.join(nodeDir, sinonDir, 'sinon-ie.js'));
+  } else if (PathsExist(path.join(sbNodeDir, sinonDir))) {
+    files.push(path.join(sbNodeDir, sinonDir, 'sinon.js'));
+    files.push(path.join(sbNodeDir, sinonDir, 'sinon-ie.js'));
+  } else {
+    log.fatal('sinon is not installed!');
+    process.exit(1);
+  }
 
   if (config.shimVideojs) {
     var vjsDir = path.join('video.js', 'dist');
 
-    if (PathsExist(path.join(config.path, vjsDir))) {
-      files.push(path.join(config.path, vjsDir, 'video.js'));
-      files.push(path.join(config.path, vjsDir, 'video-js.css'));
-    } else {
-      log.info('using videojs-spellbook\'s  version of video.js as there is no local version');
+    if (PathsExist(path.join(nodeDir, vjsDir))) {
       files.push(path.join(nodeDir, vjsDir, 'video.js'));
       files.push(path.join(nodeDir, vjsDir, 'video-js.css'));
+    } else if (PathsExist(path.join(sbNodeDir, vjsDir))) {
+      log.info('using videojs-spellbook\'s  version of video.js as there is no local version');
+      files.push(path.join(sbNodeDir, vjsDir, 'video.js'));
+      files.push(path.join(sbNodeDir, vjsDir, 'video-js.css'));
+    } else {
+      log.fatal('video.js is not installed, use spellbook.shim-video: true in package.json if you dont need it');
+      process.exit(1);
     }
   }
 
