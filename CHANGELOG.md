@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* update eslint-config-videojs to 3.0.1
 
 --------------------
 
