@@ -30,5 +30,5 @@ Run.one('sb-clean').then(function() {
     });
   }
 
-  return Run.all(commands);
+  return Run.parallel(commands);
 });

@@ -28,4 +28,4 @@ var commands = commands.map(function(command) {
 });
 
 
-Run.all(commands, {failAfter: true});
+Run.parallel(commands, {failAfter: true});

@@ -19,4 +19,4 @@ if (program.watch) {
   });
 }
 
-Run.all(commands);
+Run.parallel(commands);

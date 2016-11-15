@@ -7,18 +7,13 @@ var Promise = require('bluebird');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'keep the tester running and run as things change')
-    .option('-n, --no-build', 'dont build before testing');
+    .option('-nb, --no-build', 'dont build before testing')
+    .option('-b, --browsers <list,of,browsers>', 'comma seperated list of browsers')
+    .option('-nl, --no-lint', 'dont lint before testing');
 });
 
 if (!config.test) {
   process.exit(0);
-}
-
-var buildPromise;
-if (program.build) {
-  buildPromise = Run.one('sb-build');
-} else {
-  buildPromise = Promise.resolve();
 }
 
 var commands = [
@@ -27,6 +22,7 @@ var commands = [
 
 commands.map(function(command) {
   command.push('--no-build');
+  command.push('--no-lint');
 
   if (program.watch) {
     command.push('--watch');
@@ -35,6 +31,20 @@ commands.map(function(command) {
   return command;
 });
 
-buildPromise.then(function() {
-  Run.all(commands, {failAfter: true});
+if (program.browsers) {
+  commands[0].push('--browsers')
+  commands[0].push(program.browsers)
+}
+
+if (program.lint && !program.watch) {
+  commands.unshift(['sb-lint']);
+}
+
+var buildPromise = Promise.resolve();
+if (program.build && !program.watch) {
+  buildPromise = Run.one('sb-build');
+}
+
+buildPromise.then(function(retval) {
+  return Run.series(commands, {failAfter: true});
 });
