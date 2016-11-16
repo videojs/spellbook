@@ -14,7 +14,7 @@ var prepend = function(array, str) {
 };
 
 // CSS builds
-['sb-build-css-sass', 'sb-build-css', 'sb-build-css-css', 'sb-build-css-all'].forEach(function(binName) {
+['sb-build-css-sass', 'sb-build-css-css', 'sb-build-css-all'].forEach(function(binName) {
   tests.css[binName] = {
     files: [
       function(config) { return path.join('dist', 'browser', config.name + '.css');},
@@ -26,7 +26,7 @@ var prepend = function(array, str) {
 });
 
 // LANG builds
-['sb-build-lang', 'sb-build-lang-all', 'sb-build-lang-copy',].forEach(function(binName) {
+['sb-build-lang-all', 'sb-build-lang-copy',].forEach(function(binName) {
   tests.lang[binName] = {
     files: prepend(['index.json', 'de.json', 'en.json', 'sp.json'], (path.join('dist', 'lang') + path.sep))
   };
@@ -39,14 +39,11 @@ tests.docs['sb-build-docs-api'] = {
 tests.docs['sb-build-docs-manual'] = {
   files: ['dist/docs/manual/index.html']
 };
-
-['sb-build-docs-all', 'sb-build-docs'].forEach(function(binName) {
-  tests.docs[binName] = {
-    files: []
-      .concat(tests.docs['sb-build-docs-api'].files)
-      .concat(tests.docs['sb-build-docs-manual'].files)
-  };
-});
+tests.docs['sb-build-docs-all'] = {
+  files: []
+    .concat(tests.docs['sb-build-docs-api'].files)
+    .concat(tests.docs['sb-build-docs-manual'].files)
+};
 
 // JS dists
 tests.js['sb-build-js-browser'] = {
@@ -61,13 +58,12 @@ tests.js['sb-build-js-browser'] = {
 tests.js['sb-build-js-node'] = {
   files: ['dist/es5/index.js']
 };
-['sb-build-js-all', 'sb-build-js'].forEach(function(binName) {
-  tests.js[binName] = {
-    files: []
-      .concat(tests.js['sb-build-js-browser'].files)
-      .concat(tests.js['sb-build-js-node'].files)
-  };
-});
+
+tests.js['sb-build-js-all'] = {
+  files: []
+    .concat(tests.js['sb-build-js-browser'].files)
+    .concat(tests.js['sb-build-js-node'].files)
+};
 
 // TEST builds
 tests.test['sb-build-test-bundlers'] = {
@@ -78,62 +74,59 @@ tests.test['sb-build-test-browser'] = {
     function(config) { return path.join('dist', 'test', config.name + '.test.js');}
   ]
 };
-['sb-build-test-all', 'sb-build-test'].forEach(function(binName) {
-  tests.test[binName] = {
-    files: []
-      .concat(tests.test['sb-build-test-browser'].files)
-      .concat(tests.test['sb-build-test-bundlers'].files)
-  };
-});
+
+tests.test['sb-build-test-all'] = {
+  files: []
+    .concat(tests.test['sb-build-test-browser'].files)
+    .concat(tests.test['sb-build-test-bundlers'].files)
+};
 
 // build all
-['sb-build', 'sb-build-all'].forEach(function(binName) {
-  tests.all[binName] = {
-    files: []
-      .concat(tests.test['sb-build-test-all'].files)
-      .concat(tests.js['sb-build-js-all'].files)
-      .concat(tests.docs['sb-build-docs-all'].files)
-      .concat(tests.css['sb-build-css-all'].files)
-      .concat(tests.lang['sb-build-lang-all'].files)
-  };
-});
+tests.all['sb-build-all'] = {
+files: []
+  .concat(tests.test['sb-build-test-all'].files)
+  .concat(tests.js['sb-build-js-all'].files)
+  .concat(tests.docs['sb-build-docs-all'].files)
+  .concat(tests.css['sb-build-css-all'].files)
+  .concat(tests.lang['sb-build-lang-all'].files)
+};
 
 // run each binaries test
 Object.keys(tests).forEach(function(testName) {
 
-    // run individual dist type tests
-    Object.keys(tests[testName]).forEach(function(binName) {
-      var testProps = tests[testName][binName];
+  // run individual dist type tests
+  Object.keys(tests[testName]).forEach(function(binName) {
+    var testProps = tests[testName][binName];
 
-      parallel('build:' + testName + ':' + binName, function() {
-        // run with testHelperOptions, such as changing the pkg name to have a scope
-        [
-          {desc: 'run with default settings', options: {changePkg: false}},
-          {desc: 'run with a scoped main file', options: {changePkg: {name: '@scope/test-pkg-main'}}},
-          {desc: 'run with an npm run script', options: {changePkg: {scripts: {build: binName}}}},
-          {desc: 'run with author single quote', options: {changePkg: {author: 'Brandon \' Casey'}}},
-          {desc: 'run with nested author', options: {changePkg: {author: {name: 'Brandon \' Casey', email: 'nope@gmail.com', url: 'nope.com'}}}}
-        ].forEach(function(testOptions) {
-          it(testOptions.desc, function(done) {
-            var command = binName;
-            var helper = new TestHelper(testOptions.options);
-            var args = [];
+    parallel('build:' + testName + ':' + binName, function() {
+      // run with testHelperOptions, such as changing the pkg name to have a scope
+      [
+        {desc: 'run with default settings', options: {changePkg: false}},
+        {desc: 'run with a scoped main file', options: {changePkg: {name: '@scope/test-pkg-main'}}},
+        {desc: 'run with an npm run script', options: {changePkg: {scripts: {build: binName}}}},
+        {desc: 'run with author single quote', options: {changePkg: {author: 'Brandon \' Casey'}}},
+        {desc: 'run with nested author', options: {changePkg: {author: {name: 'Brandon \' Casey', email: 'nope@gmail.com', url: 'nope.com'}}}}
+      ].forEach(function(testOptions) {
+        it(testOptions.desc, function(done) {
+          var command = binName;
+          var helper = new TestHelper(testOptions.options);
+          var args = [];
 
-            if (testOptions.options.changePkg.scripts) {
-              command = 'npm';
-              args = ['run', 'build'];
-            }
+          if (testOptions.options.changePkg.scripts) {
+            command = 'npm';
+            args = ['run', 'build'];
+          }
 
-            helper.exec(command, args, function(code, stdout, stderr) {
-              assert.equal(stderr.length, 0, 'no stderr');
-              assert.equal(code, 0, 'should return 0');
+          helper.exec(command, args, function(code, stdout, stderr) {
+            assert.equal(stderr.length, 0, 'no stderr');
+            assert.equal(code, 0, 'should return 0');
 
-              testProps.files.forEach(function(file) {
-                if (typeof file === 'function') {
-                  file = file(helper.config);
-                }
-                var distFile = path.join(helper.config.path, file);
-                var expectedFile = path.join(__dirname, '..', file.replace('dist', 'expected-dist'));
+            testProps.files.forEach(function(file) {
+              if (typeof file === 'function') {
+                file = file(helper.config);
+              }
+              var distFile = path.join(helper.config.path, file);
+              var expectedFile = path.join(__dirname, '..', file.replace('dist', 'expected-dist'));
 
                 assert.equal(PathsExist(distFile), true, file + ' should exist');
                 assert.ok(fs.statSync(distFile).size > 10, file + ' is not 0 size');

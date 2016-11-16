@@ -10,6 +10,10 @@ module.exports = function(karmaConfig) {
     detectBrowsers = false;
   }
 
+  if (karmaConfig.browsers.length > 0) {
+    detectBrowsers = false;
+  }
+
   var files = [];
   var sbNodeDir = path.join('node_modules', 'videojs-spellbook', 'node_modules');
   var nodeDir = path.join('node_modules');

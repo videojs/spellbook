@@ -37,4 +37,4 @@ commands = commands.map(function(command) {
   return command;
 });
 
-Run.all(commands, {failAfter: true});
+Run.parallel(commands, {failAfter: true});

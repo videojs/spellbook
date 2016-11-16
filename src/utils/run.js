@@ -35,7 +35,7 @@ var one = function(command, options) {
         });
       }
 
-      if (!options.nonFatal && exitCode !== 0) {
+      if (!options.nonFatal && !options.failAfter && exitCode !== 0) {
         reject(retval);
       }
       resolve(retval);
@@ -73,25 +73,36 @@ var one = function(command, options) {
   });
 };
 
-var all = function(commands, options) {
+var runAll = function(mapCommand, commands, options) {
   options = options || {};
   commands = Array.isArray(commands) ? commands : [commands];
 
-  var promises = commands.map(function(command) {
-    return one(command, {nonFatal: options.failAfter || options.nonFatal || false});
-  });
-
-  return Promise.all(promises).then(function(retvals) {
+  return Promise[mapCommand](commands, function(command) {
+    return one(command, options);
+  }).then(function(retvals) {
     retvals.forEach(function(retval) {
-      if (retval.status !== 0) {
-        log.fatal('some commands failed!');
-        process.exit(retval.status);
+      if (options.nonFatal || retval.status === 0) {
+        return
       }
+
+      log.fatal('some commands failed!');
+      process.exit(retval.status);
     });
   });
 };
 
+// run concurrently
+var parallel = function(commands, options) {
+  return runAll('map', commands, options);
+};
+
+// run in order
+var series = function(commands, options) {
+  return runAll('mapSeries', commands, options);
+};
+
 module.exports = {
   one: one,
-  all: all,
+  parallel: parallel,
+  series: series
 };

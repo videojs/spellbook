@@ -3,8 +3,7 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
   return commander
-    .command('browser', 'run all browser tests')
-    .command('node', 'run all node tests')
-    .command('all', 'run all tests', {isDefault: true});
+    .command('require', 'require main es5 file in node')
+    .command('all', 'run all node tests', {isDefault: true});
 });
 

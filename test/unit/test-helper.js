@@ -22,7 +22,8 @@ var TestHelper = function(options) {
     debug: options.debug || process.env.DEBUG_TEST || false,
     npmLink: options.npmLink || true,
     gitInit: options.gitInit || false,
-    changePkg: options.changePkg || false
+    changePkg: options.changePkg || false,
+    copyDist: options.copyDist || false
   };
 
   // allow a ton of process listeners
@@ -45,6 +46,10 @@ var TestHelper = function(options) {
     this.projectDir = path.join(shelljs.tempdir(), id);
   }
   shelljs.cp('-R', path.join(fixtureDir, 'test-pkg-main') + path.sep, this.projectDir);
+
+  if (this.options.copyDist) {
+    shelljs.cp('-R', path.join(__dirname, '..', 'expected-dist') + path.sep, path.join(this.projectDir, 'dist'));
+  }
 
   if (!this.options.debug) {
     shelljs.config.silent = true;

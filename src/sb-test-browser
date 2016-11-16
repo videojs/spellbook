@@ -10,41 +10,71 @@ var Promise = require('bluebird');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'keep the tester running and run as things change')
-    .option('-b, --browsers', 'comma seperated list of browsers to run on')
-    .option('-n, --no-build', 'dont build before testing');
+    .option('-b, --browsers <list,of,browsers>', 'comma seperated list of browsers to run on')
+    .option('-nb, --no-build', 'dont build before testing')
+    .option('-nl, --no-lint', 'dont lint before testing');
 });
 
-if (!config.test) {
-  process.exit(0);
-}
-
-var buildPromise;
-if (program.build) {
-  buildPromise = Run.one('sb-build');
-} else {
-  buildPromise = Promise.resolve();
-}
-
 var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
-var command = [
+var commands = [];
+var karmaCommand = [
   'karma',
   'start',
   'karma.config.js'
 ];
 
 if (program.watch) {
-  command.push('--auto-watch');
-  command.push('--no-single-run');
+  karmaCommand.push('--auto-watch');
+  karmaCommand.push('--no-single-run');
 } else  {
-  command.push('--no-auto-watch');
-  command.push('--single-run');
+  karmaCommand.push('--no-auto-watch');
+  karmaCommand.push('--single-run');
 }
 
 if (program.browsers) {
-  command.push('--browsers');
-  command.push(program.browsers.join(','));
+  program.browsers = program.browsers.split(',');
+  var browsers = [];
+
+  program.browsers.forEach(function(userBrowser) {
+    userBrowser = userBrowser.trim();
+    var found = false;
+    KARMA_BROWSERS.forEach(function(karmaBrowser) {
+      // seach faster
+      if (found) {
+        return;
+      }
+      var regexp = new RegExp(karmaBrowser, 'i');
+      if (regexp.test(userBrowser)) {
+        // don't add the same browser more than once
+        if (browsers.indexOf(karmaBrowser) === -1) {
+          browsers.push(karmaBrowser);
+        }
+
+        found = true;
+      }
+    });
+
+    if (found !== true) {
+      log.fatal('invalid browser entry: ' + userBrowser);
+      process.exit(1);
+    }
+  });
+
+  karmaCommand.push('--browsers');
+  karmaCommand.push(browsers.join(','));
+}
+
+commands.push(karmaCommand);
+
+if (program.lint && !program.watch) {
+  commands.unshift(['sb-lint']);
+}
+
+var buildPromise = Promise.resolve();
+if (program.build && !program.watch) {
+  buildPromise = Run.one('sb-build');
 }
 
 buildPromise.then(function() {
-  return Run.one(command);
-});
+  return Run.series(commands, {failAfter: true});
+})
