@@ -6,7 +6,7 @@ var PathsExist = require('../../src/utils/paths-exist');
 var binName = 'sb-clean';
 var parallel = require('mocha.parallel');
 
-['sb-test-all', 'sb-test-browser'].forEach(function(binName) {
+['sb-test-all', 'sb-test-browser', 'sb-test-node-all'].forEach(function(binName) {
   parallel(binName, function() {
     it('should run error on linter', function(done) {
       var helper = new TestHelper({copyDist: true});
@@ -38,6 +38,9 @@ var parallel = require('mocha.parallel');
       });
     });
 
+    if (binName === 'sb-test-node-all') {
+      return
+    }
     it('should run just chrome', function(done) {
       var helper = new TestHelper({copyDist: true});
 

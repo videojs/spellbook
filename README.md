@@ -113,7 +113,6 @@
 
 ## Future Ideas
 ### JS
-  * add node require test
   * add banner to unminified browser bundle
   * jspm support
   * noderify npm files?

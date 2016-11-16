@@ -59,6 +59,9 @@
     "sb-test": "src/sb-test",
     "sb-test-all": "src/sb-test-all",
     "sb-test-browser": "src/sb-test-browser",
+    "sb-test-node": "src/sb-test-node",
+    "sb-test-node-require": "src/sb-test-node-require",
+    "sb-test-node-all": "src/sb-test-node-all",
     "sb-server": "src/sb-server",
     "sb-start": "src/sb-start",
     "sb-clean": "src/sb-clean",
@@ -122,6 +125,7 @@
     "sinon": "1.10.2",
     "stylelint": "^7.2.0",
     "uglify-js": "2.7.4",
+    "uuid": "^2.0.3",
     "video.js": "^5.11.7",
     "watchify": "^3.7.0",
     "webpack": "^1.13.2"
@@ -130,8 +134,7 @@
     "chai": "^3.5.0",
     "doctoc": "^1.2.0",
     "mocha": "^3.1.0",
-    "mocha.parallel": "^0.13.0",
-    "uuid": "^2.0.3"
+    "mocha.parallel": "^0.13.0"
   },
   "browserify-shim": "config/shim.config.js",
   "keywords": [

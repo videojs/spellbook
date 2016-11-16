@@ -8,17 +8,18 @@ var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'keep the tester running and run as things change')
     .option('-nb, --no-build', 'dont build before testing')
-    .option('-b, --browsers <list,of,browsers>', 'comma seperated list of browsers')
     .option('-nl, --no-lint', 'dont lint before testing');
 });
 
-if (!config.test) {
-  process.exit(0);
+var buildPromise;
+if (program.build) {
+  buildPromise = Run.one('sb-build');
+} else {
+  buildPromise = Promise.resolve();
 }
 
 var commands = [
-  ['sb-test-browser'],
-  ['sb-test-node-all'],
+  ['sb-test-node-require'],
 ];
 
 commands.map(function(command) {
@@ -32,20 +33,10 @@ commands.map(function(command) {
   return command;
 });
 
-if (program.browsers) {
-  commands[0].push('--browsers')
-  commands[0].push(program.browsers)
+if (program.lint) {
+  commands.unshift('sb-lint');
 }
 
-if (program.lint && !program.watch) {
-  commands.unshift(['sb-lint']);
-}
-
-var buildPromise = Promise.resolve();
-if (program.build && !program.watch) {
-  buildPromise = Run.one('sb-build');
-}
-
-buildPromise.then(function(retval) {
-  return Run.series(commands, {failAfter: true});
+buildPromise.then(function() {
+  Run.series(commands, {failAfter: true});
 });
