@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var PathsExist = require('./utils/paths-exist');
+var path = require('path');
+var config = require('./utils/get-config')();
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -9,10 +12,16 @@ var program = CommanderWrapper(function(commander) {
     .option('-f, --fix', 'automatically fix semantic errors were possible');
 });
 
-var commands = [
-  ['sb-lint-css-css'],
-  ['sb-lint-css-sass'],
-];
+var commands = [];
+
+if (PathsExist(path.join(config.css.src, 'index.css'))) {
+  commands.push(['sb-lint-css-css']);
+}
+
+if (PathsExist(path.join(config.css.src, 'index.scss')) ||
+    PathsExist(path.join(config.css.src, 'index.sass'))) {
+    commands.push(['sb-build-css-sass']);
+}
 
 commands = commands.map(function(command) {
   if (program.watch) {
