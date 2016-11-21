@@ -66,7 +66,9 @@ var one = function(command, options) {
 
   }).catch(function(retval) {
     log.fatal('command: ' + retval.command + ', failed with exit code: ' + retval.status);
-    if (!options.toLog && !options.silent) {
+    // don't log the error if the command is an internal one
+    // we will do that on our own
+    if (!options.toLog && !options.silent && !(/^sb-/).test(path.basename(retval.command))) {
       log.fatal('stdout:', retval.stdout, 'stderr:', retval.stderr);
     }
     process.exit(retval.status);
