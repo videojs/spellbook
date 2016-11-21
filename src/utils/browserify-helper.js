@@ -20,6 +20,7 @@ var watchify = require('watchify');
 var Promise = require('bluebird');
 var nodeResolve = require('rollup-plugin-node-resolve');
 var shimConf = require('../../config/shim.config.js');
+var shelljs = require('shelljs');
 
 // dist, src, standalone, watch, internalMap, noRollup
 var browserifyHelper = function(options) {
@@ -35,6 +36,10 @@ var browserifyHelper = function(options) {
 
   mkdirp.sync(path.dirname(options.dist));
 
+  var nodeModuleDirectories = shelljs.find('node_modules').filter(function(val) {
+    return (/node_modules\/?$/).test(val);
+  });
+
   var opts = {
     basedir: config.path,
     delay: 500,
@@ -42,10 +47,7 @@ var browserifyHelper = function(options) {
     standalone: (options.standalone ? config.name : false),
     cache: {},
     packageCache: {},
-    paths: [
-      path.join(__dirname, '..', '..', 'node_modules'),
-      path.join(config.path, 'node_modules')
-    ],
+    paths: nodeModuleDirectories,
     plugin: [
       bundleCollapser,
       errorify
@@ -57,10 +59,15 @@ var browserifyHelper = function(options) {
     ]
   };
 
-  if (!options.noRollup) {
+  if (!options.watch && !options.noRollup) {
     opts.transform.unshift([rollupify, {config: {
       plugins: [
-        nodeResolve({jsnext: true, main: false, browser: false, skip: Object.keys(shimConf)}),
+        nodeResolve({
+          jsnext: true,
+          main: false,
+          browser: false,
+          skip: true,
+        }),
       ],
       external: Object.keys(shimConf),
     }}]);
