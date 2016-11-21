@@ -82,7 +82,6 @@ server.init({
   ghostMode: program.sync || false,
   ui: program.ui || false,
   open: program.open || false,
-  injectChanges: false,
   reloadOnRestart: true,
   reloadDelay: 100,
   tunnel: program.tunnel || false,

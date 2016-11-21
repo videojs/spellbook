@@ -38,6 +38,7 @@ program.src.forEach(function(src) {
 var command =  [
   'stylelint',
   '-f', 'verbose',
+  '--color',
   '--config', 'stylelint.config.js',
 ].concat(files);
 
