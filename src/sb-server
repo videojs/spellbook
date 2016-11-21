@@ -76,7 +76,9 @@ server.init({
     middleware: [karmaProxy],
   },
   watchOptions: {
-    ignored: 'dist/docs/api/index.html'
+    ignored: [
+      path.join(config.path, 'node_modules'),
+    ],
   },
   port: program.port || config.port || 9999,
   ghostMode: program.sync || false,
@@ -90,6 +92,9 @@ server.init({
   },
   files: [
     path.join(config.path, 'dist', '**', '*.js'),
-    path.join(config.path, 'dist', '**', '*.css')
+    path.join(config.path, 'dist', '**', '*.css'),
+    path.join(config.path, 'dist', '**', '*.html'),
+    path.join(config.path, 'examples', '**', '*.html'),
+    path.join(config.path, 'index.html')
   ]
 });
