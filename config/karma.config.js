@@ -60,6 +60,7 @@ module.exports = function(karmaConfig) {
       enabled: detectBrowsers,
       usePhantomJS: false
     },
+    loggers: [{type: path.join(__dirname, '../src/utils/log.js')}],
     client: {
       clearContext: false,
       qunit: {showUI: true}

@@ -6,6 +6,7 @@ var url = require('url');
 var browserSync = require('browser-sync');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var http = require('http');
+var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -49,7 +50,7 @@ var karmaProxy = proxy(filter, {
     // check every 3000 seconds to see if port 9876 is open
     var interval = setInterval(function() {
       http.get({port: 9876, host: 'localhost'}, function(res) {
-        console.log('Port 9876 was opened, going to proxy and reload');
+        log.info('Port 9876 was opened, going to proxy and reload');
         server.reload();
         clearInterval(interval);
       }).on('error', function() {
@@ -85,6 +86,9 @@ server.init({
   reloadOnRestart: true,
   reloadDelay: 100,
   tunnel: program.tunnel || false,
+  logPrefix: function() {
+    return log.prefix('info');
+  },
   files: [
     path.join(config.path, 'dist', '**', '*.js'),
     path.join(config.path, 'dist', '**', '*.css')
