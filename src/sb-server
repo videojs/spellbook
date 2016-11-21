@@ -12,6 +12,7 @@ var program = CommanderWrapper(function(commander) {
     .option('-p, --port <number>', 'what port to start the server on', parseInt)
     .option('-o, --open', 'open the server in your default browser')
     .option('-s, --sync', 'enable cross browser action sync')
+    .option('-t, --tunnel', 'enable cross browser action sync')
     .option('-ui, --ui', 'enable browser-sync ui');
 });
 
@@ -83,6 +84,7 @@ server.init({
   injectChanges: false,
   reloadOnRestart: true,
   reloadDelay: 100,
+  tunnel: program.tunnel || false,
   files: [
     path.join(config.path, 'dist', '**', '*.js'),
     path.join(config.path, 'dist', '**', '*.css')

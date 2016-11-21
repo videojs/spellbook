@@ -3,11 +3,27 @@ var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
-  return commander;
+  return commander
+    .option('-p, --port <number>', 'what port to start the server on', parseInt)
+    .option('-o, --open', 'open the server in your default browser')
+    .option('-t, --tunnel', 'enable cross browser action sync')
 });
 
 setTimeout(function() {
-  Run.one(['sb-server'], {nonFatal: true});
+  var serverCommand = ['sb-server'];
+  if (program.open) {
+    serverCommand.push('--open');
+  }
+
+  if (program.tunnel) {
+    serverCommand.push('--tunnel');
+  }
+
+  if (program.port) {
+    serverCommand.push('--port');
+    serverCommand.push(program.port);
+  }
+  Run.one(serverCommand, {nonFatal: true});
 }, 8000);
 
 Run.one(['sb-watch'], {nonFatal: true});
