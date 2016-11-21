@@ -64,7 +64,9 @@ module.exports = function(karmaConfig) {
       clearContext: false,
       qunit: {showUI: true}
     },
-    files: files
+    files: files.map(function(pattern) {
+      return {pattern: pattern, nocache: true}
+    })
   });
 };
 

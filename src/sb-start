@@ -6,4 +6,8 @@ var program = CommanderWrapper(function(commander) {
   return commander;
 });
 
-Run.parallel(['sb-watch', 'sb-server']);
+setTimeout(function() {
+  Run.one(['sb-server'], {nonFatal: true});
+}, 8000);
+
+Run.one(['sb-watch'], {nonFatal: true});

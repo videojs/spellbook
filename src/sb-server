@@ -5,6 +5,7 @@ var proxy = require('http-proxy-middleware');
 var url = require('url');
 var browserSync = require('browser-sync');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var http = require('http');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -30,35 +31,60 @@ var filter = function (pathname, req) {
 
   return true;
 };
+
+var server;
 var karmaProxy = proxy(filter, {
   target: 'http://localhost:9876',
   pathRewrite: function(path, req) {
-    var newpath = path
+    var newurl = url.parse(path);
+    newurl.pathname =newurl.pathname
       .replace(/^\/test\/?$/, '/debug.html')
       .replace(/^\/test\//, '/');
-    return newpath;
+    return url.format(newurl);
   },
   ws: true,
   logLevel: 'error',
   onError: function(err, req, res) {
-    res.end('' +
-      'ERROR: Could not proxy /test to karma server. \n' +
-      'It is likely that karma is not started.\n' +
-      'Run `sb-test-browser --watch` to start it and reload the page.\n'
+    // check every 3000 seconds to see if port 9876 is open
+    var interval = setInterval(function() {
+      http.get({port: 9876, host: 'localhost'}, function(res) {
+        console.log('Port 9876 was opened, going to proxy and reload');
+        server.reload();
+        clearInterval(interval);
+      }).on('error', function() {
+        // console.log('Port 9876 is not up yet...');
+      });
+    }, 3000);
+
+    res.end(
+      '<script src="/browser-sync/browser-sync-client.js"></script>' +
+      '<p>' +
+      'ERROR: Could not proxy /test to karma server.' +
+      'It is likely that karma is not started.' +
+      'Run `sb-test-browser --watch` to start it and reload the page.' +
+      '</p>'
     );
   }
 });
 
-browserSync.create().init({
+server = browserSync.create()
+server.init({
   server: {
     baseDir: config.path,
     middleware: [karmaProxy],
+  },
+  watchOptions: {
+    ignored: 'dist/docs/api/index.html'
   },
   port: program.port || config.port || 9999,
   ghostMode: program.sync || false,
   ui: program.ui || false,
   open: program.open || false,
-  reloadDebounce: 100,
+  injectChanges: false,
   reloadOnRestart: true,
-  files: [path.join(config.path, 'dist', '**', '*.*'), path.join(config.path, '*.html')]
+  reloadDelay: 100,
+  files: [
+    path.join(config.path, 'dist', '**', '*.js'),
+    path.join(config.path, 'dist', '**', '*.css')
+  ]
 });

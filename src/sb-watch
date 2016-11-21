@@ -9,11 +9,14 @@ var program = CommanderWrapper(function(commander) {
 var commands = [
   ['sb-build-all'],
   ['sb-lint-all'],
-  ['sb-test-all', '--no-build'],
 ];
 commands = commands.map(function(command) {
   command.push('--watch');
   return command;
 });
 
+setTimeout(function() {
+  Run.one(['sb-test-all', '--no-build', '--no-lint', '--watch'], {nonFatal: true});
+}, 9000);
 Run.parallel(commands, {nonFatal: true});
+
