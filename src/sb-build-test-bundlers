@@ -130,7 +130,7 @@ var build = function() {
             context: config.path,
             entry: srcFile,
             // TODO: webpack breaks when we do inline-source-map...
-            devtool: 'eval',
+            devtool: 'inline-source-map',
             externals: externals,
             output: {
               filename: path.basename(distFile),

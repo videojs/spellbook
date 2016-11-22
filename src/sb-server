@@ -1,12 +1,10 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var path = require('path');
-var proxy = require('http-proxy-middleware');
-var url = require('url');
 var browserSync = require('browser-sync');
 var CommanderWrapper = require('./utils/commander-wrapper');
-var http = require('http');
 var log = require('./utils/log');
+var proxies = require('./utils/proxies');
+var path = require('path');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -15,81 +13,39 @@ var program = CommanderWrapper(function(commander) {
     .option('-o, --open', 'open the server in your default browser')
     .option('-s, --sync', 'enable cross browser action sync')
     .option('-t, --tunnel', 'enable cross browser action sync')
-    .option('-ui, --ui', 'enable browser-sync ui');
+    .option('-nui, --no-ui', 'disable browser-sync ui');
 });
 
 program.testPort = program.testPort || process.env.TEST_PORT || 9876;
 program.port = program.port || process.env.PORT || 9999;
 
-/* proxy /test to karma server */
-var filter = function (pathname, req) {
-  // always re-write /test
-  if ((/^\/test\/?$/).test(pathname)) {
-    return true;
-  }
+program.open = program.open ? 'local' : false;
+if (program.open && program.tunnel) {
+  program.open = 'tunnel';
+}
 
-  // skip proxy for non-karma requests
-  // ar karma proxy requests should only happen
-  // from /test
-  if (!req.headers.referer || !(/^\/test\/?/).test(url.parse(req.headers.referer).pathname)) {
-    return false;
-  }
+if (program.ui) {
+  program.ui = {
+    port: (program.port+1)
+  };
+}
 
-  return true;
-};
-
-var server;
-var karmaProxy = proxy(filter, {
-  target: 'http://localhost:' + program.testPort,
-  pathRewrite: function(path, req) {
-    var newurl = url.parse(path);
-    newurl.pathname =newurl.pathname
-      .replace(/^\/test\/?$/, '/debug.html')
-      .replace(/^\/test\//, '/');
-    return url.format(newurl);
-  },
-  ws: true,
-  logLevel: 'error',
-  onError: function(err, req, res) {
-    // check every 3000 seconds to see if test port is open
-    var interval = setInterval(function() {
-      http.get({port: program.testPort, host: 'localhost'}, function(res) {
-        log.info('Port' + program.testPort + ' was opened, going to proxy and reload');
-        server.reload();
-        clearInterval(interval);
-      }).on('error', function() {
-        // console.log('Port ' + program.testPort + ' is not up yet...');
-      });
-    }, 5000);
-
-    res.end(
-      '<script src="/browser-sync/browser-sync-client.js"></script>' +
-      '<p>ERROR: Could not proxy http://locahost:' + program.port + '/test to karma server at http://localhost:' + program.testPort + '. This may be due to one of two issues: </p>' +
-      '<ol>' +
-        '<li>The karma server is not started. Use `sb-test-browser --watch` or `sb-watch` to start it.</li>' +
-        '<li>The --test-port or TEST_PORT environment variable is not set to the correct karma server port.</li>' +
-      '</ol>'
-    );
-  }
-});
-
-server = browserSync.create()
+var server = browserSync.create()
 server.init({
   server: {
     baseDir: config.path,
-    middleware: [karmaProxy],
+    middleware: [proxies.test(program, server)]
   },
   watchOptions: {
-    ignored: [
-      path.join(config.path, 'node_modules'),
-    ],
+    ignored: [path.join(config.path, 'node_modules')],
   },
   port: program.port,
   ghostMode: program.sync || false,
-  ui: program.ui || false,
-  open: program.open || false,
+  ui: program.ui,
+  open: program.open,
+  online: program.tunnel || false,
   reloadOnRestart: true,
-  reloadDelay: 100,
+  reloadDelay: 200,
   tunnel: program.tunnel || false,
   logPrefix: function() {
     return log.prefix('info');
