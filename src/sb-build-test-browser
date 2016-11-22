@@ -31,7 +31,5 @@ browserifyHelper({
   src: path.join(program.src, '**', '*.test.js'),
   standalone: false,
   watch: program.watch,
-  internalMap: true,
-  // TODO: breaks watch...
-  noRollup: true,
+  internalMap: true
 });
