@@ -20,7 +20,7 @@ if (PathsExist(path.join(config.css.src, 'index.css'))) {
 
 if (PathsExist(path.join(config.css.src, 'index.scss')) ||
     PathsExist(path.join(config.css.src, 'index.sass'))) {
-    commands.push(['sb-build-css-sass']);
+    commands.push(['sb-lint-css-sass']);
 }
 
 commands = commands.map(function(command) {
