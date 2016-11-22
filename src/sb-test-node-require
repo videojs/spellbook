@@ -54,17 +54,26 @@ var run = function() {
     return Run.one(nodeCommand, {silent: true, nonFatal: true});
   }).then(function(retval) {
     if (retval.status === 0) {
+      log.info('*******************************');
       log.info('node require was successful');
+      log.info('*******************************');
     } else if (retval.status === 404) {
+      log.warn('*******************************');
       log.warn('node require was successful, but only undefined was exported!');
+      log.warn('*******************************');
+
     } else {
+      log.fatal('*******************************');
       log.fatal('node require failed with error:', retval.stderr);
+      log.fatal('*******************************');
       if (!program.watch) {
         process.exit(1);
       }
     }
     if (lintingFail) {
+      log.fatal('*******************************');
       log.fatal('code linting failed!');
+      log.fatal('*******************************');
       process.exit(1);
     }
   });
