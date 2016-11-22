@@ -9,7 +9,7 @@ var test = function(program, server) {
   var testPath = '/test'
   var filter = function (pathname, req) {
     // always re-write /test
-    if ((new RegExp('^' + testPath + '/?$')).test(pathname)) {
+    if ((new RegExp('^' + testPath + '/?')).test(pathname)) {
       return true;
     }
 
