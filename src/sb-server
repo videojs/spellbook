@@ -11,11 +11,15 @@ var log = require('./utils/log');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-p, --port <number>', 'what port to start the server on', parseInt)
+    .option('-tp, --test-port <number>', 'what port the karma server is on', parseInt)
     .option('-o, --open', 'open the server in your default browser')
     .option('-s, --sync', 'enable cross browser action sync')
     .option('-t, --tunnel', 'enable cross browser action sync')
     .option('-ui, --ui', 'enable browser-sync ui');
 });
+
+program.testPort = program.testPort || process.env.TEST_PORT || 9876;
+program.port = program.port || process.env.PORT || 9999;
 
 /* proxy /test to karma server */
 var filter = function (pathname, req) {
@@ -36,7 +40,7 @@ var filter = function (pathname, req) {
 
 var server;
 var karmaProxy = proxy(filter, {
-  target: 'http://localhost:9876',
+  target: 'http://localhost:' + program.testPort,
   pathRewrite: function(path, req) {
     var newurl = url.parse(path);
     newurl.pathname =newurl.pathname
@@ -47,24 +51,24 @@ var karmaProxy = proxy(filter, {
   ws: true,
   logLevel: 'error',
   onError: function(err, req, res) {
-    // check every 3000 seconds to see if port 9876 is open
+    // check every 3000 seconds to see if test port is open
     var interval = setInterval(function() {
-      http.get({port: 9876, host: 'localhost'}, function(res) {
-        log.info('Port 9876 was opened, going to proxy and reload');
+      http.get({port: program.testPort, host: 'localhost'}, function(res) {
+        log.info('Port' + program.testPort + ' was opened, going to proxy and reload');
         server.reload();
         clearInterval(interval);
       }).on('error', function() {
-        // console.log('Port 9876 is not up yet...');
+        // console.log('Port ' + program.testPort + ' is not up yet...');
       });
-    }, 3000);
+    }, 5000);
 
     res.end(
       '<script src="/browser-sync/browser-sync-client.js"></script>' +
-      '<p>' +
-      'ERROR: Could not proxy /test to karma server.' +
-      'It is likely that karma is not started.' +
-      'Run `sb-test-browser --watch` to start it and reload the page.' +
-      '</p>'
+      '<p>ERROR: Could not proxy http://locahost:' + program.port + '/test to karma server at http://localhost:' + program.testPort + '. This may be due to one of two issues: </p>' +
+      '<ol>' +
+        '<li>The karma server is not started. Use `sb-test-browser --watch` or `sb-watch` to start it.</li>' +
+        '<li>The --test-port or TEST_PORT environment variable is not set to the correct karma server port.</li>' +
+      '</ol>'
     );
   }
 });
@@ -80,7 +84,7 @@ server.init({
       path.join(config.path, 'node_modules'),
     ],
   },
-  port: program.port || config.port || 9999,
+  port: program.port,
   ghostMode: program.sync || false,
   ui: program.ui || false,
   open: program.open || false,

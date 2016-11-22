@@ -12,15 +12,19 @@ var program = CommanderWrapper(function(commander) {
     .option('-w, --watch', 'keep the tester running and run as things change')
     .option('-b, --browsers <list,of,browsers>', 'comma seperated list of browsers to run on')
     .option('-nb, --no-build', 'dont build before testing')
+    .option('-p, --port <port>', 'port for karma server')
     .option('-nl, --no-lint', 'dont lint before testing');
 });
+
+program.port = program.port || process.env.TEST_PORT || 9876;
 
 var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
 var commands = [];
 var karmaCommand = [
   'karma',
   'start',
-  'karma.config.js'
+  'karma.config.js',
+  '--port', program.port
 ];
 
 if (program.watch) {
@@ -69,6 +73,7 @@ commands.push(karmaCommand);
 if (program.lint && !program.watch) {
   commands.unshift(['sb-lint']);
 }
+
 
 var buildPromise = Promise.resolve();
 if (program.build && !program.watch) {

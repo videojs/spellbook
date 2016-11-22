@@ -5,6 +5,7 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-p, --port <number>', 'what port to start the server on', parseInt)
+    .option('-tp, --test-port <number>', 'what port to start the test server on', parseInt)
     .option('-o, --open', 'open the server in your default browser')
     .option('-t, --tunnel', 'enable cross browser action sync')
 });
@@ -23,7 +24,20 @@ setTimeout(function() {
     serverCommand.push('--port');
     serverCommand.push(program.port);
   }
+
+  if (program.testPort) {
+    serverCommand.push('--test-port');
+    serverCommand.push(program.testPort);
+  }
+
+  console.log(serverCommand);
   Run.one(serverCommand, {nonFatal: true});
 }, 8000);
 
-Run.one(['sb-watch'], {nonFatal: true});
+var watchCommand = ['sb-watch'];
+
+if (program.testPort) {
+  watchCommand.push('--port');
+  watchCommand.push(program.testPort);
+}
+Run.one(watchCommand, {nonFatal: true});

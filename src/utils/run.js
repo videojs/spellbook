@@ -15,6 +15,9 @@ var one = function(command, options) {
   var spawnOptions = {};
 
   args = args.map(function(c) {
+    if (typeof c === 'number') {
+      c = c.toString();
+    }
     return GetPath(c);
   });
 

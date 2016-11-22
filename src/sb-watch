@@ -3,7 +3,8 @@ var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
-  return commander;
+  return commander
+    .option('-p, --port <number>', 'what port to start the test server on', parseInt)
 });
 
 var commands = [
@@ -16,7 +17,12 @@ commands = commands.map(function(command) {
 });
 
 setTimeout(function() {
-  Run.one(['sb-test-all', '--no-build', '--no-lint', '--watch'], {nonFatal: true});
+  var testCommand = ['sb-test-all', '--no-build', '--no-lint', '--watch'];
+  if (program.port) {
+    testCommand.push('--port');
+    testCommand.push(program.port);
+  }
+  Run.one(testCommand, {nonFatal: true});
 }, 9000);
 Run.parallel(commands, {nonFatal: true});
 
