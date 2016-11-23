@@ -1,64 +1,60 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var path = require('path');
-var proxy = require('http-proxy-middleware');
-var url = require('url');
 var browserSync = require('browser-sync');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var log = require('./utils/log');
+var proxies = require('./utils/proxies');
+var path = require('path');
 
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-p, --port <number>', 'what port to start the server on', parseInt)
+    .option('-tp, --test-port <number>', 'what port the karma server is on', parseInt)
     .option('-o, --open', 'open the server in your default browser')
     .option('-s, --sync', 'enable cross browser action sync')
-    .option('-ui, --ui', 'enable browser-sync ui');
+    .option('-t, --tunnel', 'enable cross browser action sync')
+    .option('-nui, --no-ui', 'disable browser-sync ui');
 });
 
-/* proxy /test to karma server */
-var filter = function (pathname, req) {
-  // always re-write /test
-  if ((/^\/test\/?$/).test(pathname)) {
-    return true;
-  }
+program.testPort = program.testPort || process.env.TEST_PORT || 9876;
+program.port = program.port || process.env.PORT || 9999;
 
-  // skip proxy for non-karma requests
-  // ar karma proxy requests should only happen
-  // from /test
-  if (!req.headers.referer || !(/^\/test\/?/).test(url.parse(req.headers.referer).pathname)) {
-    return false;
-  }
+program.open = program.open ? 'local' : false;
+if (program.open && program.tunnel) {
+  program.open = 'tunnel';
+}
 
-  return true;
-};
-var karmaProxy = proxy(filter, {
-  target: 'http://localhost:9876',
-  pathRewrite: function(path, req) {
-    var newpath = path
-      .replace(/^\/test\/?$/, '/debug.html')
-      .replace(/^\/test\//, '/');
-    return newpath;
-  },
-  ws: true,
-  logLevel: 'error',
-  onError: function(err, req, res) {
-    res.end('' +
-      'ERROR: Could not proxy /test to karma server. \n' +
-      'It is likely that karma is not started.\n' +
-      'Run `sb-test-browser --watch` to start it and reload the page.\n'
-    );
-  }
-});
+if (program.ui) {
+  program.ui = {
+    port: (program.port+1)
+  };
+}
 
-browserSync.create().init({
+var server = browserSync.create()
+server.init({
   server: {
     baseDir: config.path,
-    middleware: [karmaProxy],
+    middleware: [proxies.test(program, server)]
   },
-  port: program.port || config.port || 9999,
+  watchOptions: {
+    ignored: [path.join(config.path, 'node_modules')],
+  },
+  port: program.port,
   ghostMode: program.sync || false,
-  ui: program.ui || false,
-  open: program.open || false,
-  reloadDebounce: 100,
+  ui: program.ui,
+  open: program.open,
+  online: program.tunnel || false,
   reloadOnRestart: true,
-  files: [path.join(config.path, 'dist', '**', '*.*'), path.join(config.path, '*.html')]
+  reloadDelay: 200,
+  tunnel: program.tunnel || false,
+  logPrefix: function() {
+    return log.prefix('info');
+  },
+  files: [
+    path.join(config.path, 'dist', '**', '*.js'),
+    path.join(config.path, 'dist', '**', '*.css'),
+    path.join(config.path, 'dist', '**', '*.html'),
+    path.join(config.path, 'examples', '**', '*.html'),
+    path.join(config.path, 'index.html')
+  ]
 });

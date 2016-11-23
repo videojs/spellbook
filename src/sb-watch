@@ -3,17 +3,39 @@ var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
-  return commander;
+  return commander
+    .option('-p, --port <number>', 'what port to start the test server on', parseInt)
+    .option('-nb, --no-build', 'dont build or watch build')
+    .option('-nl, --no-lint', 'dont lint or watch lint', parseInt);
 });
 
-var commands = [
-  ['sb-build-all'],
-  ['sb-lint-all'],
-  ['sb-test-all', '--no-build'],
-];
+var commands = [];
+var delayTime = 100;
+
+if (program.build) {
+  commands.push(['sb-build-all']);
+  delayTime += 4000;
+}
+
+if (program.lint) {
+  commands.push(['sb-lint-all']);
+  delayTime += 2000;
+}
+
 commands = commands.map(function(command) {
   command.push('--watch');
   return command;
 });
 
-Run.parallel(commands, {nonFatal: true});
+setTimeout(function() {
+  var testCommand = ['sb-test-all', '--no-build', '--no-lint', '--watch'];
+  if (program.port) {
+    testCommand.push('--port');
+    testCommand.push(program.port);
+  }
+  Run.one(testCommand, {nonFatal: true});
+}, delayTime);
+
+if (commands.length) {
+  Run.parallel(commands, {nonFatal: true});
+}

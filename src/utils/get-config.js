@@ -26,6 +26,11 @@ var GetConfig = function (dir) {
     process.exit(1);
   }
 
+  if (!PathsExist(path.join(appRoot, 'node_modules'))) {
+    log.fatal('no node_modules directory!');
+    process.exit(1);
+  }
+
   var name = workingPkg.name.replace(/^@.+\//, '');
   var author = workingPkg.author || '';
 

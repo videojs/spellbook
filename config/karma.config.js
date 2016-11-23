@@ -46,11 +46,14 @@ module.exports = function(karmaConfig) {
     }
   }
 
-  if (config.css && config.css.src && PathsExist(config.css.src)) {
-    files.push(path.join(config.dist, 'browser', config.name + '.css'));
-  }
-  files.push(path.join(config.dist, 'test', '**', '*.test.js'));
+  var dist = path.relative(config.path, config.dist);
 
+  if (config.css && config.css.src && PathsExist(config.css.src)) {
+    files.push(path.join(dist, 'browser', config.name + '.css'));
+    files.push({pattern: path.join(dist, 'browser', config.name + '.css.map'), included: false});
+  }
+
+  files.push(path.join(dist, 'test', '**', '*.test.js'));
   karmaConfig.set({
     reporters: ['dots'],
     frameworks: ['qunit', 'detectBrowsers'],
@@ -60,11 +63,18 @@ module.exports = function(karmaConfig) {
       enabled: detectBrowsers,
       usePhantomJS: false
     },
+    loggers: [{type: path.join(__dirname, '../src/utils/log.js')}],
     client: {
       clearContext: false,
       qunit: {showUI: true}
     },
-    files: files
+    files: files.map(function(pattern) {
+      if (typeof pattern !== 'string') {
+        pattern.nocache = true;
+        return pattern;
+      }
+      return {pattern: pattern, nocache: true}
+    })
   });
 };
 

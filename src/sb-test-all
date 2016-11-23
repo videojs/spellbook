@@ -9,6 +9,7 @@ var program = CommanderWrapper(function(commander) {
     .option('-w, --watch', 'keep the tester running and run as things change')
     .option('-nb, --no-build', 'dont build before testing')
     .option('-b, --browsers <list,of,browsers>', 'comma seperated list of browsers')
+    .option('-p, --port <port>', 'port for karma server')
     .option('-nl, --no-lint', 'dont lint before testing');
 });
 
@@ -35,6 +36,11 @@ commands.map(function(command) {
 if (program.browsers) {
   commands[0].push('--browsers')
   commands[0].push(program.browsers)
+}
+
+if (program.port) {
+  commands[0].push('--port')
+  commands[0].push(program.port)
 }
 
 if (program.lint && !program.watch) {

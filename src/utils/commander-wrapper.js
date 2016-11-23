@@ -15,7 +15,7 @@ var CommanderWrapper = function(fn) {
 
   var program = commander
     .version(pkg.version)
-    .option('-l, --log-level [level]', 'set the log to a specific level [' + Object.keys(log).join('|') + ']', new RegExp(Object.keys(log).join('|')))
+    .option('-l, --log-level [level]', 'set the log to a specific level [' + log.LEVELS.join('|') + ']', new RegExp(log.LEVELS.join('|')))
     .option('-q, --quiet', 'dont print any output');
 
   program = fn(program);

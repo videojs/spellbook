@@ -57,6 +57,10 @@ var getParent = function() {
   return '[' + rightPad(parent, biggestLen) + ']';
 };
 
+var getPrefix = function(level) {
+  return getParent() + '[' + rightPad(level, 5) + ']: ';
+};
+
 /**
  * get the current time
  */
@@ -123,11 +127,27 @@ var log = function(level, msgs) {
       fn = console.error;
     }
 
-    fn(getParent() + '[' + rightPad(level, 5) + ']: ' + msg);
+    fn(getPrefix(level) + msg);
   }
 };
 
-var logObj = {};
+var logObj;
+
+var appender = function() {
+  return function(logEvent) {
+    logObj.info(util.format.apply(null, logEvent.data));
+  };
+};
+
+logObj = {
+  LEVELS: Object.keys(LOG_LEVELS),
+  LOG_LEVELS: LOG_LEVELS,
+  prefix: getPrefix,
+  appender: appender,
+  configure: function(config) {
+    return appender();
+  },
+};
 Object.keys(LOG_LEVELS).forEach(function(level) {
   logObj[level] = function() {
     var msgs = Array.prototype.slice.call(arguments) || [];
