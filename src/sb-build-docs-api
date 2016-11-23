@@ -12,8 +12,8 @@ var rimraf = require('rimraf');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'watch docs for changes and rebuild')
-    .option('-d, --dist <dir>', 'directory to build api docs to', path.join(config.dist, 'docs', 'api'))
-    .arguments('<dir>')
+    .option('-d, --dist <dist-dir>', 'directory to build api docs to', path.join(config.dist, 'docs', 'api'))
+    .arguments('<src-dir>')
     .action(function(src) {
       this.src = src;
     });

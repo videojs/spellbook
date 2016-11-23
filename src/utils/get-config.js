@@ -18,12 +18,13 @@ var GetConfig = function (dir) {
   var sbPkg = readJSON(path.join(__dirname, '..', '..', 'package.json'));
 
   workingPkg.spellbook = workingPkg.spellbook || {};
-  process.NODE_ENV = process.NODE_ENV || {};
 
-  if (!workingPkg.main || !workingPkg['jsnext:main']) {
-    console.error('The package in ' + appRoot + ' does not have a main file or jsnext:main file set.');
-    console.error('please set these in your package.json');
-    process.exit(1);
+  if (!process.env.SB_INTERNAL) {
+    if (!workingPkg.main || !workingPkg['jsnext:main']) {
+      console.error('The package in ' + appRoot + ' does not have a main file or jsnext:main file set.');
+      console.error('please set these in your package.json');
+      process.exit(1);
+    }
   }
 
   if (!PathsExist(path.join(appRoot, 'node_modules'))) {
@@ -62,11 +63,11 @@ var GetConfig = function (dir) {
     scope: workingPkg.name.replace(name, '').replace(/\/$/, ''),
     version: workingPkg.version,
     path: appRoot,
-    main: path.join(appRoot, workingPkg.main),
+    main: workingPkg['main'] ? path.join(appRoot, workingPkg.main) : '',
     jsNextMain: workingPkg['jsnext:main'] ? path.join(appRoot, workingPkg['jsnext:main']) : '',
 
     // workingPkg settings
-    logLevel: process.NODE_ENV.SB_LOG_LEVEL || workingPkg.spellbook['log-level'] || 'info',
+    logLevel: process.env.SB_LOG_LEVEL || workingPkg.spellbook['log-level'] || 'info',
     ie8: workingPkg.spellbook.ie8 || false,
     browserList: workingPkg.spellbook.browserList || ['> 1%', 'last 4 versions', 'Firefox ESR'],
     shimVideojs: workingPkg.spellbook['shim-videojs'] || workingPkg.spellbook['shim-video.js'] || true,

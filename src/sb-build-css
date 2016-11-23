@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 var CommanderWrapper = require('./utils/commander-wrapper');
+var config = require('./utils/get-config')();
+var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -7,3 +9,8 @@ var program = CommanderWrapper(function(commander) {
     .command('sass', 'run sass build')
     .command('all', 'run all commands', {isDefault: true});
 });
+
+if (!config.css) {
+  log.warn('css builds are turned off').
+  process.exit();
+}

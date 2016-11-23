@@ -59,9 +59,9 @@ var CommanderWrapper = function(fn) {
   program.parse(process.argv);
 
   if (program.logLevel) {
-    process.NODE_ENV.SB_LOG_LEVEL = program.logLevel;
+    process.env.SB_LOG_LEVEL = program.logLevel;
   } else if (program.quiet) {
-    process.NODE_ENV.SB_LOG_LEVEL = 'none';
+    process.env.SB_LOG_LEVEL = 'none';
   }
 
   process.chdir(config.path);

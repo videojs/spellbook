@@ -1,16 +1,29 @@
 #!/usr/bin/env node
 var CommanderWrapper = require('./utils/commander-wrapper');
 var Run = require('./utils/run');
+var config = require('./utils/get-config')();
+var log = require('./utils/log');
+var PathsExist = require('./utils/paths-exist');
 
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'watch docs for changes and rebuild');
 });
 
-var commands = [
-  ['sb-build-docs-api'],
-  ['sb-build-docs-manual']
-];
+if (!config.docs) {
+  log.warn('Docs builds are turned off');
+  process.exit();
+}
+
+var commands = [];
+
+if (config.js && config.js.src && PathsExist(config.js.src)) {
+  commands.push(['sb-build-docs-api']);
+}
+
+if (config.docs.src) {
+  commands.push(['sb-build-docs-manual']);
+}
 
 if (program.watch) {
   commands = commands.map(function(command) {

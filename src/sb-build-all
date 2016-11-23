@@ -23,12 +23,18 @@ Run.one('sb-clean').then(function() {
     }
   });
 
+  if (!commands) {
+    log.fatal('There is nothing to build!');
+    process.exit(1);
+  }
+
   if (program.watch) {
     commands = commands.map(function(command) {
       command.push('--watch');
       return command;
     });
   }
+
 
   return Run.parallel(commands);
 });

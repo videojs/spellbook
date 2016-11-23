@@ -6,6 +6,7 @@ var os = require("os");
 var util = require('util');
 
 var LOG_LEVELS = {
+  none: 0,
   fatal: 1,
   error: 2,
   warn:  3,
@@ -81,6 +82,9 @@ var getTime = function() {
 };
 
 var log = function(level, msgs) {
+  if (level === 'none') {
+    return;
+  }
   var config = GetConfig();
   // skip if the currently set log level
   // is less than this log line
