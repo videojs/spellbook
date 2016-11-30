@@ -53,6 +53,9 @@ var CommanderWrapper = function(fn) {
   process.on('SIGQUIT', sigexit);
   process.on('exit', exit);
 
+  // allow a ton of process listeners
+  process.setMaxListeners(100);
+
   program.parse(process.argv);
 
   if (program.logLevel) {

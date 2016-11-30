@@ -62,6 +62,15 @@ var one = function(command, options) {
       stderr += str;
     });
 
+    // kill this child if the parent exits
+    process.on('exit', function() {
+      if (child) {
+        child.kill();
+      }
+    });
+    child.on('close', function() {
+      child = null;
+    });
     if (!options.toLog && !options.silent) {
       child.stdout.on('data', process.stdout.write.bind(process.stdout));
       child.stderr.on('data', process.stderr.write.bind(process.stderr));
