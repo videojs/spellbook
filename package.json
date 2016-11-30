@@ -10,7 +10,7 @@
     "clean:dist": "rimraf ./dist",
     "pretest": "npm run build",
     "test": "mocha 'test/unit/**/*.test.js'",
-    "prepublish": "npm run build build",
+    "prepublish": "npm run build",
     "prebuild": "npm run clean",
     "build": "node scripts/generate-man-pages.js"
   },

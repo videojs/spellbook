@@ -1,9 +1,16 @@
 #!/usr/bin/env node
 var CommanderWrapper = require('./utils/commander-wrapper');
+var log = require('./utils/log');
+var config = require('./utils/get-config')();
 
 var program = CommanderWrapper(function(commander) {
   return commander
     .command('copy', 'copy src lang folder to dist')
     .command('all', 'run all build lang commands', {isDefault: true});
 });
+
+if (!config.js) {
+  log.warn('lang builds are turned off').
+  process.exit();
+}
 
