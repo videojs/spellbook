@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 var CommanderWrapper = require('./utils/commander-wrapper');
+var config = require('./utils/get-config')();
+var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -8,5 +10,7 @@ var program = CommanderWrapper(function(commander) {
     .command('all', 'build all possible js outputs', {isDefault: true});
 });
 
-
-
+if (!config.test) {
+  log.warn('Unit Test builds are turned off');
+  process.exit();
+}

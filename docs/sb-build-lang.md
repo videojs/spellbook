@@ -7,7 +7,7 @@
 
 ## DESCRIPTION
 
-  Run one following sub commands for docs builds
+  Run one following sub commands for lang builds
     * copy - see sb-build-lang-copy(1)
     * all - see sb-build-lang-all(1)
 
@@ -38,7 +38,7 @@
 
 ## EXAMPLES
 
-  Build css assets with sub command
+  Build lang assets with sub command
 
     sb-build-lang copy [<args...>]
     sb-build-lang all [<args...>]

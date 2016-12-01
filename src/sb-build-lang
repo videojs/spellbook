@@ -9,7 +9,7 @@ var program = CommanderWrapper(function(commander) {
     .command('all', 'run all build lang commands', {isDefault: true});
 });
 
-if (!config.js) {
+if (!config.lang) {
   log.warn('lang builds are turned off').
   process.exit();
 }

@@ -1,17 +1,15 @@
-# sb-build-docs-all(1) - Build all documentation for a project
+# sb-build-test-all(1) - Build all unit test files for a project
 
 ## SYNOPSIS
 
-  sb-build-docs-all [-l, --log-level <level>] [-h,--help] [-q,--quiet] [-V,--version]
+  sb-build-test-all [-l, --log-level <level>] [-h,--help] [-q,--quiet] [-V,--version]
                     [-w, --watch]
 
 ## DESCRIPTION
 
   Build all of the following:
-    * manual docs - see sb-build-docs-manual(1)
-    * api docs - see sb-build-docs-api(1)
-
-  > NOTE: If js builds are turned off or js src folder does not exist, api docs will not be built.
+    * bundles - see sb-build-test-bundles(1)
+    * browser - see sb-build-test-browser(1)
 
 ## OPTIONS
 
@@ -36,30 +34,30 @@
 
   Get the current version of spellbook
 
-    sb-build-docs-all -V
-    sb-build-docs-all --version
+    sb-build-test-all -V
+    sb-build-test-all --version
 
   Get help for this binary
 
-    sb-build-docs-all --help
-    sb-build-docs-all -h
+    sb-build-test-all --help
+    sb-build-test-all -h
 
   Set the log level for this binary
 
-    sb-build-docs-all -l info
-    sb-build-docs-all -l fatal
-    sb-build-docs-all --log-level debug
-    sb-build-docs-all --log-level error
+    sb-build-test-all -l info
+    sb-build-test-all -l fatal
+    sb-build-test-all --log-level debug
+    sb-build-test-all --log-level error
 
   Dont output anything
 
-    sb-build-docs-all -q
-    sb-build-docs-all -quiet
+    sb-build-test-all -q
+    sb-build-test-all -quiet
 
   Incrementally rebuild
 
-    sb-build-docs-all --watch
-    sb-build-docs-all -w
+    sb-build-test-all --watch
+    sb-build-test-all -w
 
 ## ENVIRONMENT AND CONFIGURATION VARIABLES
 
@@ -71,21 +69,20 @@
     A package.json variable that sets the default log level to use for all videojs-spellbook
     binaries. Can be set to fatal, error, warn, info, verbose, debug, or none.
 
-  <package.json>.spellbook.docs='{}'
-    Documentation configuration to use in spellbook. If this is set to a false value
-    then docs builds will never be attempted.
+  <package.json>.spellbook.ie8=false
+    Should spellbook make sure that IE8 is supported. Defaults to false.
 
-  <package.json>.spellbook.docs.src='docs/'
-    Source directory to use for docs files, set in package.json. If this is unset
-    'docs/' will be used. If this directory does not exist docs will not be built.
+  <package.json>.spellbook.shim-videojs=true
+    Makes sure that video.js is included in unit tests but will not be bundled into
+    distribution js files. Defaults to true.
 
-  <package.json>.spellbook.js='{}'
-    JS configuration to use in spellbook. If this is set to a false value
-    then api docs builds will never be attempted.
+  <package.json>.spellbook.test='{}'
+    test configuration to use in spellbook. If this is set to a false value then test
+    builds will never be attempted.
 
-  <package.json>.spellbook.js.src='src/js'
-    Source directory to use for docs files, set in package.json. If this is unset
-    'src/js' will be used. If this directory does not exist api docs will not be built.
+  <package.json>.spellbook.test.src='test/'
+    Source directory to use for test files, set in package.json. If this is unset
+    'test/' will be used. If this directory does not exist test will not be built.
 
   <package.json>.spellbook.js='{}'
     JS configuration to use in spellbook. If this is set to a false value
@@ -97,7 +94,7 @@
 
 ## SEE ALSO
 
-  sb-build-docs(1), sb-build-docs-manual(1), sb-build-docs-api(1)
+  sb-build-test(1), sb-build-test-browser(1), sb-build-test-bundles(1)
 
 ## EXIT
 

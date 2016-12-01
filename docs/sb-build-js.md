@@ -39,7 +39,7 @@
 
 ## EXAMPLES
 
-  Build css assets with sub command
+  Build js assets with sub command
 
     sb-build-js node [<args...>]
     sb-build-js browser [<args...>]

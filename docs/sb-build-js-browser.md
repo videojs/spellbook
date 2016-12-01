@@ -6,31 +6,34 @@
                    [-w, --watch] [-d, --dist <dist-dir='dist/browser'>]
                    [<src-dir='${pkg.spellbook.js.src}'|'src/js'>]
 
-
 ## DESCRIPTION
 
   This binary will do the following:
+    1. Look for index.js in <src-dir> or fail if it does not find one
+    2. Pass what it found to browserify which will:
+      1. Pass <pkg.name> to browserify, as standalone name. This will get exposed under window and be
+        converted to title case. IE: `test-main-pkg` becomes `window.testMainPkg`
+      2. Start watching code changes to generate an internal source map.
+      3. ignore video.js if <package.json>.spellbook.shim-videojs is set to true (which is te default)
+      4. rollup all es6 code and dependencies that support it (using jsnext:main). This saves a lot of bytes
+      5. convert all code to es5 using babelify with ie8 support if <package.json>.spellbook.ie8 is set to true (default)
+        is false)
+      6. convert '__VERSION__' strings to the package version
+      7. browserify all es5 assets into the bundle
+      8. bundle-collapse all require paths so that they are 1 character numbers rather than long strings
+      9. Write a dist file to <dist-dir>/<pkg.name>.js
+    3. exorcist will remove the source map from <dist-dir>/<pkg.name>.js into <dist-dir>/<pkg.name>.js.map
+    4. uglify will be run on <dist-dir>/<pkg.name>.js this will:
+      1. Use the exorcised source map and update it to match the soon-to-be minified file
+      2. minify the file
+      3. Add a banner to the top of the file and update the source map with the line offsets
+      4. write the minified output to <dist-dir>/<pkg.name>.min.js
+      5. Write the updated souce map to <dist-dir>/<pkg.name>.min.js.map
 
-  1. Look for index.js in <src-dir> or fail if it does not find one
-  2. Pass what it found to browserify which will:
-    1. Start watching code changes to generate an internal source map.
-    2. ignore video.js if <package.json>.spellbook.shim-videojs is set to true (which is te default)
-    3. rollup all es6 code and dependencies that support it (using jsnext:main). This saves a lot of bytes
-    4. convert all code to es5 using babelify with ie8 support if <package.json>.spellbook.ie8 is set to true (default)
-       is false)
-    5. convert '__VERSION__' strings to the package version
-    6. browserify all es5 assets into the bundle
-    7. bundle-collapse all require paths so that they are 1 character numbers rather than long strings
-    8. Write a dist file to <dist-dir>/<pkg.name>.js
-  3. exorcist will remove the source map from <dist-dir>/<pkg.name>.js into <dist-dir>/<pkg.name>.js.map
-  4. uglify will be run on <dist-dir>/<pkg.name>.js this will:
-    1. Use the exorcised source map and update it to match the soon-to-be minified file
-    2. minify the file
-    3. Add a banner to the top of the file and update the source map with the line offsets
-    4. write the minified output to <dist-dir>/<pkg.name>.min.js
-    5. Write the updated souce map to <dist-dir>/<pkg.name>.min.js.map
-
-  > NOTE: During watch watchify will be used for browserify, and steps 1-2 will be the only steps run
+  > NOTE: During watch watchify will be used for browserify, steps 1-2 will be the only steps run,
+  >       and as of right now rollupify will not be used as it breaks watchify. This means that it will
+  >       have to use `main` rather than `jsnext:main` to build projects. Basically sub projects will have to
+  >       watch and rebuild their es6 -> es5 sources in order for the current project to be rebuilt.
 
 ## OPTIONS
 

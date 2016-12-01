@@ -42,7 +42,7 @@
 
 ## EXAMPLES
 
-  Build css assets with sub command
+  Build docs assets with sub command
 
     sb-build-docs api [<args...>]
     sb-build-docs manual [<args...>]

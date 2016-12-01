@@ -72,6 +72,7 @@
 # Test
 ## General
 * code coverage via istanbul
+* sb-watch should auto-retest detected browsers. sb-start should pass and arg to sb-watch to disable this behavior
 * test markdown examples js examples?
 
 ## nodejs

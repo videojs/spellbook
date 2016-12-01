@@ -6,7 +6,6 @@
                        [-w, --watch] [-d, --dist <dist-dir='dist/docs/api'>]
                        [<src-dir='${pkg.spellbook.js.src}'|'src/js'>]
 
-
 ## DESCRIPTION
 
   Build all api documenation from jsdoc comments in js at <src-dir> to html files in <dist-dir>.

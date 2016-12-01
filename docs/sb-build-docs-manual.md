@@ -6,7 +6,6 @@
                        [-w, --watch] [-d, --dist <dist-dir='dist/docs/manual'>]
                        [<src-dir='${pkg.spellbook.docs.src}'|'docs/'>]
 
-
 ## DESCRIPTION
 
   Build all manual markdown documenation from <src-dir> into html files at <dist-dir>.

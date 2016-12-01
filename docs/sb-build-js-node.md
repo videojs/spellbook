@@ -6,11 +6,10 @@
                    [-w, --watch] [-d, --dist <dist-dir='dist/es5'>]
                    [<src-dir='${pkg.spellbook.js.src}'|'src/js'>]
 
-
 ## DESCRIPTION
 
   Use babel to convert the entire es6 js directory (<src-dir>) into an es5 js directory
-  (<dist-dir>) so that it can be used by nodejs on npm.
+  (<dist-dir>) so that it can be used by nodejs on npm. Respects <pkg.spellbook.ie8>.
 
 ## OPTIONS
 
@@ -37,7 +36,6 @@
   <src-dir='${pkg.spellbook.js.src}'|'src/js'>
     Read from a specefic <src-dir> instead of `${pkg.spellbook.js.src}` or
     the default of `src/js`
-
 
 ## EXAMPLES
 
@@ -87,6 +85,9 @@
   <package.json>.spellbook.log-level=info
     A package.json variable that sets the default log level to use for all videojs-spellbook
     binaries. Can be set to fatal, error, warn, info, verbose, debug, or none.
+
+  <package.json>.spellbook.ie8=false
+    Make sure that IE8 is supported. Defaults to false.
 
   <package.json>.spellbook.js='{}'
     This setting will be ignored by this binary.
