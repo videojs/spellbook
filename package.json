@@ -181,7 +181,7 @@
     "npm-run": "^4.1.0",
     "postcss-banner": "^3.0.0",
     "postcss-cli": "^2.6.0",
-    "postcss-import": "^8.1.2",
+    "postcss-import": "^9.0.0",
     "qunitjs": "^2.0.1",
     "remark-cli": "^2.0.0",
     "remark-html": "^5.0.1",
