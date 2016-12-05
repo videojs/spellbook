@@ -22,7 +22,7 @@ var commands = [
   ['sb-test-node-all'],
 ];
 
-commands.map(function(command) {
+commands = commands.map(function(command) {
   command.push('--no-build');
   command.push('--no-lint');
 
