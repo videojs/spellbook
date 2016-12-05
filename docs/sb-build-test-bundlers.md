@@ -1,4 +1,4 @@
-# sb-build-test-bundlers) - Build Unit tests that verify that your code will work with certain browser bundlers
+# sb-build-test-bundlers(1) - Build Unit tests that verify that your code will work with certain browser bundlers
 
 ## SYNOPSIS
 

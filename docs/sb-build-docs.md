@@ -34,8 +34,8 @@
     Do not log any messages to stdout or stderr
 
   <sub-command='all'> [<args...>]
-    The sub-command to run or get help for. Can be api, manual, or all.
-    Defaults to all if nothing is passed in. [<args....>] will be passed along to sub command.
+    The sub-command to run. Defaults to all if nothing is passed in.
+    [<args....>] will be passed along to sub command.
 
   help <sub-command>
     Get help for a sub-command, this is an alias for running `sb-build-docs <sub-command> --help`.

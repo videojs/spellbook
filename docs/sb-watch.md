@@ -3,9 +3,15 @@
 ## SYNOPSIS
 
   sb-watch [-l, --log-level <level>] [-h,--help] [-q,--quiet] [-V,--version]
+           [-nb, --no-build] [-nl, --no-lint] [-p, --port <port-number=9876>]
 
 ## DESCRIPTION
 
+  This binary is an alias for running the following in --watch mode:
+
+  1. sb-build-all(1)
+  2. sb-lint-all(1)
+  3. sb-test-all(1) with '--no-build' and '--no-lint'
 
 ## OPTIONS
 
@@ -22,8 +28,14 @@
   -q, --quiet
     Do not log any messages to stdout or stderr
 
-  -d, --dry-run
-    Do not remove anything, only print what would have been removed
+  -nb, --no-build
+    Do not run an initial build and do not build on file changes.
+
+  -nl, --no-lint
+    Do not run an initial link and do not lint on file changes.
+
+  -p, --port <port-number=9876>
+    What port to open the watching test server on. Default is 9876.
 
 ## EXAMPLES
 
@@ -50,17 +62,29 @@
     sb-watch -quiet
 
 
-  Don't actually delete anything
+  Don't build and watch
 
-    sb-watch -d
-    sb-watch --dry-run
+    sb-watch -nb
+    sb-watch --no-build
 
+  Don't lint and watch
+
+    sb-watch -nl
+    sb-watch --no-lint
+
+  Set the test server port
+
+    sb-watch --port 7777
+    sb-watch -p 8888
 
 ## ENVIRONMENT AND CONFIGURATION VARIABLES
 
   SB_LOG_LEVEL='info'
     An enviornment variable that sets the log level to use for all videojs-spellbook
     binaries. Can be set to fatal, error, warn, info, verbose, debug, or none.
+
+  TEST_PORT=9876
+    The port to run the test server (karma-runner) on. Defaults to 9876.
 
   <package.json>.spellbook.log-level=info
     A package.json variable that sets the default log level to use for all videojs-spellbook
@@ -119,8 +143,7 @@
 
 ## EXIT
 
-  0 - all commands succeeded
-  1 - one or more sub-command failed
+  Not used will always exit 0.
 
 ## Spellbook
 

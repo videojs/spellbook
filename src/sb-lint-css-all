@@ -9,7 +9,7 @@ var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'watch files for changes and re-lint')
     .option('-e, --errors', 'only log errors')
-    .option('-f, --fix', 'automatically fix semantic errors were possible');
+    .option('-f, --fix', 'does not work for this binary');
 });
 
 var commands = [];

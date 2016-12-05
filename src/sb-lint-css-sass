@@ -11,7 +11,7 @@ var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'watch files for changes and re-lint')
     .option('-e, --errors', 'only log errors')
-    .option('-f, --fix', 'fix problems automatically')
+    .option('-f, --fix', 'does not work for this binary')
     .arguments('<glob-or-file...>')
     .action(function(src) {
       this.src = src;

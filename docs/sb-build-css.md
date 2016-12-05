@@ -8,7 +8,7 @@
 ## DESCRIPTION
 
   Run one of the following sub commands for css builds
-    * vanilla css - see sb-build-css-css(1)
+    * css - see sb-build-css-css(1)
     * sass - see sb-build-css-sass(1)
     * all - see sb-build-css-all(1)
 
@@ -31,8 +31,8 @@
     Do not log any messages to stdout or stderr
 
   <sub-command='all'> [<args...>]
-    The sub-command to run or get help for. Can be css, sass, or all.
-    Defaults to all if nothing is passed in. [<args....>] will be passed along to sub command.
+    The sub-command to run. Defaults to all if nothing is passed in.
+    [<args....>] will be passed along to sub command.
 
   help <sub-command>
     Get help for a sub-command, this is an alias for running `sb-build-css <sub-command> --help`.

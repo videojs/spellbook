@@ -1,16 +1,16 @@
-# sb-build-all(1) - Build all assets for a project
+# sb-lint-all(1) - Lint all assets for a project
 
 ## SYNOPSIS
 
-  sb-build-all [-l, --log-level <level>] [-h,--help] [-q,--quiet] [-V,--version]
-               [-w, --watch]
+  sb-lint-all [-l, --log-level <level>] [-h,--help] [-q,--quiet] [-V,--version]
+              [-w, --watch] [-e, --errors] [-f, --fix]
 
 ## DESCRIPTION
 
-  This is run when sb-build(1) is not passed any arguments or is passed all
+  This is run when sb-lint(1) is not passed any arguments or is passed all
   as the command to run.
 
-  This command will build css, js, lang, test, and docs depending on what is available.
+  This command will lint css, js, lang, test, and docs depending on what is available.
 
   > NOTE: If no commands can be run, an error will be logged and this binary will exit
   >       with a failure return code.
@@ -31,94 +31,104 @@
     Do not log any messages to stdout or stderr
 
   -w, --watch
-    Watch files for changes and incrementally rebuild on file change.
-    Failed builds with this active will not exit.
+    Watch files for changes and re-lint on file change.
+    Errors during linting with this active will not exit.
+
+  -e, --errors
+    Only log linting errors. Will not log any linting warnings.
+
+  -f, --fix
+    Automatically fix semantic errors where possible. This does not work
+    for every binary!
 
 ## EXAMPLES
 
   Get the current version of spellbook
 
-    sb-build-all -V
-    sb-build-all --version
+    sb-lint-all -V
+    sb-lint-all --version
 
   Get help for this binary
 
-    sb-build-all --help
-    sb-build-all -h
+    sb-lint-all --help
+    sb-lint-all -h
 
   Set the log level for this binary
 
-    sb-build-all -l info
-    sb-build-all -l fatal
-    sb-build-all --log-level debug
-    sb-build-all --log-level error
+    sb-lint-all -l info
+    sb-lint-all -l fatal
+    sb-lint-all --log-level debug
+    sb-lint-all --log-level error
 
   Dont output anything
 
-    sb-build-all -q
-    sb-build-all -quiet
+    sb-lint-all -q
+    sb-lint-all -quiet
 
-  Watch builds for changes and incrementally rebuild
+  Watch files for changes and lint again once they change
 
-    sb-build-all -w
-    sb-build-all --watch
+    sb-lint-all -w
+    sb-lint-all --watch
+
+  Fix any errors/warnings that can be fixed automatically
+
+    sb-lint-all -f
+    sb-lint-all --fix
+
+  Only log errors, do not log warnings.
+
+    sb-lint-all -e
+    sb-lint-all --errors
 
 ## ENVIRONMENT AND CONFIGURATION VARIABLES
 
   SB_LOG_LEVEL='info'
     An enviornment variable that sets the log level to use for all videojs-spellbook
-    binaries. Can be set to none, fatal, error, warn, info, verbose, or debug.
+    binaries. Can be set to fatal, error, warn, info, verbose, debug, or none.
 
   <package.json>.spellbook.log-level=info
     A package.json variable that sets the default log level to use for all videojs-spellbook
-    binaries. Can be set to none, fatal, error, warn, info, verbose, or debug.
-
-  <package.json>.spellbook.ie8=false
-    Should spellbook make sure that IE8 is supported. Defaults to false.
-
-  <package.json>.spellbook.shim-videojs=true
-    Makes sure that video.js is included in unit tests but will not be bundled into
-    distribution js files. Defaults to true.
+    binaries. Can be set to fatal, error, warn, info, verbose, debug, or none.
 
   <package.json>.spellbook.css='{}'
     CSS configuration to use in spellbook. If this is set to a false value then css
-    builds will never be attempted.
+    linting will never be attempted.
 
   <package.json>.spellbook.css.src='src/css'
     Source directory to use for css files, set in package.json. If this is unset
-    'src/css' will be used. If this directory does not exist css will not be built.
+    'src/css' will be used. If this directory does not exist css will not be linted.
 
   <package.json>.spellbook.js='{}'
     JS configuration to use in spellbook. If this is set to a false value then js
-    builds will never be attempted.
+    linting will never be attempted.
 
   <package.json>.spellbook.js.src='src/js'
     Source directory to use for js files, set in package.json. If this is unset
-    'src/js' will be used. If this directory does not exist js will not be built.
+    'src/js' will be used. If this directory does not exist js will not be linted.
 
   <package.json>.spellbook.lang='{}'
     Lang configuration to use in spellbook. If this is set to a false value then lang
-    builds will never be attempted.
+    linting will never be attempted.
 
   <package.json>.spellbook.lang.src='lang/'
     Source directory to use for lang files, set in package.json. If this is unset
-    'lang/' will be used. If this directory does not exist lang will not be built.
+    'lang/' will be used. If this directory does not exist lang will not be linted.
 
   <package.json>.spellbook.docs='{}'
     Documentation configuration to use in spellbook. If this is set to a false value
-    then docs builds will never be attempted.
+    then docs linting will never be attempted.
 
   <package.json>.spellbook.docs.src='docs/'
     Source directory to use for docs files, set in package.json. If this is unset
-    'docs/' will be used. If this directory does not exist docs will not be built.
+    'docs/' will be used. If this directory does not exist docs will not be linted.
 
   <package.json>.spellbook.test='{}'
     Test configuration to use in spellbook. If this is set to a false value
-    then test builds will never be attempted.
+    then test linting will never be attempted.
 
   <package.json>.spellbook.test.src='test/'
     Source directory to use for test files, set in package.json. If this is unset
-    'test/' will be used. If this directory does not exist tests will not be built.
+    'test/' will be used. If this directory does not exist tests will not be linted.
 
 ## SEE ALSO
 

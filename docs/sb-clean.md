@@ -52,12 +52,10 @@
     sb-clean -q
     sb-clean -quiet
 
-
   Don't actually delete anything
 
     sb-clean -d
     sb-clean --dry-run
-
 
 ## ENVIRONMENT AND CONFIGURATION VARIABLES
 

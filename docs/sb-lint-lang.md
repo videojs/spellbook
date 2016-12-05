@@ -1,17 +1,17 @@
-# sb-build-lang(1) - Build languages for a project
+# sb-lint-lang(1) - Lint lang assets for a project
 
 ## SYNOPSIS
 
-  sb-build-lang [-l, --log-level <level>] [-h,--help] [-q,--quiet] [-V,--version]
-                [<sub-command='all'> [<args...>]] [help <sub-command>]
+  sb-lint-lang [-l, --log-level <level>] [-h,--help] [-q,--quiet] [-V,--version]
+              [<sub-command='all'> [<args...>]] [help <sub-command>]
 
 ## DESCRIPTION
 
-  Run one following sub commands for lang builds
-    * copy - see sb-build-lang-copy(1)
-    * all - see sb-build-lang-all(1)
+  Potentially lint all or one of the following through sub-binaries:
+    * src - see sb-lint-lang-src(1)
+    * all - see sb-lint-lang-all(1)
 
-  By default if no command is passed in `sb-build-lang` will be run as if it was
+  By default if no command is passed in `sb-lint-lang` will be run as if it was
   passed `all`.
 
 ## OPTIONS
@@ -34,41 +34,43 @@
     [<args....>] will be passed along to sub command.
 
   help <sub-command>
-    Get help for a sub-command, this is an alias for running `sb-build-lang <sub-command> --help`.
+    Get help for a sub-command, this is an alias for running `sb-lint-lang <sub-command> --help`.
 
 ## EXAMPLES
 
-  Build lang assets with sub command
+  lint specific assets assets
 
-    sb-build-lang copy [<args...>]
-    sb-build-lang all [<args...>]
+    sb-lint-lang all [<args...>]
+    sb-lint-lang src [<args...>]
 
   Get help for a command
 
-    sb-build-lang help copy
-    sb-build-lang all --help
+    sb-lint-lang help src
+    sb-lint-lang help all
+    sb-lint-lang all --help
+    sb-lint-lang src --help
 
   Get the current version of spellbook
 
-    sb-build-lang -V
-    sb-build-lang --version
+    sb-lint-lang -V
+    sb-lint-lang --version
 
   Get help for this binary
 
-    sb-build-lang --help
-    sb-build-lang -h
+    sb-lint-lang --help
+    sb-lint-lang -h
 
   Set the log level for this binary
 
-    sb-build-lang -l info
-    sb-build-lang -l fatal
-    sb-build-lang --log-level debug
-    sb-build-lang --log-level error
+    sb-lint-lang -l info
+    sb-lint-lang -l fatal
+    sb-lint-lang --log-level debug
+    sb-lint-lang --log-level error
 
   Dont output anything
 
-    sb-build-lang -q
-    sb-build-lang -quiet
+    sb-lint-lang -q
+    sb-lint-lang -quiet
 
 ## ENVIRONMENT AND CONFIGURATION VARIABLES
 
@@ -82,15 +84,15 @@
 
   <package.json>.spellbook.lang='{}'
     Lang configuration to use in spellbook. If this is set to a false value then lang
-    builds will never be attempted.
+    linting will never be attempted.
 
   <package.json>.spellbook.lang.src='lang/'
     Source directory to use for lang files, set in package.json. If this is unset
-    'lang/' will be used. If this directory does not exist lang will not be built.
+    'lang/' will be used. If this directory does not exist lang will not be linted.
 
 ## SEE ALSO
 
-  sb-build-all(1), sb-build(1), sb-build-lang-all(1), sb-build-lang-copy(1)
+  sb-lint-lang-all(1), sb-lint-lang-src(1)
 
 ## EXIT
 

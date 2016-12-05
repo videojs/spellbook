@@ -84,7 +84,7 @@
     "sb-release": "src/sb-release"
   },
   "man": [
-    "dist/man/sb",
+    "dist/man/sb.1",
     "dist/man/sb-config.1",
     "dist/man/sb-build.1",
     "dist/man/sb-build-all.1",
@@ -136,7 +136,7 @@
     "dist/man/sb-server.1",
     "dist/man/sb-start.1",
     "dist/man/sb-clean.1",
-    "dist/man/sb-releas.1e"
+    "dist/man/sb-release.1"
   ],
   "dependencies": {
     "autoprefixer": "^6.5.1",

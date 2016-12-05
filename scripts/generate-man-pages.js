@@ -25,6 +25,9 @@ mkdirp.sync(distdir);
 var files = glob.sync(path.join(srcdir, '**', '*.md'));
 var promises = [];
 
+// allow a ton of process listeners
+process.setMaxListeners(1000);
+
 // we have to build each file individually, as there is no directory style output
 // aka src/docs/test/index.md would flatten to dist/docs/manual/index.html
 // rather than dist/docs/manual/test/index.html

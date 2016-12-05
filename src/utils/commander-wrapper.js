@@ -54,7 +54,7 @@ var CommanderWrapper = function(fn) {
   process.on('exit', exit);
 
   // allow a ton of process listeners
-  process.setMaxListeners(100);
+  process.setMaxListeners(1000);
 
   program.parse(process.argv);
 

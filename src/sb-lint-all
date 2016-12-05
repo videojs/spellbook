@@ -24,6 +24,12 @@ var commands = [];
   }
 });
 
+if (!commands) {
+  log.fatal('There is nothing to lint!');
+  process.exit(1);
+}
+
+
 commands = commands.map(function(command) {
   if (program.errors) {
     command.push('--errors');
