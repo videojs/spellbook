@@ -96,12 +96,12 @@
     binaries. Can be set to fatal, error, warn, info, verbose, debug, or none.
 
   <package.json>.spellbook.css='{}'
-    CSS configuration to use in spellbook. If this is set to a false value then css
-    linting will never be attempted.
+    CSS configuration to use in spellbook. If this is set to a false value this binary
+    will be run with defaults but still run.
 
   <package.json>.spellbook.css.src='src/css'
     Source directory to use for css files, set in package.json. If this is unset
-    'src/css' will be used. If this directory does not exist css will not be linted.
+    'src/css' will be used. If this directory does not exist css linting will fail.
 
 ## SEE ALSO
 

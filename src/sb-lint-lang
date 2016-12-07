@@ -10,7 +10,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!config.lang) {
-  log.warn('Lang builds are turned off');
+  log.warn('Lang linting is turned off');
   process.exit();
 }
 

@@ -11,7 +11,6 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!config.css) {
-  log.warn('CSS builds are turned off');
+  log.warn('CSS linting is turned off');
   process.exit();
 }
-

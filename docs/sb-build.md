@@ -42,7 +42,7 @@
 
 ## EXAMPLES
 
-  Build specific assets assets
+  Build specific assets
 
     sb-build js [<args...>]
     sb-build css [<args...>]

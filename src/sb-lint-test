@@ -10,7 +10,7 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (!config.test) {
-  log.warn('Test builds are turned off');
+  log.warn('Test linting is turned off');
   process.exit();
 }
 

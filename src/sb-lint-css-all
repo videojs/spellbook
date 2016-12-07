@@ -12,6 +12,11 @@ var program = CommanderWrapper(function(commander) {
     .option('-f, --fix', 'does not work for this binary');
 });
 
+if (!config.css) {
+  log.warn('CSS linting is turned off');
+  process.exit();
+}
+
 var commands = [];
 
 if (PathsExist(path.join(config.css.src, 'index.css'))) {

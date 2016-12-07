@@ -1,9 +1,10 @@
-# sb-lint-js-src(1) - Lint es6 js assets for a project
+# sb-lint-test-src(1) - Lint es6 js test assets for a project
 
 ## SYNOPSIS
 
-  sb-lint-js-src [-l, --log-level <level>] [-h,--help] [-q,--quiet] [-V,--version]
-                 [-w, --watch] [-e, --errors] [-f, --fix] [glob-or-file="<js-src>/**/*.js"]
+  sb-lint-test-src [-l, --log-level <level>] [-h,--help] [-q,--quiet] [-V,--version]
+                   [-w, --watch] [-e, --errors] [-f, --fix]
+                   [glob-or-file="<test-src>/**/*.test.js"]
 
 ## DESCRIPTION
 
@@ -43,48 +44,48 @@
   -f, --fix
     Fix specific semantic errors with js via eslint.
 
-  <glob-or-file="<js-src>/**/*.js">
-    The file or glob to lint. By default "<js-src>/**/*.js" is linted. <js-src> is the
-    source listed for js in package.json or 'src/js' by default.
+  <glob-or-file="<test-src>/**/*.test.js">
+    The file or glob to lint. By default "<test-src>/**/*.test.js" is linted. <test-src> is the
+    source listed for js in package.json or 'test/' by default.
 
 ## EXAMPLES
 
   Get the current version of spellbook
 
-    sb-lint-js-src -V
-    sb-lint-js-src --version
+    sb-lint-test-src -V
+    sb-lint-test-src --version
 
   Get help for this binary
 
-    sb-lint-js-src --help
-    sb-lint-js-src -h
+    sb-lint-test-src --help
+    sb-lint-test-src -h
 
   Set the log level for this binary
 
-    sb-lint-js-src -l info
-    sb-lint-js-src -l fatal
-    sb-lint-js-src --log-level debug
-    sb-lint-js-src --log-level error
+    sb-lint-test-src -l info
+    sb-lint-test-src -l fatal
+    sb-lint-test-src --log-level debug
+    sb-lint-test-src --log-level error
 
   Dont output anything
 
-    sb-lint-js-src -q
-    sb-lint-js-src -quiet
+    sb-lint-test-src -q
+    sb-lint-test-src -quiet
 
   Watch files for changes and lint again once they change
 
-    sb-lint-js-src -w
-    sb-lint-js-src --watch
+    sb-lint-test-src -w
+    sb-lint-test-src --watch
 
   Only log errors, do not log warnings.
 
-    sb-lint-js-src -e
-    sb-lint-js-src --errors
+    sb-lint-test-src -e
+    sb-lint-test-src --errors
 
   lint a specific glob or file.
 
-    sb-lint-js-src some-js-file.js
-    sb-lint-js-src js/**/*.js
+    sb-lint-test-src some-js-file.js
+    sb-lint-test-src js/**/*.js
 
 ## ENVIRONMENT AND CONFIGURATION VARIABLES
 
@@ -96,17 +97,17 @@
     A package.json variable that sets the default log level to use for all videojs-spellbook
     binaries. Can be set to fatal, error, warn, info, verbose, debug, or none.
 
-  <package.json>.spellbook.js='{}'
-    JS configuration to use in spellbook. If this is set to a false value then js
+  <package.json>.spellbook.test='{}'
+    Test configuration to use in spellbook. If this is set to a false value then test
     linting will use the default values.
 
-  <package.json>.spellbook.js.src='src/js'
+  <package.json>.spellbook.test.src='test/'
     Source directory to use for js files, set in package.json. If this is unset
-    'src/js' will be used. If this directory does not exist js linting will fail.
+    'test/' will be used. If this directory does not exist test linting will fail.
 
 ## SEE ALSO
 
-  sb-lint-js(1), sb-lint-js-all(1)
+  sb-lint-test(1), sb-lint-test-all(1)
 
 ## EXIT
 

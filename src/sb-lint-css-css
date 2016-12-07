@@ -41,10 +41,6 @@ if (program.errors) {
   command.push('--quiet');
 }
 
-if (program.fix) {
-  command.push('--fix');
-}
-
 var build = function() {
   return Run.one(command, {toLog: true, nonFatal: program.watch});
 };

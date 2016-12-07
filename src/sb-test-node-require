@@ -9,6 +9,8 @@ var Promise = require('bluebird');
 var Watch = require('./utils/watch');
 var fs = require('fs');
 var GetTmpDir = require('./utils/get-tmp-dir');
+var mkdirp = require('mkdirp');
+var rimraf = require('rimraf');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -30,9 +32,16 @@ var content = [
   '}'
 ].join('\n');
 
-var dist = GetTmpDir();
-var distFile = path.join(dist, 'node-require.js');
+var distFile = path.join(config.dist, 'test', 'node-require.js');
+mkdir.sync(path.dirname(distFile));
 fs.writeFileSync(distFile, content);
+
+var exit = function(code) {
+  log.debug('removing ' + distFile);
+  rimraf.sync(distFile);
+};
+
+process.on('exit', exit);
 
 var run = function() {
   var nodeCommand = ['node', distFile];
