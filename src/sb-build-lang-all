@@ -1,11 +1,18 @@
 #!/usr/bin/env node
 var CommanderWrapper = require('./utils/commander-wrapper');
 var Run = require('./utils/run');
+var log = require('./utils/log');
+var config = require('./utils/get-config')();
 
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'incrementally rebuild');
 });
+
+if (!config.lang) {
+  log.warn('lang builds are turned off').
+  process.exit();
+}
 
 var commands = [
   ['sb-build-lang-copy'],

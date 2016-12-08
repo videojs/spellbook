@@ -93,7 +93,7 @@ var browserifyHelper = function(options) {
         reject(error);
       });
 
-      if (!options.internalMap) {
+      if (options.watch || !options.internalMap) {
         _bundle.pipe(exorcist(options.dist + '.js.map'));
       }
       _bundle.pipe(fs.createWriteStream(options.dist + '.js'));

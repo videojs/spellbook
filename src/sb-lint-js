@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 var CommanderWrapper = require('./utils/commander-wrapper');
+var config = require('./utils/get-config')();
+var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
   return commander
     .command('src', 'lint src js')
     .command('all', 'run all js linters', {isDefault: true});
 });
+
+if (!config.js) {
+  log.warn('JS linting is turned off');
+  process.exit();
+}
+

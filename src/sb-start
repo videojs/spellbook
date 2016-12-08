@@ -9,7 +9,9 @@ var program = CommanderWrapper(function(commander) {
     .option('-o, --open', 'open the server in your default browser')
     .option('-nb, --no-build', 'dont build or watch build')
     .option('-nl, --no-lint', 'dont lint or watch lint')
-    .option('-t, --tunnel', 'enable cross browser action sync');
+    .option('-t, --tunnel', 'enable cross browser action sync')
+    .option('-nui, --no-ui', 'turn off the BrowserSync UI')
+    .option('-s, --sync', 'Sync browser actions across tabs/browsers');
 });
 
 var delayTime = 1000;
@@ -41,6 +43,14 @@ setTimeout(function() {
   if (program.testPort) {
     serverCommand.push('--test-port');
     serverCommand.push(program.testPort);
+  }
+
+  if (program.noUi) {
+    serverCommand.push('--no-ui');
+  }
+
+  if (program.sync) {
+    serverCommand.push('--sync');
   }
 
   Run.one(serverCommand, {nonFatal: true});

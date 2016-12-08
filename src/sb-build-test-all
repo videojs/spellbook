@@ -1,16 +1,29 @@
 #!/usr/bin/env node
 var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var config = require('./utils/get-config')();
+var log = require('./utils/log');
+var PathsExist = require('./utils/paths-exist');
 
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'incrementally rebuild');
 });
 
+if (!config.test) {
+  log.warn('Unit Test builds are turned off');
+  process.exit();
+}
+
 var commands = [
-  ['sb-build-test-bundlers'],
   ['sb-build-test-browser'],
 ];
+
+
+if (config.js && config.js.src && PathsExist(config.js.src)) {
+  commands.push(['sb-build-test-bundlers']);
+}
+
 
 if (program.watch) {
   commands = commands.map(function(command) {

@@ -54,14 +54,14 @@ var CommanderWrapper = function(fn) {
   process.on('exit', exit);
 
   // allow a ton of process listeners
-  process.setMaxListeners(100);
+  process.setMaxListeners(1000);
 
   program.parse(process.argv);
 
   if (program.logLevel) {
-    process.NODE_ENV.SB_LOG_LEVEL = program.logLevel;
+    process.env.SB_LOG_LEVEL = program.logLevel;
   } else if (program.quiet) {
-    process.NODE_ENV.SB_LOG_LEVEL = 'none';
+    process.env.SB_LOG_LEVEL = 'none';
   }
 
   process.chdir(config.path);

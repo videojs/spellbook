@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 var CommanderWrapper = require('./utils/commander-wrapper');
+var config = require('./utils/get-config')();
+var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
   return commander
     .command('src', 'lint source lang files')
     .command('all', 'run all lang linters', {isDefault: true});
 });
+
+if (!config.lang) {
+  log.warn('Lang linting is turned off');
+  process.exit();
+}
+

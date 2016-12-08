@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 var CommanderWrapper = require('./utils/commander-wrapper');
+var config = require('./utils/get-config')();
+var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -7,3 +9,8 @@ var program = CommanderWrapper(function(commander) {
     .command('examples', 'lint js examples in markdown files')
     .command('all', 'run all', {isDefault: true});
 });
+
+if (!config.docs) {
+  log.warn('Docs linting is turned off');
+  process.exit();
+}

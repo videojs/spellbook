@@ -2,6 +2,7 @@
 var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var config = require('./utils/get-config')();
+var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -9,6 +10,11 @@ var program = CommanderWrapper(function(commander) {
     .option('-e, --errors', 'only log errors')
     .option('-f, --fix', 'automatically fix semantic errors were possible');
 });
+
+if (!config.test) {
+  log.warn('Test linting is turned off');
+  process.exit();
+}
 
 var commands = [
   ['sb-lint-test-src']

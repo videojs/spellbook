@@ -71,7 +71,9 @@ var postcssHelper = function(options) {
       return exorcistHelper(options.dist + '.min.css');
     });
   }).then(function() {
-    return exorcistHelper(options.dist + '.css');
+    if (!options.watch) {
+      return exorcistHelper(options.dist + '.css');
+    }
   }).catch(function() {
     log.error('Build Failed!');
     if (options.watch) {

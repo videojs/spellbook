@@ -6,160 +6,92 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Features & Information](#features-&-information)
-  - [JavaScript](#javascript)
-  - [Docs](#docs)
-  - [CSS](#css)
-  - [lang](#lang)
-  - [Test](#test)
-  - [Development](#development)
-  - [npm Release management](#npm-release-management)
-- [TODO](#todo)
-  - [General](#general)
-  - [Docs](#docs-1)
-  - [Build](#build)
-- [Future Ideas](#future-ideas)
-  - [JS](#js)
-  - [General](#general-1)
-  - [lint](#lint)
-  - [Test](#test-1)
-  - [CSS](#css-1)
-  - [Development](#development-1)
-  - [Docs](#docs-2)
+- [Features](#features)
+- [Installation](#installation)
+- [Things to know](#things-to-know)
+- [Known issues & Workarounds](#known-issues--workarounds)
+- [More Information](#more-information)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Features & Information
-### JavaScript
-* es6/es5 support with entry file at `src/js/index.js`
-* Smaller browser dists by using:
-  - es6 dependency resolution using `rollupify` and packages with `jsnext:main` in their package.json
-    - allows us to `scope-hoist` and `tree-shake`
-    - allows us to only include `babel-external-helpers` once
-    - es6 dependency resolution allows us to tree shake the entire es6 code base
-  - `bundle-collapser` to convert long require strings to numbers
-  - `babelify` configuired to polyfill `Object.assign` when needed
-  - `browserify-shim` configuired to never add `video.js` to your dist files
-* minfied and unminified dists `dist/browser/<pkg-name>.{js,min.js}`
-* external source maps dists `dist/browser/<pkg-name>.{js.map,min.js.map}`
-* ie8 support using a custom `babel` preset and `uglify` `--suport-ie8` flag
-* Generate `webpack`, and `browserify` unit tests in `dist/test/<bundler-name>.test.js`
-* Bundle all manual unit tests in `src/test/**/*.test.js` to `dist/test/<pkg-name>.test.js`
-* transpose `src/js` to `dist/es5` and convert to es5 for npm deployment
-* Inclusion of `global`, `qunitjs`, `sinon`, and `video.js` into your project without the need to install it yourself
-* Support for super fast incremental rebuilds of all files using `watchify`
-* Nicer `browserify`/`watchify` error reporting using `errorify`
-* Linting of es6 code and es6 examples in documentation
-* license banner insertion at the top of minified dist files
+# Features
+* General
+  * Small browser dists by using all of the latest technologies
+  * External source maps for all js and css files
+  * Automatic licence/banner insertion at the top of minified files
+  * support for linting js, css, documentation, and documenation examples (js only)
+  * super fast incremental rebuilds `--watch`
+* JavaScript
+  * es6 -> es5 for publishing on npm
+  * Ability to support IE8 (or not) effortlessly (NOTE: this will add a lot of bytes to your dist)
+  * Support for es6 -> es6 imports using `jsnext:main` pointing to es6 entry files in package.json
+  * Support for shimming `video.js` so that it will be included in the page for testing but not included in the dist file
+  * Automatic unit test generation for `webpack` and `browserify`
+* CSS
+  * support for vanilla css with concatination via `postcss-import` (like require for css)
+  * support for sass
+* Docs
+  * API documenation generated into html files from jsdoc comments
+  * Manual documenation generated into html files
+  * Automatic table of contents for manual documenation
+* Test
+  * QUnitjs supported out of the box
+  * sinon supported out of the box (local installation not necessary or recommended)
+  * Manual debuging via karma debug page and --watch
+* Server
+  * `--tunnel` option to share your local dev server over the internet
+  * `sb-start` to:
+    * start a dev server
+    * build everything and re-build on change
+    * lint everything and re-lint on change
+    * test everything and re-build tests on change
+    * auto-reload when files change in
+      * `<project-root>/dist/**/*.js`
+      * `<project-root>/dist/**/*.css`
+      * `<project-root>/dist/**/*.html`
+      * `<project-root>/examples/**/*.html`
+      * `<project-root>/index.html`
+    * Proxy karma to `http://localhost:9999/test` so:
+      * manual debugging is easier
+      * it can be included in a tunnel over the internet
+      * auto-reloads will happen when code changes
+  * browser-sync which will:
+    * reload on file change
+    * offers a ui for configuration at `http://localhost:10000`
+    * can be used to turn off auto reload etc.
+* Release mangagement
+  * Support for use as an npm script or standalone
+  * Does the following:
+    1. Release un-released changelog entries with `chg`
+    2. update the version in package.json
+    3. support/build dists for bower in the tag so they don't clutter the main repo
+    4. make a git commit with the version name as the message
+    5. tag a git branch
+    6. Advise the user on how to push to git, and publish to npm
 
-### Docs
-* Generate html documents from all manual documenation in `src/docs`
-* Automatic TOC generation for all manual documenation
-* Manual documentation is generated to `dist/docs/manual`
-* Automatic jsdoc generation for all code in `src/js/**/*.js` to `dist/docs/api`
-* Lint manual docs for style errors
-* Lint manual doc js examples with eslint
+# Installation
+1. Run `npm install --save-dev videojs-spellbook`
+2. Read the [sb man page](/docs/sb.md) to lean about how your project should be structured.
 
-### CSS
-* sass support with entry file at `src/css/index.scss`
-* minfied and unminified dists `dist/browser/<pkg-name>.{css,min.css}`
-* external source maps dists `dist/browser/<pkg-name>.{css.map,min.css.map}`
-* banner insertion at the top of files
+# Things to know
+* If video.js is not installed in your project the version in spellbook will be used
+* CSS changes are injected without a page reload
+* `jsnext:main` must point to your es6 main file in each project that you want to bundle together (this will make
+  the dist files much smaller).
+* `global`/`video.js` are included in spellbook and will be used for your project if your project does not have/need
+  local versions.
 
-### lang
-* lint json `lang` files in `src/lang/**/*.json`
-* copy `lang` files to `dist/lang`
+# Known issues & Workarounds
+* sometimes binaries fail to exit during watch which can cause weird behaviour
+  * make sure to check for running `sb-*` binaries if things are weird
+* rollup is not used during watch (rollupify and watchify don't play nice)
+  * this is not really something that can be worked around yet but it should
+    not be an issue as rollup will be used during `build` and `watch` should only
+    be used in development
+* es6 code changes in sub projects don't trigger a rebuild on watch
+  * This is due to rollupify not working with watchify, see the above issue. Have spellbook or your
+    current build system watch your sub-project and rebuild its es5 dist on change.
 
-### Test
-* Automatically run tests on all supported browsers for all files in `dist/test/*.test.js`
-* build js files for tests just before testing
-* incremental rebuilds and re-run when javascript has changed
-* integration for manual debuging using --watch
-* integration with the development server
-
-### Development
-* Super fast incremental rebuilds where possible
-* Optimizations for node.js 6
-* Proxy karma test runner to development server `http://localhost:9999/test` for easy debugging
-* `sb-start` to:
-  - start a dev server
-  - build everything
-  - lint everything
-  - test everything
-  - auto-reload when files change in `<project-root>/dist/**/*` or `<project-root>/*.html`
-  - auto re-run lint/build/test where needed to get the build back up to date
-
-### npm Release management
-1. Release un-released changelog entries with `chg`
-2. update the version in package.json
-3. support/build dists for bower in the tag so they don't clutter the main repo
-4. make a git commit with the version name as the message
-5. tag a git branch
-6. Advise the user on how to push to git, and publish to npm
-
-## TODO
-### General
-* Automatic index file generation
-* generate documentation index file to link to api/manual docs
-* Create a zip file of the source code to upload to github
-
-### Docs
-* make remark-toc generation automatic rather than forcing users to add a section
-* better markdown linting rules, remove the preset we are using
-
-### Build
-* windows support
-  - must run current executables with `node` rather than directly
-
-## Future Ideas
-### JS
-  * add banner to unminified browser bundle
-  * jspm support
-  * noderify npm files?
-  * only build the main code bundle once in with `js-browser-main` and include that in `js-browser-test`
-  * jsx support
-  * ts support
-  * add rollup bundler support
-  * fix issues with rollup and --watch
-
-### General
-* lint jsdoc examples (convert to md using jsdoc2md and lint)
-* test jsdoc examples?
-* test markdown examples?
-* switch to `conventional-changelog` instead of `chg`
-* add support for [colors](https://github.com/chalk/chalk), and remove builtin colors from linters
-* add support for [tab-completion](https://github.com/mklabs/node-tabtab)
-* add documentation and a [man page](https://github.com/wooorm/remark-man)
-* convert everything to a promise based api and use [loud rejection](https://github.com/sindresorhus/loud-rejection)
-* http://docopt.org/
-* https://programmers.stackexchange.com/questions/307467/what-are-good-habits-for-designing-command-line-arguments
-* http://eng.localytics.com/exploring-cli-best-practices/
-* sb-create && sb-upgrade
-  * proxy to the generator
-* sb-check
-  * proxy to npm-check-update
-* sb-release
-* support prerelease signifiers (beta, alpha etc)
-* when browserify-shim support config passing, use that rather than using browserify-shim in user pkg.json
-  * see: https://github.com/thlorenz/browserify-shim/pull/195
-
-### lint
-* verify that --fix and --errors work for each linter
-
-### Test
-* get tests to run in nodejs
-* code coverage
-* watch, server, and sb-test-karma unit test
-
-### CSS
-* styl support
-* less support
-
-### Development
-* localhost:<port> alternative such as <module-name>.dev
-  * hotel?
-  * mehserve?
-  * vhost?
-
-### Docs
-* find an html theme
+# More Information
+* [Man Pages](/docs/)
+* [TODO](TODO.md)

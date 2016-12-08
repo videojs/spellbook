@@ -2,6 +2,7 @@
 var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var log = require('./utils/log');
+var config = require('./utils/get-config')();
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -15,6 +16,10 @@ var commands = [
   ['sb-lint-docs-examples']
 ];
 
+if (!config.docs) {
+  log.warn('Docs linting is turned off');
+  process.exit();
+}
 
 commands = commands.map(function(command) {
   if (program.watch) {
