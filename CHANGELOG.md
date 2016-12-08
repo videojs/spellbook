@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 2.1.0 (2016-12-08)
 * update eslint-config-videojs to 3.0.1 (#18)
 * added linting before testing, but fail after both (#13)
 * fix es6 module resolution (#16)
@@ -9,8 +14,6 @@ CHANGELOG
 * fix live-reload related issues (#17)
 * prevent zombies by killing any running process when parent exits (#20)
 * Add man pages and documenation on each binary in spellbook (#22)
-
---------------------
 
 ## 2.0.2 (2016-11-03)
 * fix node6 karma tests
