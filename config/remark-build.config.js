@@ -1,6 +1,7 @@
 module.exports = {
-  "plugins": [
-    "toc",
-    "html"
-  ]
+  plugins: {
+    toc: {},
+    slug: {},
+    html: {}
+  }
 };

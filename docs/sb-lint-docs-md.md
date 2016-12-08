@@ -7,14 +7,13 @@
 
 ## DESCRIPTION
 
-  This lints all files under <glob-or-file>.
+  This lints all markdown files under <glob-or-file>.
 
   This will use remark internally to lint docs. Rules can be found under the videojs-spellbook
   package in 'configs/remark-lint.config.js' or on the web at:
   https://github.com/videojs/spellbook/blob/master/config/remark-lint.config.js
 
-  This uses remark-preset-lint-recommended:
-  https://github.com/wooorm/remark-lint/tree/master/packages/remark-preset-lint-recommended
+  When using `--fix` any "Table of Contents" section will also be updated.
 
 ## OPTIONS
 
@@ -39,8 +38,7 @@
     Only log linting errors. Will not log any linting warnings.
 
   -f, --fix
-    This will not do anything for this binary as remark does not support it. It is
-    only here for to maintain the same linting API across binaries.
+    Fix errors and warnings automatically before linting. Will not work in with --watch.
 
   <glob-or-file="<docs-src>/**/*.md">
     The file or glob to lint. By default "<docs-src>/**/*.md" is linted. <docs-src> is the
@@ -84,6 +82,11 @@
 
     sb-lint-docs-md -e
     sb-lint-docs-md --errors
+
+  Automatically fix before linting
+
+    sb-lint-docs-md -f
+    sb-lint-docs-md --fix
 
  lint a specific glob or file.
 

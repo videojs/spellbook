@@ -6,11 +6,10 @@
 - [Release](#release)
 - [Lint](#lint)
   - [General](#general-1)
-  - [Docs](#docs)
   - [JS](#js)
 - [Build](#build)
   - [JS](#js-1)
-  - [Docs](#docs-1)
+  - [Docs](#docs)
   - [CSS](#css)
 - [Test](#test)
   - [General](#general-2)
@@ -39,9 +38,6 @@
 ## General
 * verify that --fix and --errors work for each linter
 
-## Docs
-* better markdown linting rules, remove the preset we are using
-
 ## JS
 * eslint rules (see if there are any other useful ones)
 * eslint-plugin-qunit
@@ -62,7 +58,6 @@
 
 ## Docs
 * implement jsdoc tui theme
-* make remark-toc generation automatic rather than forcing users to add a section
 * html theme for guides
 
 ## CSS

@@ -11,7 +11,7 @@ var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'watch files for changes and re-lint')
     .option('-e, --errors', 'only log errors')
-    .option('-f, --fix', 'does not work for this binary')
+    .option('-f, --fix', 'automatically fix errors before linting, does not work with --watch')
     .arguments('<glob-or-file...>')
     .action(function(src) {
       this.src = src;
@@ -42,7 +42,6 @@ program.src.forEach(function(src) {
 
 var command = [
   'remark',
-  '--no-stdout', // don't print the file to stdout
   '--rc-path', 'remark-lint.config.js'
 ].concat(files);
 
@@ -51,7 +50,17 @@ if (program.watch) {
 }
 
 if (program.errors) {
-  command.push('--quiet');
+  command.push('--silent');
 }
 
-Run.one(command, {toLog: true, nonFatal: program.watch});
+if (program.fix && !program.watch) {
+  command.push('--output');
+}
+
+Run.one(command, {toLog: true, nonFatal: program.watch}).then(function() {
+  if (program.fix) {
+    // remove --ouptut and lint again
+    command.pop();
+    return Run.one(command, {toLog: true});
+  }
+});
