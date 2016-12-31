@@ -206,7 +206,7 @@
     "doctoc": "^1.2.0",
     "mocha": "^3.1.0",
     "mocha.parallel": "^0.14.0",
-    "npm-run-all": "^3.1.1",
+    "npm-run-all": "^4.0.0",
     "remark-man": "^4.0.0"
   },
   "browserify-shim": "config/shim.config.js",
