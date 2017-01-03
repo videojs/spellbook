@@ -205,7 +205,7 @@
     "chai": "^3.5.0",
     "doctoc": "^1.2.0",
     "mocha": "^3.1.0",
-    "mocha.parallel": "^0.13.0",
+    "mocha.parallel": "^0.14.0",
     "npm-run-all": "^3.1.1",
     "remark-man": "^4.0.0"
   },
