@@ -6,6 +6,10 @@ _(none)_
 
 --------------------
 
+## 2.1.1 (2017-01-05)
+* dependency major verion updates
+* fix an issue causing unit tests to fail
+
 ## 2.1.0 (2016-12-08)
 * update eslint-config-videojs to 3.0.1 (#18)
 * added linting before testing, but fail after both (#13)
