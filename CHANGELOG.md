@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 2.1.2 (2017-01-11)
+* pin postcss-import to 9.0.0 to stop build failures
+
 ## 2.1.1 (2017-01-05)
 * dependency major verion updates
 * fix an issue causing unit tests to fail
