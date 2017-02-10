@@ -42,7 +42,7 @@ if (program.browsers) {
   program.browsers.split(',').forEach(function(userBrowser) {
     var i = findBrowser(KARMA_BROWSERS, userBrowser);
 
-    if (found === -1) {
+    if (i === -1) {
       log.fatal('invalid browser entry: ' + userBrowser);
       return process.exit(1);
     }
@@ -88,7 +88,12 @@ if (process.env.TRAVIS) {
   if (config.test && config.test.travisBrowsers) {
     browsers = config.test.travisBrowsers;
   } else {
-    browsers = ['Firefox', 'travisChrome'];
+    browsers = ['Firefox', 'Chrome'];
+  }
+
+  var i = findBrowser(browsers, 'chrome');
+  if (i !== -1) {
+    browsers[i] = 'travisChrome';
   }
 }
 
@@ -156,9 +161,21 @@ if (program.build && !program.watch) {
 
 buildPromise.then(function() {
   if (program.lint && !program.watch) {
-    // commands.unshift(['sb-lint']);
+    return Run.one(['sb-lint'], {nonFatal: true});
   }
+  return Promise.resolve();
+}).then(function(retval) {
+  var lintingFail = false;
+  if (retval && retval.status && retval.status !== 0) {
+    lintingFail = true;
+  }
+
   var server = new KarmaServer(karmaOptions, function(exitCode) {
+    // always return failure if linting failed
+    // unless this is during --watch
+    if (!program.watch && lintingFail) {
+      exitCode = 1;
+    }
     process.exit(exitCode)
   });
 
@@ -172,4 +189,6 @@ buildPromise.then(function() {
       server.refreshFiles();
     });
   }
+
 });
+

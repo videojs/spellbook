@@ -185,6 +185,8 @@ TestHelper.prototype.npmLink = function(dir) {
   // mimic npm link
   var pkgsToLink = shelljs.ls('-d', path.join(fixtureDir, '*'));
   pkgsToLink.push(path.join(__dirname, '..', '..'));
+  pkgsToLink.push(path.join(__dirname, '..', '..', 'node_modules', 'video.js'));
+  pkgsToLink.push(path.join(__dirname, '..', '..', 'node_modules', 'sinon'));
 
   pkgsToLink.forEach(function(folder) {
     // skip the main package
