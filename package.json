@@ -9,7 +9,7 @@
     "clean:manual": "node -e 'require(\"./test/unit/test-helper\").prototype.fixtureClean();'",
     "clean:dist": "rimraf ./dist",
     "pretest": "npm run build",
-    "test": "[ -z \"$TRAVIS_TEST\" ] && TRAVIS_TEST='test/unit/**/*.test.js'; mocha \"$TRAVIS_TEST\"",
+    "test": "mocha 'test/unit/**/*.test.js'",
     "prepublish": "npm run build",
     "prebuild": "npm run clean",
     "build": "node scripts/generate-man-pages.js"
