@@ -6,6 +6,8 @@ var log = require('./utils/log');
 var Run = require('./utils/run');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var Promise = require('bluebird');
+var KarmaServer = require('karma').Server;
+var Watch = require('./utils/watch');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -18,62 +20,134 @@ var program = CommanderWrapper(function(commander) {
 
 program.port = program.port || process.env.TEST_PORT || 9876;
 
-var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
-var commands = [];
-var karmaCommand = [
-  'karma',
-  'start',
-  'karma.config.js',
-  '--port', program.port
-];
+var findBrowser = function(browserList, browserToFind)  {
+  var regexp = new RegExp(browserToFind.trim(), 'i');
 
-if (program.watch) {
-  karmaCommand.push('--auto-watch');
-  karmaCommand.push('--no-single-run');
-} else  {
-  karmaCommand.push('--no-auto-watch');
-  karmaCommand.push('--single-run');
-}
+  for (var i = 0; i < browserList.length; i++) {
+    var currentBrowser = browserList[i].trim();
 
-if (program.browsers) {
-  program.browsers = program.browsers.split(',');
-  var browsers = [];
+    if (regexp.test(currentBrowser)) {
+      return i;
 
-  program.browsers.forEach(function(userBrowser) {
-    userBrowser = userBrowser.trim();
-    var found = false;
-    KARMA_BROWSERS.forEach(function(karmaBrowser) {
-      // seach faster
-      if (found) {
-        return;
-      }
-      var regexp = new RegExp(karmaBrowser, 'i');
-      if (regexp.test(userBrowser)) {
-        // don't add the same browser more than once
-        if (browsers.indexOf(karmaBrowser) === -1) {
-          browsers.push(karmaBrowser);
-        }
-
-        found = true;
-      }
-    });
-
-    if (found !== true) {
-      log.fatal('invalid browser entry: ' + userBrowser);
-      process.exit(1);
     }
+  }
+
+  return -1;
+};
+
+var browsers = [];
+if (program.browsers) {
+  var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
+
+  program.browsers.split(',').forEach(function(userBrowser) {
+    var i = findBrowser(KARMA_BROWSERS, userBrowser);
+
+    if (found === -1) {
+      log.fatal('invalid browser entry: ' + userBrowser);
+      return process.exit(1);
+    }
+
+    browsers.push(KARMA_BROWSERS[i]);
   });
-
-  karmaCommand.push('--browsers');
-  karmaCommand.push(browsers.join(','));
 }
 
-commands.push(karmaCommand);
+var files = [];
+var nodeDir = path.join('node_modules');
+var sinonDir = path.join('sinon', 'pkg');
 
-if (program.lint && !program.watch) {
-  commands.unshift(['sb-lint']);
+if (PathsExist(path.join(nodeDir, sinonDir))) {
+  files.push(path.join(nodeDir, sinonDir, 'sinon.js'));
+  files.push(path.join(nodeDir, sinonDir, 'sinon-ie.js'));
 }
 
+// the default is true
+if (config.shimVideojs) {
+  var vjsDir = path.join('video.js', 'dist');
+
+  if (PathsExist(path.join(nodeDir, vjsDir))) {
+    files.push(path.join(nodeDir, vjsDir, 'video.js'));
+    files.push(path.join(nodeDir, vjsDir, 'video-js.css'));
+  } else {
+    log.fatal('video.js is not installed, use `spellbook.shim-video: false` in package.json if you dont need video.js');
+    process.exit(1);
+  }
+}
+
+var dist = path.relative(config.path, config.dist);
+
+if (config.css && config.css.src && PathsExist(config.css.src)) {
+  files.push(path.join(dist, 'browser', config.name + '.css'));
+  files.push({pattern: path.join(dist, 'browser', config.name + '.css.map'), included: false});
+}
+
+files.push(path.join(__dirname, '..', 'config', 'qunit.tests-exist.js'));
+files.push(path.join(dist, 'test', '**',  '*.test.js'));
+
+// On Travis CI, we can only run in Firefox/Chrome
+if (process.env.TRAVIS) {
+  if (config.test && config.test.travisBrowsers) {
+    browsers = config.test.travisBrowsers;
+  } else {
+    browsers = ['Firefox', 'travisChrome'];
+  }
+}
+
+var karmaOptions = {
+  reporters: ['dots'],
+  frameworks: ['qunit', 'detectBrowsers'],
+  plugins: ['karma-*'],
+  basePath: config.path,
+  browsers: browsers || [],
+  port: program.port,
+  autoWatch: program.watch,
+  singleRun: !program.watch,
+  detectBrowsers: {
+    enabled: !program.watch && browsers.length === 0,
+    usePhantomJS: false,
+    postDetection: function(availableBrowsers) {
+      if (!config.test || !config.test.skipBrowsers) {
+        return availableBrowsers;
+      }
+
+      config.test.skipBrowsers.forEach(function(browser) {
+        var i = findBrowser(availableBrowsers, browser);
+        if (i !== -1) {
+          availableBrowsers.splice(i, 1);
+          console.log('Skipping ' + browser);
+        }
+      });
+
+      return availableBrowsers;
+    }
+  },
+  loggers: [{type: path.join(__dirname, '../src/utils/log.js')}],
+  client: {
+    clearContext: false,
+    qunit: {showUI: true}
+  },
+  customLaunchers: {
+    travisChrome: {
+      base: 'Chrome',
+        flags: ['--no-sandbox']
+    }
+  },
+  customHeaders: [
+    {match: '.*', name: 'Cache-Control', value: 'no-cache, no-store, must-revalidate'},
+    {match: '.*', name: 'Pragma', value: 'no-cache'},
+    {match: '.*', name: 'Expires', value: '0'}
+  ],
+  files: files.map(function(pattern) {
+    var obj = {pattern: pattern};
+    if (typeof pattern !== 'string') {
+      obj = pattern;
+    }
+    obj.nocache = true;
+    //obj.served = true;
+    //obj.watched = true;
+
+    return obj;
+  })
+};
 
 var buildPromise = Promise.resolve();
 if (program.build && !program.watch) {
@@ -81,5 +155,21 @@ if (program.build && !program.watch) {
 }
 
 buildPromise.then(function() {
-  return Run.series(commands, {failAfter: true});
-})
+  if (program.lint && !program.watch) {
+    // commands.unshift(['sb-lint']);
+  }
+  var server = new KarmaServer(karmaOptions, function(exitCode) {
+    process.exit(exitCode)
+  });
+
+  server.start();
+
+  if (program.watch) {
+    var patterns = karmaOptions.files.map(function(obj) {
+      return obj.pattern;
+    });
+    Watch(patterns, function() {
+      server.refreshFiles();
+    });
+  }
+});

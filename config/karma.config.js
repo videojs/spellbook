@@ -22,12 +22,6 @@ module.exports = function(karmaConfig) {
   if (PathsExist(path.join(nodeDir, sinonDir))) {
     files.push(path.join(nodeDir, sinonDir, 'sinon.js'));
     files.push(path.join(nodeDir, sinonDir, 'sinon-ie.js'));
-  } else if (PathsExist(path.join(sbNodeDir, sinonDir))) {
-    files.push(path.join(sbNodeDir, sinonDir, 'sinon.js'));
-    files.push(path.join(sbNodeDir, sinonDir, 'sinon-ie.js'));
-  } else {
-    log.fatal('sinon is not installed!');
-    process.exit(1);
   }
 
   if (config.shimVideojs) {
@@ -36,10 +30,6 @@ module.exports = function(karmaConfig) {
     if (PathsExist(path.join(nodeDir, vjsDir))) {
       files.push(path.join(nodeDir, vjsDir, 'video.js'));
       files.push(path.join(nodeDir, vjsDir, 'video-js.css'));
-    } else if (PathsExist(path.join(sbNodeDir, vjsDir))) {
-      log.info('using videojs-spellbook\'s  version of video.js as there is no local version');
-      files.push(path.join(sbNodeDir, vjsDir, 'video.js'));
-      files.push(path.join(sbNodeDir, vjsDir, 'video-js.css'));
     } else {
       log.fatal('video.js is not installed, use spellbook.shim-video: true in package.json if you dont need it');
       process.exit(1);
@@ -53,7 +43,8 @@ module.exports = function(karmaConfig) {
     files.push({pattern: path.join(dist, 'browser', config.name + '.css.map'), included: false});
   }
 
-  files.push(path.join(dist, 'test', '**', '*.test.js'));
+  files.push(path.join(__dirname, 'qunit.tests-exist.js'));
+  files.push(path.join(dist, 'test', '**',  '*.test.js'));
   karmaConfig.set({
     reporters: ['dots'],
     frameworks: ['qunit', 'detectBrowsers'],
@@ -68,12 +59,32 @@ module.exports = function(karmaConfig) {
       clearContext: false,
       qunit: {showUI: true}
     },
+    customHeaders: [{
+      match: '.*',
+      name: 'Cache-Control',
+      value: 'no-cache, no-store, must-revalidate'
+    }, {
+      match: '.*',
+      name: 'Pragma',
+      value: 'no-cache'
+    }, {
+      match: '.*',
+      name: 'Expires',
+      value: '0'
+    }],
+    upstreamProxy: {
+      port: 9999,
+    },
     files: files.map(function(pattern) {
+      var obj = {pattern: pattern};
       if (typeof pattern !== 'string') {
-        pattern.nocache = true;
-        return pattern;
+        obj = pattern;
       }
-      return {pattern: pattern, nocache: true}
+      obj.nocache = true;
+      //obj.served = true;
+      //obj.watched = true;
+
+      return obj;
     })
   });
 };

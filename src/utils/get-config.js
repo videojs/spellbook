@@ -86,8 +86,10 @@ var GetConfig = function (dir) {
       src: path.join(appRoot, 'lang')
     }, workingPkg.spellbook.lang || {}),
     test: Object.assign({
-      src: path.join(appRoot, 'test')
-    }, workingPkg.spellbook.lang || {}),
+      src: path.join(appRoot, 'test'),
+      skipBrowsers: [],
+      travisBrowsers: [],
+    }, workingPkg.spellbook.test || {}),
 
     css: Object.assign({
       src: path.join(appRoot, 'src', 'css')
