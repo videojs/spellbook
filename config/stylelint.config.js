@@ -17,7 +17,6 @@ module.exports = {
 
     // declaration block
     "declaration-block-no-duplicate-properties": true,
-    "declaration-block-properties-order": "alphabetical",
     "declaration-block-semicolon-newline-after": "always",
     "declaration-block-semicolon-newline-before": "never-multi-line",
     "declaration-block-semicolon-space-after": "never-single-line",
@@ -28,7 +27,6 @@ module.exports = {
     "block-closing-brace-newline-after": "always",
     "block-closing-brace-newline-before": "always",
     "block-no-empty": true,
-    "block-no-single-line": true,
     "block-opening-brace-newline-after": "always",
     "block-opening-brace-newline-before": "always-single-line",
     "block-opening-brace-space-before": "always",
@@ -47,7 +45,6 @@ module.exports = {
     // media feature
     "media-feature-colon-space-after": "always",
     "media-feature-colon-space-before": "never",
-    "media-feature-no-missing-punctuation": true,
     "media-feature-range-operator-space-after": "always",
     "media-feature-range-operator-space-before": "never",
 
@@ -70,6 +67,5 @@ module.exports = {
     "no-duplicate-selectors": true,
     "no-eol-whitespace": true,
     "no-invalid-double-slash-comments": true,
-    "stylelint-disable-reason": "always-after"
   }
 };
