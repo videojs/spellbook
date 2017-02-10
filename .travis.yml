@@ -1,4 +1,4 @@
-sudo: required
+sudo: false
 dist: trusty
 language: node_js
 node_js:
@@ -9,7 +9,15 @@ before_script:
   - export CHROME_BIN=/usr/bin/google-chrome
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
+env:
+  - TRAVIS_TEST='test/unit/all.test.js'
+  - TRAVIS_TEST='test/unit/sb-build-all.test.js'
+  - TRAVIS_TEST='test/unit/sb-clean.test.js'
+  - TRAVIS_TEST='test/unit/sb-lint-all.test.js'
+  - TRAVIS_TEST='test/unit/sb-release.test.js'
+  - TRAVIS_TEST='test/unit/sb-test.test.js'
 addons:
+  firefox: latest
   apt:
     sources:
     - google-chrome
