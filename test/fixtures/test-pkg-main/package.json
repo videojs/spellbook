@@ -11,8 +11,9 @@
   "author": "Brandon 'Casey <someemail@lol.com> (http://foo.bar.com)",
   "license": "MIT",
   "devDependencies": {
-    "videojs-spellbook": "*",
-    "test-pkg-two": "*"
+    "test-pkg-two": "*",
+    "video.js": "^5.16.0",
+    "videojs-spellbook": "*"
   },
   "browserify-shim": "node_modules/videojs-spellbook/config/shim.config.js",
   "spellbook": {

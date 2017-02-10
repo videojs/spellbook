@@ -70,7 +70,7 @@ var GetConfig = function (dir) {
     logLevel: process.env.SB_LOG_LEVEL || workingPkg.spellbook['log-level'] || 'info',
     ie8: workingPkg.spellbook.ie8 || false,
     browserList: workingPkg.spellbook.browserList || ['> 1%', 'last 4 versions', 'Firefox ESR'],
-    shimVideojs: workingPkg.spellbook['shim-videojs'] || workingPkg.spellbook['shim-video.js'] || true,
+    shimVideojs: workingPkg.spellbook['shimVideojs'] || workingPkg.spellbook['shimVideo.js'] || true,
     bannerObj: {
       name: workingPkg.name || '',
       version: workingPkg.version || '',
@@ -86,8 +86,10 @@ var GetConfig = function (dir) {
       src: path.join(appRoot, 'lang')
     }, workingPkg.spellbook.lang || {}),
     test: Object.assign({
-      src: path.join(appRoot, 'test')
-    }, workingPkg.spellbook.lang || {}),
+      src: path.join(appRoot, 'test'),
+      skipBrowsers: [],
+      travisBrowsers: [],
+    }, workingPkg.spellbook.test || {}),
 
     css: Object.assign({
       src: path.join(appRoot, 'src', 'css')

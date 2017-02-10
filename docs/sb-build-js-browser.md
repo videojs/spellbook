@@ -14,7 +14,7 @@
       1. Pass <pkg.name> to browserify, as standalone name. This will get exposed under window and be
         converted to title case. IE: `test-main-pkg` becomes `window.testMainPkg`
       2. Start watching code changes to generate an internal source map.
-      3. ignore video.js if <package.json>.spellbook.shim-videojs is set to true (which is te default)
+      3. ignore video.js if <package.json>.spellbook.shimVideojs is set to true (which is te default)
       4. rollup all es6 code and dependencies that support it (using jsnext:main). This saves a lot of bytes
       5. convert all code to es5 using babelify with ie8 support if <package.json>.spellbook.ie8 is set to true (default)
         is false)
@@ -121,7 +121,7 @@
   <package.json>.spellbook.ie8=false
     Make sure that IE8 is supported. Defaults to false.
 
-  <package.json>.spellbook.shim-videojs=true
+  <package.json>.spellbook.shimVideojs=true
     Makes sure that video.js is included in unit tests but will not be bundled into
     distribution js files. Defaults to true.
 

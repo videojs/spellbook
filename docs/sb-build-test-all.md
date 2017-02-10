@@ -72,7 +72,7 @@
   <package.json>.spellbook.ie8=false
     Should spellbook make sure that IE8 is supported. Defaults to false.
 
-  <package.json>.spellbook.shim-videojs=true
+  <package.json>.spellbook.shimVideojs=true
     Makes sure that video.js is included in unit tests but will not be bundled into
     distribution js files. Defaults to true.
 

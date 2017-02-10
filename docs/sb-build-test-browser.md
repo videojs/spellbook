@@ -12,7 +12,7 @@
     1. Look for *.test.js in <src-dir> or fail if it does not find one
     2. Pass what it found to browserify which will:
       1. Start watching code changes to generate an internal source map.
-      2. ignore video.js if <package.json>.spellbook.shim-videojs is set to true (which is te default)
+      2. ignore video.js if <package.json>.spellbook.shimVideojs is set to true (which is te default)
       3. rollup all es6 code and dependencies that support it (using jsnext:main). This saves a lot of bytes and
          mimics what we do on normal builds
       5. convert all code to es5 using babelify with ie8 support if <package.json>.spellbook.ie8 is set to true (default)
@@ -106,7 +106,7 @@
   <package.json>.spellbook.ie8=false
     Should spellbook make sure that IE8 is supported. Defaults to false.
 
-  <package.json>.spellbook.shim-videojs=true
+  <package.json>.spellbook.shimVideojs=true
     Makes sure that video.js is included in unit tests but will not be bundled into
     distribution js files. Defaults to true.
 
