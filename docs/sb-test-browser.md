@@ -18,7 +18,7 @@
      --watch. If run with --watch karma will be run with --no-single-run and --auto-watch.
   2. Karma will shim sinon manually as only specific versions of sinon work for our needs.
      If you install sinon locally it will be used instead of the version included with spellbook.
-  3. Karma will shim video.js unless `shim-videojs` is set to false in package.json
+  3. Karma will shim video.js unless `shimVideojs` is set to false in package.json
   4. Karma will start a sever on <port> and use karma-detect-browsers to decide what browsers to run on
      unless --browsers is provided.
   5. Karma will run tests and exit with a return code of success or failure depending on if the tests
@@ -120,7 +120,7 @@
     A package.json variable that sets the default log level to use for all videojs-spellbook
     binaries. Can be set to fatal, error, warn, info, verbose, debug, or none.
 
-  <package.json>.spellbook.shim-videojs=true
+  <package.json>.spellbook.shimVideojs=true
     If video.js is shimed it will be included in unit tests for use. Otherwise it won't be.
 
 ## SEE ALSO

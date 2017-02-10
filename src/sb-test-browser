@@ -68,7 +68,7 @@ if (config.shimVideojs) {
     files.push(path.join(nodeDir, vjsDir, 'video.js'));
     files.push(path.join(nodeDir, vjsDir, 'video-js.css'));
   } else {
-    log.fatal('video.js is not installed, use `spellbook.shim-video: false` in package.json if you dont need video.js');
+    log.fatal('video.js is not installed, use `spellbook.shimVideojs: false` in package.json if you dont need video.js');
     process.exit(1);
   }
 }

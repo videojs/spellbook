@@ -15,7 +15,7 @@
       * <dist-dir>/browserify.start.js
     3. Runs browserify on `browserify.start.js` which:
       1. Start watching code changes to generate an internal source map.
-      2. ignore video.js if <package.json>.spellbook.shim-videojs is set to true (which is te default)
+      2. ignore video.js if <package.json>.spellbook.shimVideojs is set to true (which is te default)
       3. convert all code to es5 using babelify with ie8 support if <package.json>.spellbook.ie8 is set to true (default)
         is false)
       4. convert '__VERSION__' strings to the package version
@@ -24,7 +24,7 @@
       7. Write a dist file to <dist-dir>/browserify.test.js
     4. Runs webpack on `webpack.start.js` which:
       1. Start watching code changes to generate an internal source map.
-      2. ignore video.js if <package.json>.spellbook.shim-videojs is set to true (which is te default)
+      2. ignore video.js if <package.json>.spellbook.shimVideojs is set to true (which is te default)
       3. convert all code to es5 using babel-loader with ie8 support if <package.json>.spellbook.ie8 is set to true (default)
         is false)
       5. webpackify all es5 assets into the bundle
@@ -112,7 +112,7 @@
   <package.json>.spellbook.ie8=false
     Should spellbook make sure that IE8 is supported. Defaults to false.
 
-  <package.json>.spellbook.shim-videojs=true
+  <package.json>.spellbook.shimVideojs=true
     Makes sure that video.js is included in unit tests but will not be bundled into
     distribution js files. Defaults to true.
 

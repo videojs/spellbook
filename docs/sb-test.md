@@ -87,7 +87,7 @@
     A package.json variable that sets the default log level to use for all videojs-spellbook
     binaries. Can be set to fatal, error, warn, info, verbose, debug, or none.
 
-  <package.json>.spellbook.shim-videojs=true
+  <package.json>.spellbook.shimVideojs=true
     If video.js is shimed it will be included in unit tests for use. Otherwise it won't be.
 
   <package.json>.spellbook.test='{}'
