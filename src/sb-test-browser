@@ -54,10 +54,17 @@ if (program.browsers) {
 var files = [];
 var nodeDir = path.join('node_modules');
 var sinonDir = path.join('sinon', 'pkg');
+var sbNodeDir = path.join('node_modules', 'videojs-spellbook', 'node_modules');
+
 
 if (PathsExist(path.join(nodeDir, sinonDir))) {
   files.push(path.join(nodeDir, sinonDir, 'sinon.js'));
   files.push(path.join(nodeDir, sinonDir, 'sinon-ie.js'));
+} else if (PathsExist(path.join(sbNodeDir, sinonDir))) {
+  files.push(path.join(sbNodeDir, sinonDir, 'sinon.js'));
+  files.push(path.join(sbNodeDir, sinonDir, 'sinon-ie.js'));
+} else {
+  log.warn('sinon is not installed!');
 }
 
 // the default is true

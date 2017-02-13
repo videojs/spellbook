@@ -23,7 +23,7 @@ var test = function(program, server) {
   var interval;
 
   return proxy(filter, {
-    target: 'http://localhost:' + program.testPort,
+    target: 'http://0.0.0.0:' + program.testPort,
     pathRewrite: function(pathname, req) {
       var newurl = url.parse(pathname);
 

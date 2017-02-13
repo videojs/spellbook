@@ -45,8 +45,7 @@ server.init({
   open: program.open,
   online: program.tunnel || false,
   injectChanges: false,
-  reloadOnRestart: true,
-  reloadDelay: 0,
+  reloadDelay: 200,
   tunnel: program.tunnel || false,
   logPrefix: function() {
     return log.prefix('info');
