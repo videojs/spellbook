@@ -6,6 +6,11 @@ _(none)_
 
 --------------------
 
+## 2.1.3 (2017-02-13)
+* Fix stylelint deprications
+* Fix karma watch (fixes dev server watch)
+* Remove video.js/sinon import from dependencies for spellbook
+
 ## 2.1.2 (2017-01-11)
 * pin postcss-import to 9.0.0 to stop build failures
 
