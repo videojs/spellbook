@@ -6,6 +6,10 @@ _(none)_
 
 --------------------
 
+## 2.1.4 (2017-02-13)
+* re-include sinon
+* fix --tunnel
+
 ## 2.1.3 (2017-02-13)
 * Fix stylelint deprications
 * Fix karma watch (fixes dev server watch)
