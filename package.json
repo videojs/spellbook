@@ -206,7 +206,7 @@
     "mocha": "^3.1.0",
     "mocha.parallel": "^0.15.0",
     "npm-run-all": "^4.0.0",
-    "remark-man": "^4.0.0",
+    "remark-man": "^5.0.0",
     "video.js": "^5.11.7"
   },
   "browserify-shim": "config/shim.config.js",
