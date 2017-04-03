@@ -24,7 +24,7 @@ var shelljs = require('shelljs');
 
 // dist, src, standalone, watch, internalMap, noRollup
 var browserifyHelper = function(options) {
-  ['.js', '.js.map'].forEach(function(ext) {
+  ['.js', '.js.map', '-with-map.js'].forEach(function(ext) {
     rimraf.sync(options.dist + ext);
   });
   var files = GetFiles(options.src);
@@ -89,9 +89,13 @@ var browserifyHelper = function(options) {
       });
 
       if (options.watch || !options.internalMap) {
-        _bundle.pipe(exorcist(options.dist + '.js.map'));
+        _bundle
+          .pipe(exorcist(options.dist + '.js.map', ''))
+          .pipe(fs.createWriteStream(options.dist + '.js'));
+      } else {
+        _bundle
+          .pipe(fs.createWriteStream(options.dist + '.js'));
       }
-      _bundle.pipe(fs.createWriteStream(options.dist + '.js'));
     }).then(function(error) {
       if (error) {
         throw new Error(error);

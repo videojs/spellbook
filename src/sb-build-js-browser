@@ -9,6 +9,9 @@ var PathsExist = require('./utils/paths-exist');
 var GetFiles = require('./utils/get-files');
 var Watch = require('./utils/watch');
 var rimraf = require('rimraf');
+var sourceMappingURL = require('source-map-url');
+var fs = require('fs');
+var shelljs = require('shelljs');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -42,7 +45,7 @@ browserifyHelper({
     return;
   }
   // clean
-  ['min.js', 'min.js.map'].forEach(function(ext) {
+  ['min.js', 'min.js.map', '-with-map.min.js'].forEach(function(ext) {
     rimraf.sync(distFile + ext);
   });
 
@@ -79,5 +82,20 @@ browserifyHelper({
   return Run.one(command, {silent: true}).then(function() {
     log.info('Wrote: ' + distFile + '.min.js');
     log.info('Wrote: ' + distFile + '.min.js.map');
+
+    var code = fs.readFileSync(distFile + '.js', 'utf8');
+    var minCode = fs.readFileSync(distFile + '.min.js', 'utf8');
+
+    shelljs.cp(distFile + '.js', distFile + '-with-map.js');
+    shelljs.cp(distFile + '.min.js', distFile + '-with-map.min.js');
+    code = sourceMappingURL.removeFrom(code);
+    minCode = sourceMappingURL.removeFrom(minCode);
+
+    fs.writeFileSync(distFile + '.js', code);
+    fs.writeFileSync(distFile + '.min.js', minCode);
+
+    log.info('Wrote: ' + distFile + '-with-map.min.js');
+    log.info('Wrote: ' + distFile + '-with-map.js');
+
   });
 });
