@@ -56,7 +56,7 @@ var command = [
 var build = function() {
   log.info('Building...');
 
-  ['.css', '.css.map', '.css.min.map', '.css.min'].forEach(function(ext) {
+  ['.css', '-with-map.css', '.css.map', '.min.css.map', '.min.css', '-with-map.min.css'].forEach(function(ext) {
     rimraf.sync(distFile + ext);
   });
   mkdirp.sync(path.dirname(distFile));

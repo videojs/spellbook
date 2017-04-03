@@ -48,7 +48,7 @@ var postcssHelper = function(options) {
   if (!options.noStart) {
     log.info('Building...');
 
-    ['.css', '.css.map', '.css.min.map', '.css.min', '-with-map.css', '-with-map.min.css'].forEach(function(ext) {
+    ['.css', '.css.map', 'min.css.map', 'min.css', '-with-map.css', '-with-map.min.css'].forEach(function(ext) {
       rimraf.sync(options.dist + ext);
     });
   }
