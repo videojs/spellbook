@@ -59,6 +59,7 @@ var postcssHelper = function(options) {
   Run.one(postcssCmd, {silent: true, toLog: options.watch, nonFatal: options.watch}).then(function(retval) {
     if (retval.status === 0) {
       log.info('Wrote: ' + options.dist + '.css');
+      log.info('Wrote: ' + options.dist + '.css.map');
     }
     if (options.watch) {
       if (retval.status !== 0) {
@@ -68,12 +69,8 @@ var postcssHelper = function(options) {
     }
     return Run.one(cssnanoCmd, {silent: true}).then(function() {
       log.info('Wrote: ' + options.dist + '.min.css');
-      return exorcistHelper(options.dist + '.min.css');
+      log.info('Wrote: ' + options.dist + '.min.css.map');
     });
-  }).then(function() {
-    if (!options.watch) {
-      return exorcistHelper(options.dist + '.css');
-    }
   }).catch(function() {
     log.error('Build Failed!');
     if (options.watch) {
