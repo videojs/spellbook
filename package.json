@@ -197,7 +197,7 @@
     "uglify-js": "2.8.5",
     "uuid": "^3.0.0",
     "watchify": "^3.7.0",
-    "webpack": "^1.13.2",
+    "webpack": "^2.3.0",
     "sinon": "1.10.2"
   },
   "devDependencies": {
