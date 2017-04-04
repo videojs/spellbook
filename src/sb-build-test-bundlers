@@ -107,22 +107,26 @@ var build = function() {
           webpack({
             watch: program.watch || false,
             module: {
-              loaders: [{
+              rules: [{
                 test: /\.js$/,
-                exclude: /node_modules/,
-                cacheDirectory: program.watch || false,
-                loader: 'babel-loader',
-                query: {presets: [GetPath('babel-preset.config.js')]}
+                exclude: /(node_modules|bower_components)/,
+                use: {
+                  loader: 'babel-loader',
+                  options: {
+                    cacheDirectory: program.watch || false,
+                    presets: [GetPath('babel-preset.config.js')]
+                  }
+                }
               }]
             },
             resolve: {
-              root: [
+              modules: [
                 path.join(__dirname, '..', 'node_modules'),
                 path.join(config.path, 'node_modules')
               ],
             },
             resolveLoader: {
-              root: [
+              modules: [
                 path.join(__dirname, '..', 'node_modules'),
                 path.join(config.path, 'node_modules')
               ],
