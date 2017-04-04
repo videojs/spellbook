@@ -62,12 +62,7 @@ var browserifyHelper = function(options) {
   if (!options.watch && !options.noRollup) {
     opts.transform.unshift([rollupify, {config: {
       plugins: [
-        nodeResolve({
-          jsnext: true,
-          main: false,
-          browser: false,
-          skip: true,
-        }),
+        nodeResolve({jsnext: true, main: false, modulesOnly: true}),
       ],
       external: Object.keys(shimConf),
     }}]);
