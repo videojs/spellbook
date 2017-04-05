@@ -2,10 +2,13 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* BREAKING: move source map url out of main dist files and into -with-map files
-* BREAKING: Better documentation tooling, new sb-lint-docs-md rules that may break builds
+_(none)_
 
 --------------------
+
+## 3.0.0 (2017-04-05)
+* BREAKING: move source map url out of main dist files and into -with-map files
+* BREAKING: Better documentation tooling, new sb-lint-docs-md rules that may break builds
 
 ## 2.1.5 (2017-04-05)
 * dependency version bumps
