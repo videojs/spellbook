@@ -27,7 +27,6 @@ if (!program.src) {
 
 var command = [
   'remark',
-  '--no-config',
   '--no-color',
   '--rc-path', 'remark-build.config.js',
 ];

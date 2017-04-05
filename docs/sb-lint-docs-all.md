@@ -37,8 +37,7 @@
     Only log linting errors. Will not log any linting warnings.
 
   -f, --fix
-    This will only work for fixing issues in sb-lint-docs-examples as
-    sb-lint-docs-md does not support it.
+    Fix warnings and errors automatically before linting.
 
 ## EXAMPLES
 

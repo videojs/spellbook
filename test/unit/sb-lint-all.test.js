@@ -24,8 +24,8 @@ var tests = {
     file: 'docs/index.md'
   },
   'sb-lint-docs-md': {
-    lines: 9,
-    doubleLines: 14,
+    lines: 10,
+    doubleLines: 16,
     file: 'docs/index.md'
   },
   'sb-lint-lang-src': {

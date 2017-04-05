@@ -9,6 +9,7 @@
 ## DESCRIPTION
 
   Build all manual markdown documenation from <src-dir> into html files at <dist-dir>.
+  Be sure to add "Table of Contents" as a heading so that remark can automatically fill it out for you!
 
 ## OPTIONS
 
@@ -35,7 +36,6 @@
   <src-dir='${pkg.spellbook.docs.src}'|'docs/'>
     Read from a specefic <src-dir> instead of `${pkg.spellbook.docs.src}` or
     the default of `docs/`
-
 
 ## EXAMPLES
 
