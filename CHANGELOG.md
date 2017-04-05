@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* dependency version vumps
+_(none)_
 
 --------------------
+
+## 2.1.5 (2017-04-05)
+* dependency version bumps
 
 ## 2.1.4 (2017-02-13)
 * re-include sinon
