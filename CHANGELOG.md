@@ -2,9 +2,13 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* dependency version vumps
+* BREAKING: move source map url out of main dist files and into -with-map files
+* BREAKING: Better documentation tooling, new sb-lint-docs-md rules that may break builds
 
 --------------------
+
+## 2.1.5 (2017-04-05)
+* dependency version bumps
 
 ## 2.1.4 (2017-02-13)
 * re-include sinon
