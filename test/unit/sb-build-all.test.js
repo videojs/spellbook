@@ -18,8 +18,10 @@ var prepend = function(array, str) {
   tests.css[binName] = {
     files: [
       function(config) { return path.join('dist', 'browser', config.name + '.css');},
+      function(config) { return path.join('dist', 'browser', config.name + '-with-map.css');},
       function(config) { return path.join('dist', 'browser', config.name + '.css.map');},
       function(config) { return path.join('dist', 'browser', config.name + '.min.css');},
+      function(config) { return path.join('dist', 'browser', config.name + '-with-map.min.css');},
       function(config) { return path.join('dist', 'browser', config.name + '.min.css.map');}
     ]
   };
@@ -50,6 +52,8 @@ tests.js['sb-build-js-browser'] = {
   files: [
     function(config) { return path.join('dist', 'browser', config.name + '.js');},
     function(config) { return path.join('dist', 'browser', config.name + '.js.map');},
+    function(config) { return path.join('dist', 'browser', config.name + '-with-map.js');},
+    function(config) { return path.join('dist', 'browser', config.name + '-with-map.min.js');},
     function(config) { return path.join('dist', 'browser', config.name + '.min.js');},
     function(config) { return path.join('dist', 'browser', config.name + '.min.js.map');}
   ]

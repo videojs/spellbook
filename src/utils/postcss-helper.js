@@ -7,7 +7,9 @@ var exorcistHelper = require('./exorcist-helper');
 var Run = require('./run');
 var mkdirp = require('mkdirp');
 var rimraf = require('rimraf');
-
+var sourceMappingURL = require('source-map-url');
+var fs = require('fs');
+var shelljs = require('shelljs');
 var Promise = require('bluebird');
 var path = require('path');
 
@@ -46,7 +48,7 @@ var postcssHelper = function(options) {
   if (!options.noStart) {
     log.info('Building...');
 
-    ['.css', '.css.map', '.css.min.map', '.css.min'].forEach(function(ext) {
+    ['.css', '.css.map', 'min.css.map', 'min.css', '-with-map.css', '-with-map.min.css'].forEach(function(ext) {
       rimraf.sync(options.dist + ext);
     });
   }
@@ -71,6 +73,22 @@ var postcssHelper = function(options) {
       log.info('Wrote: ' + options.dist + '.min.css');
       log.info('Wrote: ' + options.dist + '.min.css.map');
     });
+  }).then(function() {
+    if (!options.watch) {
+      var code = fs.readFileSync(options.dist + '.css', 'utf8');
+      var minCode = fs.readFileSync(options.dist + '.min.css', 'utf8');
+
+      shelljs.cp(options.dist + '.css', options.dist + '-with-map.css');
+      shelljs.cp(options.dist + '.min.css', options.dist + '-with-map.min.css');
+      code = sourceMappingURL.removeFrom(code);
+      minCode = sourceMappingURL.removeFrom(minCode);
+
+      fs.writeFileSync(options.dist + '.css', code);
+      fs.writeFileSync(options.dist + '.min.css', minCode);
+
+      log.info('Wrote: ' + options.dist + '-with-map.min.css');
+      log.info('Wrote: ' + options.dist + '-with-map.css');
+    }
   }).catch(function() {
     log.error('Build Failed!');
     if (options.watch) {
