@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 2.1.6 (2017-04-05)
+* version bumps
+
 ## 2.1.5 (2017-04-05)
 * dependency version bumps
 

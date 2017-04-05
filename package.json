@@ -1,6 +1,6 @@
 {
   "name": "videojs-spellbook",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "An official web project builder for video.js and its plugins",
   "scripts": {
     "premanual": "npm run clean",
