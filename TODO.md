@@ -22,12 +22,12 @@
 * Should we make watch a [dashboard](https://github.com/FormidableLabs/nodejs-dashboard)
 * Add [colors](https://github.com/chalk/chalk)
 * Add [tab-completion](https://github.com/mklabs/node-tabtab)
-* Add documentation with a [man page](https://github.com/wooorm/remark-man)
 * See if we follow:
   * http://docopt.org/
   * https://programmers.stackexchange.com/questions/307467/what-are-good-habits-for-designing-command-line-arguments
   * http://eng.localytics.com/exploring-cli-best-practices/
 * githooks for spellbook (run things when certain actions happen)
+* Try to cut down on dependencies
 
 # Release
 * Create a zip file of the source code to upload to github
