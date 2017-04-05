@@ -5,6 +5,8 @@ CHANGELOG
 _(none)_
 
 --------------------
+## 3.0.2 (2017-04-05)
+* revert sinon bump
 
 ## 3.0.1 (2017-04-05)
 * dependency bumps
