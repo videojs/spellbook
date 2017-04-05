@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 3.0.1 (2017-04-05)
+* dependency bumps
+
 ## 3.0.0 (2017-04-05)
 * BREAKING: move source map url out of main dist files and into -with-map files
 * BREAKING: Better documentation tooling, new sb-lint-docs-md rules that may break builds
