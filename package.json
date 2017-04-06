@@ -177,6 +177,7 @@
     "karma-ie-launcher": "^1.0.0",
     "karma-qunit": "^1.2.0",
     "karma-safari-launcher": "^1.0.0",
+    "lodash.debounce": "^4.0.8",
     "mkdirp": "^0.5.1",
     "node-sass": "^4.5.2",
     "npm-run": "^4.1.0",

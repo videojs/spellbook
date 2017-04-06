@@ -1,12 +1,7 @@
 var eslintrc = require('eslint-config-videojs');
 
-var eslintConfig = Object.assign(eslintrc, {
-  env: {
-    "browser": true
-  },
-  rules: {
-    'no-var': 'off'
-  }
-});
+var eslintConfig = eslintrc;
+eslintConfig.env.browser = true;
+eslintConfig.rules['no-var'] = 'off';
 
-module.exports = eslintrc;
+module.exports = eslintConfig;
