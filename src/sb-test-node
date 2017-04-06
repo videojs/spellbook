@@ -7,3 +7,7 @@ var program = CommanderWrapper(function(commander) {
     .command('all', 'run all node tests', {isDefault: true});
 });
 
+if (config.test && config.test.node === false) {
+  log.warn('Node running is turned off!');
+  process.exit(0);
+}
