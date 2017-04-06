@@ -80,6 +80,10 @@ if (config.shimVideojs) {
   }
 }
 
+if (config.test && config.test.files) {
+  files = files.concat(config.test.files);
+}
+
 var dist = path.relative(config.path, config.dist);
 
 if (config.css && config.css.src && PathsExist(config.css.src)) {
