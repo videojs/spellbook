@@ -20,4 +20,4 @@ if (!program.src) {
   program.src = [path.join(config.docs.src, '**', '*.md')];
 }
 
-eslintHelper(program);
+eslintHelper(program, 'eslint-examples.config.js');
