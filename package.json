@@ -150,6 +150,7 @@
     "bluebird": "^3.4.6",
     "browser-sync": "^2.15.0",
     "browserify": "^14.0.0",
+    "browserify-banner": "^1.0.3",
     "browserify-shim": "^3.8.12",
     "browserify-versionify": "^1.0.6",
     "bundle-collapser": "^1.2.1",

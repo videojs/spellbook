@@ -10,6 +10,7 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var rimraf = require('rimraf');
 
+var browserifyBanner = require('browserify-banner');
 var bundleCollapser = require('bundle-collapser/plugin');
 var errorify = require('errorify');
 var babelify = require('babelify');
@@ -66,6 +67,19 @@ var browserifyHelper = function(options) {
       ],
       external: Object.keys(shimConf),
     }}]);
+  }
+
+  if (options.standalone) {
+    // remove the last newline in the banner
+    // uglify adds it for us
+    var banner = '/*!\n';
+
+    Object.keys(config.bannerObj).forEach(function(k) {
+      banner += ' * @' + k + ' ' + config.bannerObj[k] + '\n';
+    });
+    banner += " */\n";
+
+    opts.plugin.push([browserifyBanner, {template: banner}]);
   }
 
   if (options.watch) {
