@@ -49,14 +49,6 @@ browserifyHelper({
     rimraf.sync(distFile + ext);
   });
 
-  // remove the last newline in the banner
-  // uglify adds it for us
-  var banner = '/*!\n';
-  Object.keys(config.bannerObj).forEach(function(k) {
-    banner += ' * @' + k + ' ' + config.bannerObj[k] + '\n';
-  });
-
-  banner += ' */';
   var command = [
     'uglifyjs',
     '--compress',
@@ -67,8 +59,7 @@ browserifyHelper({
     distFile + '.min.js.map',
     '--source-map-url',
     path.basename(distFile) + '.min.js.map',
-    '--preamble',
-    banner,
+    '--comments',
     '-o',
     distFile + '.min.js',
     '--',

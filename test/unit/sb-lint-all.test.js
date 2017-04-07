@@ -19,8 +19,8 @@ var tests = {
     file: 'src/css/index.scss'
   },
   'sb-lint-docs-examples': {
-    lines: 8,
-    doubleLines: 11,
+    lines: 7,
+    doubleLines: 9,
     file: 'docs/index.md'
   },
   'sb-lint-docs-md': {

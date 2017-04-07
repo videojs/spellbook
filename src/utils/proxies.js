@@ -8,12 +8,34 @@ var log = require('./log');
 var test = function(program, server) {
   var testPath = '/test'
   var filter = function (pathname, req) {
+
+
     // always re-write /test
     if ((new RegExp('^' + testPath + '/?')).test(pathname)) {
       return true;
     }
 
+    // if it comes from
     if (req.headers.referer && (new RegExp('^' + testPath + '/?')).test(url.parse(req.headers.referer).pathname)) {
+      return true;
+    }
+
+    // if it comes from /context.html
+    if (req.headers.referer && (new RegExp('^/context.html\??')).test(url.parse(req.headers.referer).pathname)) {
+      return true;
+    }
+
+    if (req.headers.referer && (new RegExp('^/debug.html\??')).test(url.parse(req.headers.referer).pathname)) {
+      return true;
+    }
+
+    // if it comes from /socket.io
+    if ((new RegExp('^/socket.io/')).test(pathname)) {
+      return true;
+    }
+
+    // if it is the debug page directly
+    if ((new RegExp('^/debug.html\??')).test(pathname)) {
       return true;
     }
 
@@ -25,11 +47,13 @@ var test = function(program, server) {
   return proxy(filter, {
     target: 'http://0.0.0.0:' + program.testPort,
     pathRewrite: function(pathname, req) {
-      var newurl = url.parse(pathname);
+      var oldurl = url.parse(pathname);
+      var newurl = oldurl;
 
       newurl.pathname = newurl.pathname
-        .replace(new RegExp('^' + testPath + '/?$'), '/debug.html')
+        .replace(new RegExp('^' + testPath + '/?$'), '/')
         .replace(new RegExp('^' + testPath + '/'), '/');
+
       return url.format(newurl);
     },
     ws: true,
@@ -54,7 +78,7 @@ var test = function(program, server) {
         '<script src="/browser-sync/browser-sync-client.js"></script>' +
         '<p>ERROR: Could not proxy http://locahost:' + program.port + testPath + ' to karma server at http://localhost:' + program.testPort + '. This may be due to one of two issues: </p>' +
         '<ol>' +
-          '<li>The karma server is not started. Use `sb-test-browser --watch` or `sb-watch` to start it.</li>' +
+          '<li>The karma server is not started. Use `sb-test-browser --watch`,  `sb-watch`, or `sb-start` to start it.</li>' +
           '<li>The --test-port or TEST_PORT environment variable is not set to the correct karma server port.</li>' +
         '</ol>'
       );

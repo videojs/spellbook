@@ -5,7 +5,8 @@ var PathsExist = require('./paths-exist');
 var Run = require('./run');
 var Watch = require('./watch');
 
-var eslintHelper = function(program) {
+var eslintHelper = function(program, configName) {
+  configName = configName || 'eslint.config.js';
   var files = [];
   program.src.forEach(function(src) {
     // make it recursive
@@ -20,7 +21,7 @@ var eslintHelper = function(program) {
     '--color',
     '--no-eslintrc',
     '--ignore', 'node_modules',
-    '--config', 'eslint.config.js'
+    '--config', configName
   ].concat(files);
 
   if (program.errors) {

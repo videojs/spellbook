@@ -8,6 +8,7 @@ var CommanderWrapper = require('./utils/commander-wrapper');
 var Promise = require('bluebird');
 var KarmaServer = require('karma').Server;
 var Watch = require('./utils/watch');
+var debounce = require('lodash.debounce');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -80,6 +81,10 @@ if (config.shimVideojs) {
   }
 }
 
+if (config.test && config.test.files) {
+  files = files.concat(config.test.files);
+}
+
 var dist = path.relative(config.path, config.dist);
 
 if (config.css && config.css.src && PathsExist(config.css.src)) {
@@ -87,7 +92,7 @@ if (config.css && config.css.src && PathsExist(config.css.src)) {
   files.push({pattern: path.join(dist, 'browser', config.name + '.css.map'), included: false});
 }
 
-files.push(path.join(__dirname, '..', 'config', 'qunit.tests-exist.js'));
+files.push(path.join(__dirname, '..', 'config', 'karma-helper.js'));
 files.push(path.join(dist, 'test', '**',  '*.test.js'));
 
 // On Travis CI, we can only run in Firefox/Chrome
@@ -111,7 +116,7 @@ var karmaOptions = {
   basePath: config.path,
   browsers: browsers || [],
   port: program.port,
-  autoWatch: program.watch,
+  restartOnFileChange: false,
   singleRun: !program.watch,
   detectBrowsers: {
     enabled: !program.watch && browsers.length === 0,
@@ -155,7 +160,7 @@ var karmaOptions = {
     }
     obj.nocache = true;
     //obj.served = true;
-    //obj.watched = true;
+    obj.watched = false;
 
     return obj;
   })
@@ -192,9 +197,9 @@ buildPromise.then(function() {
     var patterns = karmaOptions.files.map(function(obj) {
       return obj.pattern;
     });
-    Watch(patterns, function() {
+    Watch(patterns, debounce(function() {
       server.refreshFiles();
-    });
+    }, 1000));
   }
 
 });

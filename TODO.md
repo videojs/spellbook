@@ -45,16 +45,16 @@
 # Build
 ## JS
   * rollup to a temporary file seperately from browserify
-  * add banner to unminified browser bundle
-  * jspm support?
-  * noderify npm files?
   * only build the main code bundle once in with `js-browser-main` and include that in `js-browser-test`
-  * jsx support
-  * ts support
-  * add rollup bundler support
-  * fix issues with rollup and --watch
+  * add rollup bundler support in `build-test-bundlers`
+  * fix issues with rollup and --watch (issue is in rollupify )
+    * see: https://github.com/nolanlawson/rollupify/issues/54
   * when browserify-shim support config passing, use that rather than using browserify-shim in user pkg.json
     * see: https://github.com/thlorenz/browserify-shim/pull/195
+  * jspm support?
+  * noderify npm files?
+  * jsx support?
+  * ts support?
 
 ## Docs
 * implement jsdoc tui theme
