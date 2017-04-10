@@ -5,32 +5,30 @@ module.exports = function(program, config, karmaConfig) {
     return karmaConfig;
   }
 
-  if (process.env.BROWSER_STACK_USERNAME) {
-    karmaConfig.browsers = [
-      'chrome_bs',
-      'firefox_bs',
-      'safari_bs',
-      'edge_bs',
-      'ie11_bs',
-      'ie10_bs',
-      'ie9_bs',
-      'ie8_bs'
-    ];
-    karmaConfig.browserStack.name = process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH;
-  } else if (config.test && config.test.travisBrowsers) {
-    karmaConfig.browsers = config.test.travisBrowsers;
+  // do anything that travis needs outside of browser setup here
+  karmaConfig.customLaunchers = karmaConfig.customLaunchers || {};
+  karmaConfig.customLaunchers.travisChrome = {
+    base: 'Chrome',
+    flags: ['--no-sandbox']
+  };
+
+  if (process.env.BROWSER_STACK_USERNAME || process.env.SAUCE_USERNAME) {
+    return karmaConfig;
+  }
+
+  // only run with travis browsers if not using browserstack or sauce
+  if (config.test && config.test.browsers) {
+    karmaConfig.browsers = config.test.browsers;
   } else {
     karmaConfig.browsers = ['Firefox', 'Chrome'];
   }
 
-  if (!process.env.BROWSER_STACK_USERNAME) {
-    var i = findBrowser(browsers, 'chrome');
+  // change Chrome entries to travisChrome
+  var i = findBrowser(karmaConfig.browsers, 'chrome');
 
-    if (i !== -1) {
-      browsers[i] = 'travisChrome';
-    }
+  if (i !== -1) {
+    karmaConfig.browsers[i] = 'travisChrome';
   }
-
 
   return karmaConfig;
 };

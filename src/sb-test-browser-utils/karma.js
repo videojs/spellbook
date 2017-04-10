@@ -49,7 +49,7 @@ module.exports = function(program, config, karmaConfig) {
     frameworks: ['qunit', 'detectBrowsers'],
     plugins: ['karma-*'],
     basePath: config.path,
-    browsers: karmaConfig.browses || [],
+    browsers: karmaConfig.browsers || [],
     port: program.port,
     restartOnFileChange: false,
     singleRun: !program.watch,

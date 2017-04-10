@@ -12,7 +12,7 @@ var binaries = Object.keys(pkg.bin).concat(GetFiles(path.join(__dirname, '..', '
   var basename = path.basename(file);
 
   // filter out the utils folder
-  if (basename === 'utils') {
+  if (basename === 'utils' || basename === 'sb-test-browser-utils') {
     return false;
   }
 

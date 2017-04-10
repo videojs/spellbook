@@ -12,6 +12,7 @@ module.exports = function(program, config, karmaConfig) {
 
     config.test.skipBrowsers.forEach(function(browser) {
       var i = findBrowser(availableBrowsers, browser);
+
       if (i !== -1) {
         availableBrowsers.splice(i, 1);
         log.info('Skipping ' + browser);
@@ -20,6 +21,7 @@ module.exports = function(program, config, karmaConfig) {
 
     return availableBrowsers;
   };
+
 
   return karmaConfig;
 };

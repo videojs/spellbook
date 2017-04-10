@@ -21,7 +21,7 @@ var program = CommanderWrapper(function(commander) {
 
 program.port = program.port || process.env.TEST_PORT || 9876;
 
-var karmaConfig = {browsers: []};
+var karmaConfig = {browsers: config.test && config.test.browsers || []};
 if (program.browsers) {
   var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
 
@@ -40,6 +40,7 @@ if (program.browsers) {
 // support various configurations
 karmaConfig = require('./sb-test-browser-utils/karma')(program, config, karmaConfig);
 karmaConfig = require('./sb-test-browser-utils/browserstack')(program, config, karmaConfig);
+karmaConfig = require('./sb-test-browser-utils/saucelabs')(program, config, karmaConfig);
 karmaConfig = require('./sb-test-browser-utils/travis')(program, config, karmaConfig);
 karmaConfig = require('./sb-test-browser-utils/teamcity')(program, config, karmaConfig);
 karmaConfig = require('./sb-test-browser-utils/detect-browsers')(program, config, karmaConfig);
