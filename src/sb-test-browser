@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 var config = require('./utils/get-config')();
-var PathsExist = require('./utils/paths-exist');
 var path = require('path');
 var log = require('./utils/log');
 var Run = require('./utils/run');
@@ -9,6 +8,7 @@ var Promise = require('bluebird');
 var KarmaServer = require('karma').Server;
 var Watch = require('./utils/watch');
 var debounce = require('lodash.debounce');
+var findBrowser = require('./sb-test-browser-utils/find-browser');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -21,22 +21,7 @@ var program = CommanderWrapper(function(commander) {
 
 program.port = program.port || process.env.TEST_PORT || 9876;
 
-var findBrowser = function(browserList, browserToFind)  {
-  var regexp = new RegExp(browserToFind.trim(), 'i');
-
-  for (var i = 0; i < browserList.length; i++) {
-    var currentBrowser = browserList[i].trim();
-
-    if (regexp.test(currentBrowser)) {
-      return i;
-
-    }
-  }
-
-  return -1;
-};
-
-var browsers = [];
+var karmaConfig = {browsers: config.test && config.test.browsers || []};
 if (program.browsers) {
   var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
 
@@ -48,123 +33,17 @@ if (program.browsers) {
       return process.exit(1);
     }
 
-    browsers.push(KARMA_BROWSERS[i]);
+    karmaConfig.browsers.push(KARMA_BROWSERS[i]);
   });
 }
 
-var files = [];
-var nodeDir = path.join('node_modules');
-var sinonDir = path.join('sinon', 'pkg');
-var sbNodeDir = path.join('node_modules', 'videojs-spellbook', 'node_modules');
-
-
-if (PathsExist(path.join(nodeDir, sinonDir))) {
-  files.push(path.join(nodeDir, sinonDir, 'sinon.js'));
-  files.push(path.join(nodeDir, sinonDir, 'sinon-ie.js'));
-} else if (PathsExist(path.join(sbNodeDir, sinonDir))) {
-  files.push(path.join(sbNodeDir, sinonDir, 'sinon.js'));
-  files.push(path.join(sbNodeDir, sinonDir, 'sinon-ie.js'));
-} else {
-  log.warn('sinon is not installed!');
-}
-
-// the default is true
-if (config.shimVideojs) {
-  var vjsDir = path.join('video.js', 'dist');
-
-  if (PathsExist(path.join(nodeDir, vjsDir))) {
-    files.push(path.join(nodeDir, vjsDir, 'video.js'));
-    files.push(path.join(nodeDir, vjsDir, 'video-js.css'));
-  } else {
-    log.fatal('video.js is not installed, use `spellbook.shimVideojs: false` in package.json if you dont need video.js');
-    process.exit(1);
-  }
-}
-
-if (config.test && config.test.files) {
-  files = files.concat(config.test.files);
-}
-
-var dist = path.relative(config.path, config.dist);
-
-if (config.css && config.css.src && PathsExist(config.css.src)) {
-  files.push(path.join(dist, 'browser', config.name + '.css'));
-  files.push({pattern: path.join(dist, 'browser', config.name + '.css.map'), included: false});
-}
-
-files.push(path.join(__dirname, '..', 'config', 'karma-helper.js'));
-files.push(path.join(dist, 'test', '**',  '*.test.js'));
-
-// On Travis CI, we can only run in Firefox/Chrome
-if (process.env.TRAVIS) {
-  if (config.test && config.test.travisBrowsers) {
-    browsers = config.test.travisBrowsers;
-  } else {
-    browsers = ['Firefox', 'Chrome'];
-  }
-
-  var i = findBrowser(browsers, 'chrome');
-  if (i !== -1) {
-    browsers[i] = 'travisChrome';
-  }
-}
-
-var karmaOptions = {
-  reporters: ['dots'],
-  frameworks: ['qunit', 'detectBrowsers'],
-  plugins: ['karma-*'],
-  basePath: config.path,
-  browsers: browsers || [],
-  port: program.port,
-  restartOnFileChange: false,
-  singleRun: !program.watch,
-  detectBrowsers: {
-    enabled: !program.watch && browsers.length === 0,
-    usePhantomJS: false,
-    postDetection: function(availableBrowsers) {
-      if (!config.test || !config.test.skipBrowsers) {
-        return availableBrowsers;
-      }
-
-      config.test.skipBrowsers.forEach(function(browser) {
-        var i = findBrowser(availableBrowsers, browser);
-        if (i !== -1) {
-          availableBrowsers.splice(i, 1);
-          console.log('Skipping ' + browser);
-        }
-      });
-
-      return availableBrowsers;
-    }
-  },
-  loggers: [{type: path.join(__dirname, '../src/utils/log.js')}],
-  client: {
-    clearContext: false,
-    qunit: {showUI: true}
-  },
-  customLaunchers: {
-    travisChrome: {
-      base: 'Chrome',
-        flags: ['--no-sandbox']
-    }
-  },
-  customHeaders: [
-    {match: '.*', name: 'Cache-Control', value: 'no-cache, no-store, must-revalidate'},
-    {match: '.*', name: 'Pragma', value: 'no-cache'},
-    {match: '.*', name: 'Expires', value: '0'}
-  ],
-  files: files.map(function(pattern) {
-    var obj = {pattern: pattern};
-    if (typeof pattern !== 'string') {
-      obj = pattern;
-    }
-    obj.nocache = true;
-    //obj.served = true;
-    obj.watched = false;
-
-    return obj;
-  })
-};
+// support various configurations
+karmaConfig = require('./sb-test-browser-utils/karma')(program, config, karmaConfig);
+karmaConfig = require('./sb-test-browser-utils/browserstack')(program, config, karmaConfig);
+karmaConfig = require('./sb-test-browser-utils/saucelabs')(program, config, karmaConfig);
+karmaConfig = require('./sb-test-browser-utils/travis')(program, config, karmaConfig);
+karmaConfig = require('./sb-test-browser-utils/teamcity')(program, config, karmaConfig);
+karmaConfig = require('./sb-test-browser-utils/detect-browsers')(program, config, karmaConfig);
 
 var buildPromise = Promise.resolve();
 if (program.build && !program.watch) {
@@ -182,7 +61,7 @@ buildPromise.then(function() {
     lintingFail = true;
   }
 
-  var server = new KarmaServer(karmaOptions, function(exitCode) {
+  var server = new KarmaServer(karmaConfig, function(exitCode) {
     // always return failure if linting failed
     // unless this is during --watch
     if (!program.watch && lintingFail) {
@@ -194,7 +73,7 @@ buildPromise.then(function() {
   server.start();
 
   if (program.watch) {
-    var patterns = karmaOptions.files.map(function(obj) {
+    var patterns = karmaConfig.files.map(function(obj) {
       return obj.pattern;
     });
     Watch(patterns, debounce(function() {

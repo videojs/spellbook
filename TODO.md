@@ -66,6 +66,7 @@
 
 # Test
 ## General
+* Get `rerun`, `no-try-catch` etc.. to work on the non-debug page, aka get get parameters to work
 * code coverage via istanbul
 * sb-watch should auto-retest detected browsers. sb-start should pass and arg to sb-watch to disable this behavior
 * test markdown examples js examples?
