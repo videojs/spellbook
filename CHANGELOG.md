@@ -5,6 +5,16 @@ CHANGELOG
 _(none)_
 
 --------------------
+## 3.1.0 (2017-04-11)
+* Better doc example linting, allow videojs/player globals
+* Support SauceLabs, BrowserStack, Travis, and TeamCity
+* Fix node testing during watch
+* Allow bundler tests to be turned off
+* Update Uglify-js2
+* Allow additional test files to be specified
+* Better karma proxy
+* add banner to unminified js bundle
+
 ## 3.0.2 (2017-04-05)
 * revert sinon bump
 
