@@ -33,6 +33,11 @@ var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'keep the tester running and run as things change');
 });
+
+if (config.test && config.test.bundlers === false) {
+  log.info('bundler test builds are turned off');
+  process.exit(0);
+}
 var dist = path.join(config.dist, 'test');
 
 // always finish the log

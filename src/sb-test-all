@@ -55,5 +55,9 @@ if (program.build && !program.watch) {
 }
 
 buildPromise.then(function(retval) {
-  return Run.series(commands, {failAfter: true});
+  if (!program.watch) {
+    return Run.series(commands, {failAfter: true});
+  } else {
+    return Run.parallel(commands);
+  }
 });
