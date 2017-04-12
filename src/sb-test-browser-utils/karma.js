@@ -1,5 +1,6 @@
 var PathsExist = require('../utils/paths-exist');
 var path = require('path');
+var log = require('../utils/log');
 
 module.exports = function(program, config, karmaConfig) {
   var files = [];
