@@ -8,9 +8,11 @@ module.exports = function(program, config, karmaConfig) {
   var sbNodeDir = path.join('node_modules', 'videojs-spellbook', 'node_modules');
 
   if (PathsExist(path.join(nodeDir, sinonDir))) {
+    log.info('using local sinon');
     files.push(path.join(nodeDir, sinonDir, 'sinon.js'));
     files.push(path.join(nodeDir, sinonDir, 'sinon-ie.js'));
   } else if (PathsExist(path.join(sbNodeDir, sinonDir))) {
+    log.info('using spellbook sinon');
     files.push(path.join(sbNodeDir, sinonDir, 'sinon.js'));
     files.push(path.join(sbNodeDir, sinonDir, 'sinon-ie.js'));
   } else {
@@ -25,8 +27,7 @@ module.exports = function(program, config, karmaConfig) {
       files.push(path.join(nodeDir, vjsDir, 'video.js'));
       files.push(path.join(nodeDir, vjsDir, 'video-js.css'));
     } else {
-      log.fatal('video.js is not installed, use `spellbook.shimVideojs: false` in package.json if you dont need video.js');
-      process.exit(1);
+      log.warn('video.js is not installed, use `spellbook.shimVideojs: false` in package.json if you dont need video.js');
     }
   }
 
