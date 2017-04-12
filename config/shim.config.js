@@ -17,7 +17,11 @@ if (!config.shimVideojs) {
 // copy over custom shims
 if (config.shim) {
   Object.keys(config.shim).forEach(function(k) {
-    shim[k] = config.shim[k];
+    if (typeof config.shim === 'string') {
+      shim[k] = {exports: config.shim[k]};
+    } else {
+      shim[k] = config.shim[k];
+    }
   });
 }
 
