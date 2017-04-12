@@ -5,6 +5,10 @@ CHANGELOG
 _(none)_
 
 --------------------
+## 3.1.3 (2017-04-12)
+* fix karma.js logging
+* re-add global
+
 ## 3.1.2 (2017-04-12)
 * remove global as a dep
 * update todo
