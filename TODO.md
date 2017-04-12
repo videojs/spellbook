@@ -19,6 +19,7 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # General
+* Should we debounce all Watch functions?
 * Should we make watch a [dashboard](https://github.com/FormidableLabs/nodejs-dashboard)
 * Add [colors](https://github.com/chalk/chalk)
 * Add [tab-completion](https://github.com/mklabs/node-tabtab)
