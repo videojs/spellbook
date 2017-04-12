@@ -11,6 +11,7 @@ var fs = require('fs');
 var GetTmpDir = require('./utils/get-tmp-dir');
 var mkdirp = require('mkdirp');
 var rimraf = require('rimraf');
+var debounce = require('lodash.debounce');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -89,7 +90,9 @@ var run = function() {
 };
 
 if (program.watch) {
-  Watch(path.join(config.path, 'dist', 'es5', '**', '*.js'), run);
+  Watch(path.join(config.path, 'dist', 'es5', '**', '*.js'), debounce(function() {
+    run();
+  }, 1000));
 } else {
   run();
 }
