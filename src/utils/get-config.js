@@ -71,6 +71,7 @@ var GetConfig = function (dir) {
     ie8: workingPkg.spellbook.ie8 || false,
     browserList: workingPkg.spellbook.browserList || ['> 1%', 'last 4 versions', 'Firefox ESR'],
     shimVideojs: workingPkg.spellbook['shimVideojs'] || workingPkg.spellbook['shimVideo.js'] || true,
+    shim: workingPkg.spellbook.shim || {},
     bannerObj: {
       name: workingPkg.name || '',
       version: workingPkg.version || '',

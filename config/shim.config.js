@@ -14,4 +14,11 @@ if (!config.shimVideojs) {
   delete shim['video.js'];
 }
 
+// copy over custom shims
+if (config.shim) {
+  Object.keys(config.shim).forEach(function(k) {
+    shim[k] = config.shim[k];
+  });
+}
+
 module.exports = shim;

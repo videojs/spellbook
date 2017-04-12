@@ -54,7 +54,7 @@ var browserifyHelper = function(options) {
       errorify
     ],
     transform: [
-      [shim, {global: true}],
+      [shim, {global: true, shim: shimConf}],
       [babelify, {presets: GetPath('babel-preset.config.js')}],
       [versionify, {global: true}]
     ]
