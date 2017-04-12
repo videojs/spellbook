@@ -5,6 +5,9 @@ CHANGELOG
 _(none)_
 
 --------------------
+## 3.1.1 (2017-04-12)
+* fix builds where sub projects also use browserify-shim
+
 ## 3.1.0 (2017-04-11)
 * Better doc example linting, allow videojs/player globals
 * Support SauceLabs, BrowserStack, Travis, and TeamCity
