@@ -5,6 +5,13 @@ CHANGELOG
 _(none)_
 
 --------------------
+## 3.1.2 (2017-04-12)
+* remove global as a dep
+* update todo
+* better shim specification
+* better sb-test-browser info
+* debounce node require test
+
 ## 3.1.1 (2017-04-12)
 * fix builds where sub projects also use browserify-shim
 
