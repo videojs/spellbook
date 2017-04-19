@@ -9,7 +9,7 @@
 ## DESCRIPTION
 
   This lints all files under <glob-or-file>.
-o
+
   This will use eslint and eslint-plugin-json internally to lint json.
   Rules can be found at:
   https://github.com/azeemba/eslint-plugin-json
@@ -37,8 +37,7 @@ o
     Only log linting errors. Will not log any linting warnings.
 
   -f, --fix
-    This should fix any issues that eslint can fix automatically within markdown
-    examples.
+    This will not do anything as --fix does not work with eslint-plugin-json.
 
   <glob-or-file="<lang-src>/**/*.json">
     The file or glob to lint. By default "<lang-src>/**/*.md" is linted. <lang-src> is the

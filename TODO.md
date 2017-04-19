@@ -19,6 +19,7 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # General
+* Pass commands, options, files, and flags down to child binaries
 * Should we debounce all Watch functions?
 * Should we make watch a [dashboard](https://github.com/FormidableLabs/nodejs-dashboard)
 * Add [colors](https://github.com/chalk/chalk)
@@ -29,6 +30,7 @@
   * http://eng.localytics.com/exploring-cli-best-practices/
 * githooks for spellbook (run things when certain actions happen)
 * Try to cut down on dependencies
+* switch to babel-inline-version rather than versionify
 
 # Release
 * Create a zip file of the source code to upload to github
@@ -36,12 +38,17 @@
 * support prerelease signifiers (beta, alpha etc)
 
 # Lint
-## General
-* verify that --fix and --errors work for each linter
+## Lang
+* get --fix to work
+* have more linting rules that make sense, ie: two spaced indent etc
+
+## CSS
+* use --fix on sb-lint-css-css & sb-lint-css-sass when it is available https://github.com/stylelint/stylelint/pull/2467
 
 ## JS
 * eslint rules (see if there are any other useful ones)
 * eslint-plugin-qunit
+* use --fix with sb-lint-docs-examples when it is available https://github.com/eslint/eslint-plugin-markdown/issues/58
 
 # Build
 ## JS
@@ -52,6 +59,7 @@
     * see: https://github.com/nolanlawson/rollupify/issues/54
   * when browserify-shim support config passing, use that rather than using browserify-shim in user pkg.json
     * see: https://github.com/thlorenz/browserify-shim/pull/195
+    * maybe switch to exposify
   * jspm support?
   * noderify npm files?
   * jsx support?
@@ -60,6 +68,7 @@
 ## Docs
 * implement jsdoc tui theme
 * html theme for guides
+* build jsdocs without a manual docs folder as long as docs are turned on
 
 ## CSS
 * styl support?
@@ -69,7 +78,6 @@
 ## General
 * Get `rerun`, `no-try-catch` etc.. to work on the non-debug page, aka get get parameters to work
 * code coverage via istanbul
-* sb-watch should auto-retest detected browsers. sb-start should pass and arg to sb-watch to disable this behavior
 * test markdown examples js examples?
 
 ## nodejs

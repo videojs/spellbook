@@ -9,38 +9,52 @@ var parallel = require('mocha.parallel');
 
 var tests = {
   'sb-lint-css-css': {
-    lines: 14,
-    doubleLines: 18,
+    lines: 6,
+    doubleLines: 9,
+    errorLines: 5,
+    fixLines: 7,
     file: 'src/css/index.css'
   },
   'sb-lint-css-sass': {
-    lines: 12,
-    doubleLines: 15,
+    lines: 6,
+    doubleLines: 9,
+    errorLines: 5,
+    fixLines: 7,
     file: 'src/css/index.scss'
   },
   'sb-lint-docs-examples': {
-    lines: 7,
-    doubleLines: 9,
+    lines: 9,
+    doubleLines: 13,
+    errorLines: 8,
+    fixLines: 10,
     file: 'docs/index.md'
   },
   'sb-lint-docs-md': {
-    lines: 10,
-    doubleLines: 16,
+    lines: 11,
+    doubleLines: 18,
+    errorLines: 10,
+    fixLines: 10,
     file: 'docs/index.md'
   },
   'sb-lint-lang-src': {
     lines: 9,
     doubleLines: 13,
+    errorLines: 9,
+    fixLines: 10,
     file: 'lang/index.json'
   },
   'sb-lint-js-src': {
     lines: 13,
     doubleLines: 21,
+    errorLines: 9,
+    fixLines: 11,
     file: 'src/js/index.js'
   },
   'sb-lint-test-src': {
-    lines: 7,
-    doubleLines: 9,
+    lines: 9,
+    doubleLines: 13,
+    errorLines: 8,
+    fixLines: 8,
     file: 'test/index.test.js'
   },
 };
@@ -166,6 +180,41 @@ parallel('linters:single', function() {
         helper.cleanup(done);
       });
     });
+
+    it(binName + ' should work with --errors', function(done) {
+      var helper = new TestHelper();
+      var glob = path.join(
+        helper.config.path,
+        path.dirname(testProps.file),
+        '*.' + path.extname(testProps.file)
+      );
+
+      helper.exec(binName, ['--errors'], function(code, stdout, stderr) {
+        var lines = stderr.length + stdout.length;
+
+        assert.notEqual(code, 0, 'should not return 0');
+        assert.equal(lines, testProps.errorLines, 'should print ' + testProps.errorLines + ' lines');
+        helper.cleanup(done);
+      });
+    });
+
+    it(binName + ' should work with --fix', function(done) {
+      var helper = new TestHelper();
+      var glob = path.join(
+        helper.config.path,
+        path.dirname(testProps.file),
+        '*.' + path.extname(testProps.file)
+      );
+
+      helper.exec(binName, ['--fix'], function(code, stdout, stderr) {
+        var lines = stderr.length + stdout.length;
+
+        assert.notEqual(code, 0, 'should not return 0');
+        assert.equal(lines, testProps.fixLines, 'should print ' + testProps.fixLines + ' lines');
+        helper.cleanup(done);
+      });
+    });
+
   });
 });
 

@@ -2,6 +2,9 @@ import TestingThing from '../src/js/index';
 import QUnit from 'qunitjs';
 import sinon from 'sinon';
 
+
+// some super long line, some super long line, some super long line, some super long line, some super long line
+
 QUnit.module('test', {
   beforeEach() {
     this.clock = sinon.useFakeTimers();

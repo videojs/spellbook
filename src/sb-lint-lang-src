@@ -3,6 +3,7 @@ var config = require('./utils/get-config')();
 var path = require('path');
 var eslintHelper = require('./utils/eslint-helper');
 var CommanderWrapper = require('./utils/commander-wrapper');
+var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -18,6 +19,10 @@ var program = CommanderWrapper(function(commander) {
 
 if (!program.src) {
   program.src = [path.join(config.lang.src, '**', '*.json')];
+}
+
+if (program.fix) {
+  log.info('--fix does not work currently as eslint-plugin-json does not support it!');
 }
 
 eslintHelper(program);

@@ -42,8 +42,8 @@ o
     Only log linting errors. Will not log any linting warnings.
 
   -f, --fix
-    This should fix any issues that eslint can fix automatically within markdown
-    examples.
+    This command will do nothing for this binary as --fix is not supported
+    for eslint-plugin-markdown which is used internally
 
   <glob-or-file="<docs-src>/**/*.md">
     The file or glob to lint. By default "<docs-src>/**/*.md" is linted. <docs-src> is the
@@ -77,11 +77,6 @@ o
 
     sb-lint-docs-examples -w
     sb-lint-docs-examples --watch
-
-  Fix any errors/warnings that can be fixed automatically
-
-    sb-lint-docs-examples -f
-    sb-lint-docs-examples --fix
 
   Only log errors, do not log warnings.
 

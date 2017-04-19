@@ -42,7 +42,8 @@ program.src.forEach(function(src) {
 
 var command = [
   'remark',
-  '--rc-path', 'remark-lint.config.js'
+  '--rc-path', 'remark-lint.config.js',
+  '--no-stdout',
 ].concat(files);
 
 if (program.watch) {
@@ -57,10 +58,12 @@ if (program.fix && !program.watch) {
   command.push('--output');
 }
 
-Run.one(command, {toLog: true, nonFatal: program.watch}).then(function() {
+Run.one(command, {toLog: true, nonFatal: program.watch}).then(function(result) {
   if (program.fix) {
-    // remove --ouptut and lint again
+    // remove --output and lint again
     command.pop();
     return Run.one(command, {toLog: true});
+  } else {
+    return Promise.resolve(result);
   }
 });
