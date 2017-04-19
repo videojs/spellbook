@@ -4,13 +4,26 @@ var log = require('./utils/log');
 var config = require('./utils/get-config')();
 
 var program = CommanderWrapper(function(commander) {
+  var doDefault = true;
+
+  process.argv.forEach(function(arg) {
+    if ((/^(copy|all|-h|--help)$/).test(arg)) {
+      doDefault = false;
+    }
+  });
+
+  if (doDefault) {
+    process.argv.splice(2, 0, 'all');
+  }
+
+  commander.on('--help', function() {
+    console.log('  Command Options:');
+    console.log('    -w, --watch              watch files for changes and rebuild');
+    console.log();
+  });
+
   return commander
     .command('copy', 'copy src lang folder to dist')
-    .command('all', 'run all build lang commands', {isDefault: true});
+    .command('all', 'run all build lang commands');
 });
-
-if (!config.lang) {
-  log.warn('lang builds are turned off').
-  process.exit();
-}
 

@@ -21,8 +21,11 @@ if (!config.test) {
 
 var commands = [
   ['sb-test-browser'],
-  ['sb-test-node-all'],
 ];
+
+if (config.test.node !== false) {
+  commands.push(['sb-test-node-all']);
+}
 
 commands = commands.map(function(command) {
   command.push('--no-build');

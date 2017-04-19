@@ -14,7 +14,7 @@ Run.one('sb-clean').then(function() {
   var commands = [];
 
   ['js', 'test', 'css', 'docs', 'lang'].forEach(function(buildName) {
-    if (!config[buildName] || !config[buildName].src || config[buildName].build === false) {
+    if (config[buildName] === false || !config[buildName].src || config[buildName].build === false) {
       log.debug(buildName + ' build is turned off in package.json.');
     } else if (!PathsExist(config[buildName].src)) {
       log.debug(buildName + ' build will not run as src dir ' + config[buildName].src + ' does not exist.');
@@ -34,7 +34,6 @@ Run.one('sb-clean').then(function() {
       return command;
     });
   }
-
 
   return Run.parallel(commands);
 });

@@ -19,7 +19,11 @@
 
 ## General
 
-* Pass commands, options, files, and flags down to child binaries
+* switch to memoryFS where we are building temp files
+* test child argument passing
+* test getConfig
+* test build-turn-off
+
 * Should we debounce all Watch functions?
 * Should we make watch a [dashboard](https://github.com/FormidableLabs/nodejs-dashboard)
 * Add [colors](https://github.com/chalk/chalk)
@@ -77,6 +81,7 @@
 * implement jsdoc tui theme
 * html theme for guides
 * build jsdocs without a manual docs folder as long as docs are turned on
+* throw manual docs under guides on tui theme
 
 ### CSS
 
@@ -87,7 +92,7 @@
 
 ### General
 
-* Get `rerun`, `no-try-catch` etc.. to work on the non-debug page, aka get get parameters to work
+* Get `rerun`, `no-try-catch` etc.. to work on the non-debug page after reload
 * code coverage via istanbul
 * test markdown examples js examples?
 

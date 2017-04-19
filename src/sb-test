@@ -5,13 +5,37 @@ var Promise = require('bluebird');
 var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
+  if (!config.test) {
+    log.warn('Test running is turned off!');
+    process.exit();
+  }
+
+  var doDefault = true;
+
+  process.argv.forEach(function(arg) {
+    if ((/^(browser|node|all|-h|--help)$/).test(arg)) {
+      doDefault = false;
+    }
+  });
+
+  if (doDefault) {
+    process.argv.splice(2, 0, 'all');
+  }
+
+  commander.on('--help', function() {
+    console.log('  Command Options:');
+    console.log('    -nb, --no-build                   dont build before testing');
+    console.log('    -nl, --no-lint                    dont lint before testing');
+    console.log('    -b, --browsers <list,of,browsers> comma seperated list of browsers');
+    console.log('    -p, --port <port>                 specify a specfic testing port');
+    console.log('    -w, --watch                       keep the tester running and run as things change');
+    console.log();
+  });
+
   return commander
     .command('browser', 'run all browser tests')
     .command('node', 'run all node tests')
-    .command('all', 'run all tests', {isDefault: true});
+    .command('all', 'run all tests');
 });
 
-if (!config.test) {
-  log.warn('Test running is turned off!');
-  process.exit(0);
-}
+

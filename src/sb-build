@@ -2,12 +2,31 @@
 var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
+  var doDefault = true;
+
+  process.argv.forEach(function(arg) {
+    if ((/^(js|test|docs|css|lang|all|-h|--help)$/).test(arg)) {
+      doDefault = false;
+    }
+  });
+
+  if (doDefault) {
+    process.argv.splice(2, 0, 'all');
+  }
+
+  commander.on('--help', function() {
+    console.log('  Command Options:');
+    console.log('    -w, --watch              watch files for changes and rebuild');
+    console.log();
+  });
+
   return commander
     .command('js', 'build js for the project')
     .command('test', 'build test js for the project')
     .command('css', 'build css for the project')
     .command('docs', 'build docs for the project')
     .command('lang', 'build lang for the project')
-    .command('all', 'run all builds for the project', {isDefault: true});
+    .command('all', 'run all builds for the project');
 });
+
 
