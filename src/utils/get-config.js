@@ -80,22 +80,22 @@ var GetConfig = function (dir) {
     },
     dist: path.join(appRoot, 'dist'),
 
-    docs: Object.assign({
+    docs: workingPkg.spellbook.docs === false ? false : Object.assign({
       src: path.join(appRoot, 'docs')
     }, workingPkg.spellbook.docs || {}),
-    lang: Object.assign({
+    lang: workingPkg.spellbook.lang === false ? false : Object.assign({
       src: path.join(appRoot, 'lang')
     }, workingPkg.spellbook.lang || {}),
-    test: Object.assign({
+    test: workingPkg.spellbook.test === false ? false : Object.assign({
       src: path.join(appRoot, 'test'),
       skipBrowsers: [],
       travisBrowsers: [],
     }, workingPkg.spellbook.test || {}),
 
-    css: Object.assign({
+    css: workingPkg.spellbook.css === false ? false : Object.assign({
       src: path.join(appRoot, 'src', 'css')
     }, workingPkg.spellbook.css || {}),
-    js: Object.assign({
+    js: workingPkg.spellbook.js === false ? false : Object.assign({
       src: path.join(appRoot, 'src', 'js')
     }, workingPkg.spellbook.js || {})
   };
