@@ -3,12 +3,13 @@ var eslintHelper = require('./utils/eslint-helper');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var path = require('path');
 var config = require('./utils/get-config')();
+var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'watch files for changes and re-lint')
     .option('-e, --errors', 'only log errors')
-    .option('-f, --fix', 'fix problems automatically')
+    .option('-f, --fix', 'does not work for this binary')
     .arguments('<glob-or-file...>')
     .action(function(src) {
       this.src = src;
@@ -18,6 +19,10 @@ var program = CommanderWrapper(function(commander) {
 
 if (!program.src) {
   program.src = [path.join(config.docs.src, '**', '*.md')];
+}
+
+if (program.fix) {
+  log.info('--fix does not work with this binary at this time!');
 }
 
 eslintHelper(program, 'eslint-examples.config.js');

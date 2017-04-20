@@ -18,4 +18,4 @@ var program = CommanderWrapper(function(commander) {
 if (!program.src) {
   program.src = [path.join(config.test.src, '**', '*.test.js')];
 }
-eslintHelper(program);
+eslintHelper(program, 'eslint-tests.config.js');

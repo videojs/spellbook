@@ -32,7 +32,7 @@ program.src.forEach(function(src) {
 
 var command =  [
   'stylelint',
-  '-f', 'verbose',
+  '-f', 'string',
   '--color',
   '--config', 'stylelint.config.js',
 ].concat(files);
@@ -41,8 +41,22 @@ if (program.errors) {
   command.push('--quiet');
 }
 
+if (program.fix) {
+  log.info('--fix does not work currently as stylelint does not support it!');
+}
+
 var build = function() {
-  return Run.one(command, {toLog: true, nonFatal: program.watch});
+  return Run.one(command, {toLog: true, nonFatal: program.watch}).then(function(result) {
+    if (result.stdout === '' && result.stderr === '') {
+      var msg = 'No linting problems!';
+
+      if (program.errors) {
+        msg += ' Note: there may be hidden warnings. as --errors is in use';
+      }
+
+      log.info(msg);
+    }
+  });
 };
 
 if (program.watch) {
