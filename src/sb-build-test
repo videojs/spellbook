@@ -4,13 +4,28 @@ var config = require('./utils/get-config')();
 var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
+  var doDefault = true;
+
+  process.argv.forEach(function(arg) {
+    if ((/^(browser|bundlers|all|-h|--help)$/).test(arg)) {
+      doDefault = false;
+    }
+  });
+
+  if (doDefault) {
+    process.argv.splice(2, 0, 'all');
+  }
+
+  commander.on('--help', function() {
+    console.log('  Command Options:');
+    console.log('    -w, --watch              watch files for changes and rebuild');
+    console.log();
+  });
+
+
   return commander
     .command('browser', 'build js tests for the browser')
     .command('bundlers', 'build js bundler tests for the browser')
-    .command('all', 'build all possible js outputs', {isDefault: true});
+    .command('all', 'build all possible js outputs');
 });
 
-if (!config.test) {
-  log.warn('Unit Test builds are turned off');
-  process.exit();
-}

@@ -6,7 +6,14 @@ var PathsExist = require('../../src/utils/paths-exist');
 var binName = 'sb-clean';
 var parallel = require('mocha.parallel');
 
-['sb-test-all', 'sb-test-browser', 'sb-test-node-all'].forEach(function(binName) {
+[
+  'sb-test',
+  'sb-test-all',
+  'sb-test-browser',
+  'sb-test-node',
+  'sb-test-node-all',
+  'sb-test-node-require'
+].forEach(function(binName) {
   parallel(binName, function() {
     it('should run error on linter', function(done) {
       var helper = new TestHelper({copyDist: true});
@@ -28,6 +35,10 @@ var parallel = require('mocha.parallel');
       });
     });
 
+    if ((/^sb-test-node/).test(binName)) {
+      return
+    }
+
     it('should error on fake browser', function(done) {
       var helper = new TestHelper({copyDist: true});
 
@@ -38,9 +49,6 @@ var parallel = require('mocha.parallel');
       });
     });
 
-    if (binName === 'sb-test-node-all') {
-      return
-    }
     it('should run just chrome', function(done) {
       var helper = new TestHelper({copyDist: true});
 
@@ -50,5 +58,16 @@ var parallel = require('mocha.parallel');
         helper.cleanup(done);
       });
     });
+
+  it('should run on a different port', function(done) {
+      var helper = new TestHelper({copyDist: true});
+
+      helper.exec(binName, ['--no-lint', '--no-build', '--port', '9888'], function(code, stdout, stderr) {
+
+        assert.equal(code, 0, 'should return success');
+        helper.cleanup(done);
+      });
+    });
+
   });
 });

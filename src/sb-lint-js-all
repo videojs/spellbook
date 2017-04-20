@@ -11,11 +11,6 @@ var program = CommanderWrapper(function(commander) {
     .option('-f, --fix', 'automatically fix semantic errors were possible');
 });
 
-if (!config.js) {
-  log.warn('JavaScript linting is turned off');
-  process.exit();
-}
-
 var commands = [
   ['sb-lint-js-src']
 ];

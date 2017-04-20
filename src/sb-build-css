@@ -4,13 +4,28 @@ var config = require('./utils/get-config')();
 var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
+  var doDefault = true;
+
+  process.argv.forEach(function(arg) {
+    if ((/^(css|sass|all|-h|--help)$/).test(arg)) {
+      doDefault = false;
+    }
+  });
+
+  if (doDefault) {
+    process.argv.splice(2, 0, 'all');
+  }
+
+  commander.on('--help', function() {
+    console.log('  Command Options:');
+    console.log('    -w, --watch              watch files for changes and rebuild');
+    console.log();
+  });
+
   return commander
     .command('css', 'run vanilla css build')
     .command('sass', 'run sass build')
-    .command('all', 'run all commands', {isDefault: true});
+    .command('all', 'run all commands');
 });
 
-if (!config.css) {
-  log.warn('css builds are turned off').
-  process.exit();
-}
+

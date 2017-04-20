@@ -16,11 +16,6 @@ var commands = [
   ['sb-lint-docs-examples']
 ];
 
-if (!config.docs) {
-  log.warn('Docs linting is turned off');
-  process.exit();
-}
-
 commands = commands.map(function(command) {
   if (program.watch) {
     command.push('--watch');

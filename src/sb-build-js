@@ -4,14 +4,26 @@ var log = require('./utils/log');
 var config = require('./utils/get-config')();
 
 var program = CommanderWrapper(function(commander) {
+  var doDefault = true;
+
+  process.argv.forEach(function(arg) {
+    if ((/^(browser|node|all|-h|--help)$/).test(arg)) {
+      doDefault = false;
+    }
+  });
+
+  if (doDefault) {
+    process.argv.splice(2, 0, 'all');
+  }
+
+  commander.on('--help', function() {
+    console.log('  Command Options:');
+    console.log('    -w, --watch              watch files for changes and rebuild');
+    console.log();
+  });
+
   return commander
     .command('browser', 'build js browser output')
     .command('node', 'build nodejs output')
-    .command('all', 'build all possible js outputs', {isDefault: true});
+    .command('all', 'build all possible js outputs');
 });
-
-if (!config.js) {
-  log.warn('js builds are turned off').
-  process.exit();
-}
-

@@ -4,13 +4,26 @@ var config = require('./utils/get-config')();
 var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
-  return commander
-    .command('all', 'run all doc builds', {isDefault: true})
-    .command('api', 'run the api doc build')
-    .command('manual', 'run the manual doc build');
-});
+  var doDefault = true;
 
-if (!config.docs) {
-  log.warn('Docs builds are turned off');
-  process.exit();
-}
+  process.argv.forEach(function(arg) {
+    if ((/^(api|manual|all|-h|--help)$/).test(arg)) {
+      doDefault = false;
+    }
+  });
+
+  if (doDefault) {
+    process.argv.splice(2, 0, 'all');
+  }
+
+  commander.on('--help', function() {
+    console.log('  Command Options:');
+    console.log('    -w, --watch              watch files for changes and rebuild');
+    console.log();
+  });
+
+  return commander
+    .command('api', 'run the api doc build')
+    .command('manual', 'run the manual doc build')
+    .command('all', 'run all doc builds');
+});

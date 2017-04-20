@@ -15,7 +15,7 @@ var program = CommanderWrapper(function(commander) {
 var commands = [];
 
 ['js', 'test', 'css', 'docs', 'lang'].forEach(function(buildName) {
-  if (!config[buildName] || !config[buildName].src || config[buildName].lint === false) {
+  if (config[buildName] === false || !config[buildName].src || config[buildName].lint === false) {
     log.debug(buildName + ' linter is turned off in package.json.');
   } else if (!PathsExist(config[buildName].src)) {
     log.debug(buildName + ' linter will not run as src dir ' + config[buildName].src + ' does not exist.');

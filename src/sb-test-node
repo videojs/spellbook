@@ -4,12 +4,27 @@ var log = require('./utils/log');
 var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
+  var doDefault = true;
+
+  process.argv.forEach(function(arg) {
+    if ((/^(require|all|-h|--help)$/).test(arg)) {
+      doDefault = false;
+    }
+  });
+
+  if (doDefault) {
+    process.argv.splice(2, 0, 'all');
+  }
+
+  commander.on('--help', function() {
+    console.log('  Command Options:');
+    console.log('    -nb, --no-build                   dont build before testing');
+    console.log('    -nl, --no-lint                    dont lint before testing');
+    console.log('    -w, --watch                       keep the tester running and run as things change');
+    console.log();
+  });
+
   return commander
     .command('require', 'require main es5 file in node')
-    .command('all', 'run all node tests', {isDefault: true});
+    .command('all', 'run all node tests');
 });
-
-if (config.test && config.test.node === false) {
-  log.warn('Node running is turned off!');
-  process.exit(0);
-}

@@ -9,11 +9,6 @@ var program = CommanderWrapper(function(commander) {
     .option('-w, --watch', 'incrementally rebuild');
 });
 
-if (!config.js) {
-  log.warn('js builds are turned off').
-  process.exit();
-}
-
 var commands = [
   ['sb-build-js-node'],
   ['sb-build-js-browser'],

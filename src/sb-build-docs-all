@@ -10,11 +10,6 @@ var program = CommanderWrapper(function(commander) {
     .option('-w, --watch', 'watch docs for changes and rebuild');
 });
 
-if (!config.docs) {
-  log.warn('Docs builds are turned off');
-  process.exit();
-}
-
 var commands = [];
 
 if (config.js && config.js.src && PathsExist(config.js.src)) {

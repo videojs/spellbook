@@ -10,11 +10,6 @@ var program = CommanderWrapper(function(commander) {
     .option('-w, --watch', 'incrementally rebuild');
 });
 
-if (!config.test) {
-  log.warn('Unit Test builds are turned off');
-  process.exit();
-}
-
 var commands = [
   ['sb-build-test-browser'],
 ];

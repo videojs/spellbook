@@ -21,6 +21,8 @@ var program = CommanderWrapper(function(commander) {
 
 program.port = program.port || process.env.TEST_PORT || 9876;
 
+process.env.TEST_PORT = program.port;
+
 var karmaConfig = {browsers: config.test && config.test.browsers || []};
 if (program.browsers) {
   var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];

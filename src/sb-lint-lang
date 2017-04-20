@@ -4,13 +4,28 @@ var config = require('./utils/get-config')();
 var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
+  var doDefault = true;
+
+  process.argv.forEach(function(arg) {
+    if ((/^(src|all|-h|--help)$/).test(arg)) {
+      doDefault = false;
+    }
+  });
+
+  if (doDefault) {
+    process.argv.splice(2, 0, 'all');
+  }
+
+  commander.on('--help', function() {
+    console.log('  Command Options:');
+    console.log('    -w, --watch              watch files for changes and relint');
+    console.log('    -f, --fix                automatically fix issues, may not work for all binaries');
+    console.log('    -e, --errors             only print linting errors');
+    console.log();
+  });
+
+
   return commander
     .command('src', 'lint source lang files')
-    .command('all', 'run all lang linters', {isDefault: true});
+    .command('all', 'run all lang linters');
 });
-
-if (!config.lang) {
-  log.warn('Lang linting is turned off');
-  process.exit();
-}
-

@@ -4,13 +4,28 @@ var config = require('./utils/get-config')();
 var log = require('./utils/log');
 
 var program = CommanderWrapper(function(commander) {
+  var doDefault = true;
+
+  process.argv.forEach(function(arg) {
+    if ((/^(sass|css|all|-h|--help)$/).test(arg)) {
+      doDefault = false;
+    }
+  });
+
+  if (doDefault) {
+    process.argv.splice(2, 0, 'all');
+  }
+
+  commander.on('--help', function() {
+    console.log('  Command Options:');
+    console.log('    -w, --watch              watch files for changes and relint');
+    console.log('    -f, --fix                automatically fix issues, may not work for all binaries');
+    console.log('    -e, --errors             only print linting errors');
+    console.log();
+  });
+
   return commander
     .command('css', 'lint css files')
     .command('sass', 'lint sass files')
-    .command('all', 'run all css lint commands', {isDefault: true});
+    .command('all', 'run all css lint commands');
 });
-
-if (!config.css) {
-  log.warn('CSS linting is turned off');
-  process.exit();
-}

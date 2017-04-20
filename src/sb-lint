@@ -2,11 +2,31 @@
 var CommanderWrapper = require('./utils/commander-wrapper');
 
 var program = CommanderWrapper(function(commander) {
+  var doDefault = true;
+
+  process.argv.forEach(function(arg) {
+    if ((/^(docs|lang|js|test|css|all|-h|--help)$/).test(arg)) {
+      doDefault = false;
+    }
+  });
+
+  if (doDefault) {
+    process.argv.splice(2, 0, 'all');
+  }
+
+  commander.on('--help', function() {
+    console.log('  Command Options:');
+    console.log('    -w, --watch              watch files for changes and relint');
+    console.log('    -f, --fix                automatically fix issues, may not work for all binaries');
+    console.log('    -e, --errors             only print linting errors');
+    console.log();
+  });
+
   return commander
     .command('docs', 'lint docs, and js examples in docs')
     .command('lang', 'lint json lang files')
     .command('js', 'lint src js')
     .command('test', 'lint test js')
     .command('css', 'lint css')
-    .command('all', 'lint css', {isDefault: true});
+    .command('all', 'lint css');
 });
