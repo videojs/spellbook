@@ -12,7 +12,10 @@
     "test": "mocha 'test/unit/**/*.test.js'",
     "prepublish": "npm run build",
     "prebuild": "npm run clean",
-    "build": "node scripts/generate-man-pages.js"
+    "precommit": "npm run build:docs && git add ./TODO.md ./README.md",
+    "build": "npm-run-all -p build:*",
+    "build:docs": "SB_INTERNAL=1 node ./src/sb-lint-docs-md --fix ./TODO.md ./README.md",
+    "build:man": "node scripts/generate-man-pages.js"
   },
   "repository": {
     "type": "git",
@@ -208,7 +211,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "doctoc": "^1.2.0",
+    "husky": "^0.13.3",
     "mocha": "^3.1.0",
     "mocha.parallel": "^0.15.0",
     "npm-run-all": "^4.0.0",
