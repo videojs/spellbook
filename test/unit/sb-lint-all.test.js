@@ -66,7 +66,9 @@ var manyTests = {};
 ['sb-lint-css', 'sb-lint-css-all'].forEach(function(binName) {
   manyTests[binName] = {
     lines: tests['sb-lint-css-css'].lines + tests['sb-lint-css-sass'].lines,
-    doubleLines: tests['sb-lint-css-css'].doubleLines + tests['sb-lint-css-sass'].doubleLines
+    doubleLines: tests['sb-lint-css-css'].doubleLines + tests['sb-lint-css-sass'].doubleLines,
+    errorLines: tests['sb-lint-css-css'].errorLines + tests['sb-lint-css-css'].errorLines,
+    fixLines: tests['sb-lint-css-css'].fixLines + tests['sb-lint-css-css'].fixLines
   };
 });
 
@@ -74,7 +76,9 @@ var manyTests = {};
 ['sb-lint-js', 'sb-lint-js-all'].forEach(function(binName) {
   manyTests[binName] = {
     lines: tests['sb-lint-js-src'].lines,
-    doubleLines: tests['sb-lint-js-src'].doubleLines
+    doubleLines: tests['sb-lint-js-src'].doubleLines,
+    errorLines: tests['sb-lint-js-src'].errorLines,
+    fixLines: tests['sb-lint-js-src'].fixLines
   };
 });
 
@@ -82,7 +86,9 @@ var manyTests = {};
 ['sb-lint-test', 'sb-lint-test-all'].forEach(function(binName) {
   manyTests[binName] = {
     lines: tests['sb-lint-test-src'].lines,
-    doubleLines: tests['sb-lint-test-src'].doubleLines
+    doubleLines: tests['sb-lint-test-src'].doubleLines,
+    errorLines: tests['sb-lint-test-src'].errorLines,
+    fixLines: tests['sb-lint-test-src'].fixLines
   };
 });
 
@@ -90,7 +96,9 @@ var manyTests = {};
 ['sb-lint-lang', 'sb-lint-lang-all'].forEach(function(binName) {
   manyTests[binName] = {
     lines: tests['sb-lint-lang-src'].lines,
-    doubleLines: tests['sb-lint-lang-src'].doubleLines
+    doubleLines: tests['sb-lint-lang-src'].doubleLines,
+    errorLines: tests['sb-lint-lang-src'].errorLines,
+    fixLines: tests['sb-lint-lang-src'].fixLines
   };
 });
 
@@ -98,11 +106,12 @@ var manyTests = {};
 ['sb-lint-docs', 'sb-lint-docs-all'].forEach(function(binName) {
   manyTests[binName] = {
     lines: tests['sb-lint-docs-md'].lines + tests['sb-lint-docs-examples'].lines,
-    doubleLines: tests['sb-lint-docs-md'].doubleLines + tests['sb-lint-docs-examples'].doubleLines
+    doubleLines: tests['sb-lint-docs-md'].doubleLines + tests['sb-lint-docs-examples'].doubleLines,
+    errorLines: tests['sb-lint-docs-md'].errorLines + tests['sb-lint-docs-examples'].errorLines,
+    fixLines: tests['sb-lint-docs-md'].fixLines + tests['sb-lint-docs-examples'].fixLines
   };
 });
 
-// TODO: --fix, --errors
 parallel('linters:single', function() {
   Object.keys(tests).forEach(function(binName) {
     var testProps = tests[binName];
@@ -240,5 +249,45 @@ parallel('linters:multiple', function() {
         helper.cleanup(done);
       });
     });
+
+    it(binName + ' should lint default files with --errors', function(done) {
+      var helper = new TestHelper();
+
+      helper.exec(binName, ['--errors'], function(code, stdout, stderr) {
+        var lines = stderr.length + stdout.length - 3;
+
+        // -all binaries will have two less lines than
+        // non-all binaies because the non -all ones
+        // run the -all binaries
+        if (!(/-all$/).test(binName)) {
+          lines -= 2;
+        }
+
+        assert.notEqual(code, 0, 'should not return 0');
+        assert.equal(lines, testProps.errorLines, 'should print ' + testProps.errorLines + ' lines');
+        helper.cleanup(done);
+      });
+    });
+
+    it(binName + ' should lint default files with --fix', function(done) {
+      var helper = new TestHelper();
+
+      helper.exec(binName, ['--fix'], function(code, stdout, stderr) {
+        var lines = stderr.length + stdout.length - 3;
+
+        // -all binaries will have two less lines than
+        // non-all binaies because the non -all ones
+        // run the -all binaries
+        if (!(/-all$/).test(binName)) {
+          lines -= 2;
+        }
+
+        assert.notEqual(code, 0, 'should not return 0');
+        assert.equal(lines, testProps.fixLines, 'should print ' + testProps.fixLines + ' lines');
+        helper.cleanup(done);
+      });
+    });
+
+
   });
 });

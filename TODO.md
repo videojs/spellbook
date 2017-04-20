@@ -5,6 +5,7 @@
 * [General](#general)
 * [Release](#release)
 * [Lint](#lint)
+  * [General](#general-1)
   * [Lang](#lang)
   * [CSS](#css)
   * [JS](#js)
@@ -13,14 +14,14 @@
   * [Docs](#docs)
   * [CSS](#css-1)
 * [Test](#test)
-  * [General](#general-1)
+  * [General](#general-2)
   * [nodejs](#nodejs)
   * [Server](#server)
 
 ## General
 
 * switch to memoryFS where we are building temp files
-* test child argument passing
+* test --watch somehow
 * test getConfig
 * test build-turn-off
 
@@ -43,6 +44,10 @@
 * support prerelease signifiers (beta, alpha etc)
 
 ## Lint
+
+### General
+
+* handle file arguments in all binaries
 
 ### Lang
 
