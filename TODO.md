@@ -20,9 +20,9 @@
 
 ## General
 
+* custom preinstall script so the project will only install the minimum required packages
 * switch to memoryFS where we are building temp files
 * test --watch somehow
-* test getConfig
 * test build-turn-off
 
 * Should we debounce all Watch functions?
@@ -34,6 +34,7 @@
   * <https://programmers.stackexchange.com/questions/307467/what-are-good-habits-for-designing-command-line-arguments>
   * <http://eng.localytics.com/exploring-cli-best-practices/>
 * githooks for spellbook (run things when certain actions happen)
+* can spellbook provide husky?
 * Try to cut down on dependencies
 * switch to babel-inline-version rather than versionify
 
@@ -73,9 +74,8 @@
 * add rollup bundler support in `build-test-bundlers`
 * fix issues with rollup and --watch (issue is in rollupify )
   * see: <https://github.com/nolanlawson/rollupify/issues/54>
-* when browserify-shim support config passing, use that rather than using browserify-shim in user pkg.json
-  * see: <https://github.com/thlorenz/browserify-shim/pull/195>
-  * maybe switch to exposify
+* switch to exposify instead of browserify-shim
+  * see: <https://github.com/thlorenz/exposify>
 * jspm support?
 * noderify npm files?
 * jsx support?
@@ -84,7 +84,6 @@
 ### Docs
 
 * implement jsdoc tui theme
-* html theme for guides
 * build jsdocs without a manual docs folder as long as docs are turned on
 * throw manual docs under guides on tui theme
 
@@ -97,8 +96,8 @@
 
 ### General
 
-* Get `rerun`, `no-try-catch` etc.. to work on the non-debug page after reload
 * code coverage via istanbul
+* Get `rerun`, `no-try-catch` etc.. to work on the non-debug page after reload
 * test markdown examples js examples?
 
 ### nodejs

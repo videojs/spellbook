@@ -12,7 +12,7 @@ var rimraf = require('rimraf');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'watch docs for changes and rebuild')
-    .option('-d, --dist <dist-dir>', 'directory to build api docs to', path.join(config.dist, 'docs', 'api'))
+    .option('-d, --dist <dist-dir>', 'directory to build api docs to', path.join(config.docs.dist, 'api'))
     .arguments('<src-dir>')
     .action(function(src) {
       this.src = src;

@@ -18,7 +18,14 @@ var GetFiles = function() {
         return GetFiles.apply(null, search);
       };
     }
-    files = files.concat(fn());
+    var newFiles = fn();
+    var i = newFiles.length;
+
+    while (i--) {
+      if (files.indexOf(newFiles[i]) === -1) {
+        files.push(newFiles[i]);
+      }
+    }
   });
 
   return files;

@@ -20,7 +20,6 @@ var rollupify = require('rollupify');
 var watchify = require('watchify');
 var Promise = require('bluebird');
 var nodeResolve = require('rollup-plugin-node-resolve');
-var shimConf = require('../../config/shim.config.js');
 var shelljs = require('shelljs');
 
 // dist, src, standalone, watch, internalMap, noRollup
@@ -54,7 +53,7 @@ var browserifyHelper = function(options) {
       errorify
     ],
     transform: [
-      [shim, {global: true, shim: shimConf}],
+      [shim, {global: true, shim: config.shim}],
       [babelify, {presets: GetPath('babel-preset.config.js')}],
       [versionify, {global: true}]
     ]
@@ -65,7 +64,7 @@ var browserifyHelper = function(options) {
       plugins: [
         nodeResolve({jsnext: true, main: false, modulesOnly: true}),
       ],
-      external: Object.keys(shimConf),
+      external: Object.keys(config.shim),
     }}]);
   }
 

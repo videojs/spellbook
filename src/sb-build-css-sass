@@ -15,7 +15,7 @@ var mkdirp = require('mkdirp');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'incremental rebuild')
-    .option('-d, --dist <dist-dir>', 'dir to write output to', path.join(config.dist, 'browser'))
+    .option('-d, --dist <dist-dir>', 'dir to write output to', config.css.dist)
     .arguments('<src-dir>')
     .action(function(src) {
       this.src = src;

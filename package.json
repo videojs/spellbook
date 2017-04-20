@@ -218,7 +218,6 @@
     "remark-man": "^5.0.0",
     "video.js": "^5.11.7"
   },
-  "browserify-shim": "config/shim.config.js",
   "keywords": [
     "videojs",
     "videojs-plugin"

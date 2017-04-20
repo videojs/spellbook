@@ -112,182 +112,229 @@ var manyTests = {};
   };
 });
 
-parallel('linters:single', function() {
-  Object.keys(tests).forEach(function(binName) {
-    var testProps = tests[binName];
+['sb-lint', 'sb-lint-all'].forEach(function(binName) {
+  var lines = 15;
+  var doubleLines = 15;
+  var errorLines = 15;
+  var fixLines = 15;
 
-    it(binName + ' should lint default files with no args', function(done) {
-      var helper = new TestHelper();
+  ['sb-lint-docs', 'sb-lint-lang', 'sb-lint-js', 'sb-lint-test', 'sb-lint-css'].forEach(function(b) {
+    lines += manyTests[b].lines;
+    doubleLines += manyTests[b].doubleLines;
+    errorLines += manyTests[b].errorLines;
+    fixLines += manyTests[b].fixLines;
+  });
 
-      helper.exec(binName, function(code, stdout, stderr) {
-        var lines = stderr.length + stdout.length;
+  manyTests[binName] = {
+    lines: lines,
+    doubleLines: doubleLines,
+    errorLines: errorLines,
+    fixLines: fixLines
+  };
+});
 
-        assert.notEqual(code, 0, 'should not return 0');
-        assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
-        helper.cleanup(done);
-      });
+describe('lint:sanity', function() {
+  var singleBins = Object.keys(tests);
+  var muitiBins = Object.keys(manyTests);
+
+  it('all binaries are being tested', function() {
+    var binaries = TestHelper.prototype.getBinList();
+
+    binaries.forEach(function(bin) {
+      // skip non lint bins
+      if (!(/^sb-lint/).test(bin)) {
+        return;
+      }
+
+      var tested = false;
+
+      if (singleBins.indexOf(bin) !== -1 || muitiBins.indexOf(bin) !== -1) {
+        tested = true;
+      }
+
+      assert.ok(tested, bin + ' is being tested');
     });
-
-    it(binName + ' should lint custom dir', function(done) {
-      var helper = new TestHelper();
-      var newsrc = path.join(helper.config.path, 'newsrc');
-
-      mkdirp.sync(newsrc);
-      shelljs.mv(path.join(helper.config.path, testProps.file), newsrc);
-      helper.exec(binName, [newsrc], function(code, stdout, stderr) {
-        var lines = stderr.length + stdout.length;
-
-        assert.notEqual(code, 0, 'should not return 0');
-        assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
-        helper.cleanup(done);
-      });
-    });
-
-    it(binName + ' should lint custom file', function(done) {
-      var helper = new TestHelper();
-      var oldsrc = path.join(helper.config.path, testProps.file);
-      var newsrc = path.join(helper.config.path, 'newsrc' + path.extname(oldsrc));
-
-      shelljs.mv(oldsrc, newsrc);
-      helper.exec(binName, [newsrc], function(code, stdout, stderr) {
-        var lines = stderr.length + stdout.length;
-
-        assert.notEqual(code, 0, 'should not return 0');
-        assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
-        helper.cleanup(done);
-      });
-    });
-
-    it(binName + ' should lint two files', function(done) {
-      var helper = new TestHelper();
-      var oldsrc = path.join(helper.config.path, testProps.file);
-      var newsrc = path.join(helper.config.path, 'newsrc' + path.extname(oldsrc));
-
-      shelljs.cp(oldsrc, newsrc);
-      helper.exec(binName, [newsrc, oldsrc], function(code, stdout, stderr) {
-        var lines = stderr.length + stdout.length;
-
-        assert.notEqual(code, 0, 'should not return 0');
-        assert.equal(lines, testProps.doubleLines, 'should print ' + testProps.doubleLines + ' lines');
-        helper.cleanup(done);
-      });
-    });
-
-    it(binName + ' should lint custom glob', function(done) {
-      var helper = new TestHelper();
-      var glob = path.join(
-        helper.config.path,
-        path.dirname(testProps.file),
-        '*.' + path.extname(testProps.file)
-      );
-
-      helper.exec(binName, [], function(code, stdout, stderr) {
-        var lines = stderr.length + stdout.length;
-
-        assert.notEqual(code, 0, 'should return 0');
-        assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
-        helper.cleanup(done);
-      });
-    });
-
-    it(binName + ' should work with --errors', function(done) {
-      var helper = new TestHelper();
-      var glob = path.join(
-        helper.config.path,
-        path.dirname(testProps.file),
-        '*.' + path.extname(testProps.file)
-      );
-
-      helper.exec(binName, ['--errors'], function(code, stdout, stderr) {
-        var lines = stderr.length + stdout.length;
-
-        assert.notEqual(code, 0, 'should not return 0');
-        assert.equal(lines, testProps.errorLines, 'should print ' + testProps.errorLines + ' lines');
-        helper.cleanup(done);
-      });
-    });
-
-    it(binName + ' should work with --fix', function(done) {
-      var helper = new TestHelper();
-      var glob = path.join(
-        helper.config.path,
-        path.dirname(testProps.file),
-        '*.' + path.extname(testProps.file)
-      );
-
-      helper.exec(binName, ['--fix'], function(code, stdout, stderr) {
-        var lines = stderr.length + stdout.length;
-
-        assert.notEqual(code, 0, 'should not return 0');
-        assert.equal(lines, testProps.fixLines, 'should print ' + testProps.fixLines + ' lines');
-        helper.cleanup(done);
-      });
-    });
-
   });
 });
 
-parallel('linters:multiple', function() {
+describe('lint:single', function() {
+  Object.keys(tests).forEach(function(binName) {
+    var testProps = tests[binName];
+
+    parallel(binName, function() {
+      it(binName + ' should lint default files with no args', function(done) {
+        var helper = new TestHelper();
+
+        helper.exec(binName, function(code, stdout, stderr) {
+          var lines = stderr.length + stdout.length;
+
+          assert.notEqual(code, 0, 'should not return 0');
+          assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
+          helper.cleanup(done);
+        });
+      });
+
+      it('should lint custom dir', function(done) {
+        var helper = new TestHelper();
+        var newsrc = path.join(helper.config.path, 'newsrc');
+
+        mkdirp.sync(newsrc);
+        shelljs.mv(path.join(helper.config.path, testProps.file), newsrc);
+        helper.exec(binName, [newsrc], function(code, stdout, stderr) {
+          var lines = stderr.length + stdout.length;
+
+          assert.notEqual(code, 0, 'should not return 0');
+          assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
+          helper.cleanup(done);
+        });
+      });
+
+      it('should lint custom file', function(done) {
+        var helper = new TestHelper();
+        var oldsrc = path.join(helper.config.path, testProps.file);
+        var newsrc = path.join(helper.config.path, 'newsrc' + path.extname(oldsrc));
+
+        shelljs.mv(oldsrc, newsrc);
+        helper.exec(binName, [newsrc], function(code, stdout, stderr) {
+          var lines = stderr.length + stdout.length;
+
+          assert.notEqual(code, 0, 'should not return 0');
+          assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
+          helper.cleanup(done);
+        });
+      });
+
+      it('should lint two files', function(done) {
+        var helper = new TestHelper();
+        var oldsrc = path.join(helper.config.path, testProps.file);
+        var newsrc = path.join(helper.config.path, 'newsrc' + path.extname(oldsrc));
+
+        shelljs.cp(oldsrc, newsrc);
+        helper.exec(binName, [newsrc, oldsrc], function(code, stdout, stderr) {
+          var lines = stderr.length + stdout.length;
+
+          assert.notEqual(code, 0, 'should not return 0');
+          assert.equal(lines, testProps.doubleLines, 'should print ' + testProps.doubleLines + ' lines');
+          helper.cleanup(done);
+        });
+      });
+
+      it('should lint custom glob', function(done) {
+        var helper = new TestHelper();
+        var glob = path.join(
+          helper.config.path,
+          path.dirname(testProps.file),
+          '*.' + path.extname(testProps.file)
+        );
+
+        helper.exec(binName, [], function(code, stdout, stderr) {
+          var lines = stderr.length + stdout.length;
+
+          assert.notEqual(code, 0, 'should return 0');
+          assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
+          helper.cleanup(done);
+        });
+      });
+
+      it('should work with --errors', function(done) {
+        var helper = new TestHelper();
+        var glob = path.join(
+          helper.config.path,
+          path.dirname(testProps.file),
+          '*.' + path.extname(testProps.file)
+        );
+
+        helper.exec(binName, ['--errors'], function(code, stdout, stderr) {
+          var lines = stderr.length + stdout.length;
+
+          assert.notEqual(code, 0, 'should not return 0');
+          assert.equal(lines, testProps.errorLines, 'should print ' + testProps.errorLines + ' lines');
+          helper.cleanup(done);
+        });
+      });
+
+      it('should work with --fix', function(done) {
+        var helper = new TestHelper();
+        var glob = path.join(
+          helper.config.path,
+          path.dirname(testProps.file),
+          '*.' + path.extname(testProps.file)
+        );
+
+        helper.exec(binName, ['--fix'], function(code, stdout, stderr) {
+          var lines = stderr.length + stdout.length;
+
+          assert.notEqual(code, 0, 'should not return 0');
+          assert.equal(lines, testProps.fixLines, 'should print ' + testProps.fixLines + ' lines');
+          helper.cleanup(done);
+        });
+      });
+    });
+  });
+});
+
+describe('lint:multiple', function() {
   Object.keys(manyTests).forEach(function(binName) {
-    var testProps = manyTests[binName];
 
-    it(binName + ' should lint default files with no args', function(done) {
-      var helper = new TestHelper();
+    parallel(binName, function() {
+      var testProps = manyTests[binName];
 
-      helper.exec(binName, function(code, stdout, stderr) {
-        var lines = stderr.length + stdout.length - 3;
+      it('should lint default files with no args', function(done) {
+        var helper = new TestHelper();
 
-        // -all binaries will have two less lines than
-        // non-all binaies because the non -all ones
-        // run the -all binaries
-        if (!(/-all$/).test(binName)) {
-          lines -= 2;
-        }
+        helper.exec(binName, function(code, stdout, stderr) {
+          var lines = stderr.length + stdout.length - 3;
 
-        assert.notEqual(code, 0, 'should not return 0');
-        assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
-        helper.cleanup(done);
+          // -all binaries will have two less lines than
+          // non-all binaies because the non -all ones
+          // run the -all binaries
+          if (!(/-all$/).test(binName)) {
+            lines -= 2;
+          }
+
+          assert.notEqual(code, 0, 'should not return 0');
+          assert.equal(lines, testProps.lines, 'should print ' + testProps.lines + ' lines');
+          helper.cleanup(done);
+        });
+      });
+
+      it('should lint default files with --errors', function(done) {
+        var helper = new TestHelper();
+
+        helper.exec(binName, ['--errors'], function(code, stdout, stderr) {
+          var lines = stderr.length + stdout.length - 3;
+
+          // -all binaries will have two less lines than
+          // non-all binaies because the non -all ones
+          // run the -all binaries
+          if (!(/-all$/).test(binName)) {
+            lines -= 2;
+          }
+
+          assert.notEqual(code, 0, 'should not return 0');
+          assert.equal(lines, testProps.errorLines, 'should print ' + testProps.errorLines + ' lines');
+          helper.cleanup(done);
+        });
+      });
+
+      it('should lint default files with --fix', function(done) {
+        var helper = new TestHelper();
+
+        helper.exec(binName, ['--fix'], function(code, stdout, stderr) {
+          var lines = stderr.length + stdout.length - 3;
+
+          // -all binaries will have two less lines than
+          // non-all binaies because the non -all ones
+          // run the -all binaries
+          if (!(/-all$/).test(binName)) {
+            lines -= 2;
+          }
+
+          assert.notEqual(code, 0, 'should not return 0');
+          assert.equal(lines, testProps.fixLines, 'should print ' + testProps.fixLines + ' lines');
+          helper.cleanup(done);
+        });
       });
     });
-
-    it(binName + ' should lint default files with --errors', function(done) {
-      var helper = new TestHelper();
-
-      helper.exec(binName, ['--errors'], function(code, stdout, stderr) {
-        var lines = stderr.length + stdout.length - 3;
-
-        // -all binaries will have two less lines than
-        // non-all binaies because the non -all ones
-        // run the -all binaries
-        if (!(/-all$/).test(binName)) {
-          lines -= 2;
-        }
-
-        assert.notEqual(code, 0, 'should not return 0');
-        assert.equal(lines, testProps.errorLines, 'should print ' + testProps.errorLines + ' lines');
-        helper.cleanup(done);
-      });
-    });
-
-    it(binName + ' should lint default files with --fix', function(done) {
-      var helper = new TestHelper();
-
-      helper.exec(binName, ['--fix'], function(code, stdout, stderr) {
-        var lines = stderr.length + stdout.length - 3;
-
-        // -all binaries will have two less lines than
-        // non-all binaies because the non -all ones
-        // run the -all binaries
-        if (!(/-all$/).test(binName)) {
-          lines -= 2;
-        }
-
-        assert.notEqual(code, 0, 'should not return 0');
-        assert.equal(lines, testProps.fixLines, 'should print ' + testProps.fixLines + ' lines');
-        helper.cleanup(done);
-      });
-    });
-
-
   });
 });

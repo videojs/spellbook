@@ -15,8 +15,7 @@
     "video.js": "^5.16.0",
     "videojs-spellbook": "*"
   },
-  "browserify-shim": "node_modules/videojs-spellbook/config/shim.config.js",
   "spellbook": {
-    "log-level": "info"
+    "logLevel": "info"
   }
 }

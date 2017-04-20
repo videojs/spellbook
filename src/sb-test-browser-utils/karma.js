@@ -21,14 +21,14 @@ module.exports = function(program, config, karmaConfig) {
   }
 
   // the default is true
-  if (config.shimVideojs) {
+  if (config.shim['video.js']) {
     var vjsDir = path.join('video.js', 'dist');
 
     if (PathsExist(path.join(nodeDir, vjsDir))) {
       files.push(path.join(nodeDir, vjsDir, 'video.js'));
       files.push(path.join(nodeDir, vjsDir, 'video-js.css'));
     } else {
-      log.warn('video.js is not installed, use `spellbook.shimVideojs: false` in package.json if you dont need video.js');
+      log.warn('video.js is not installed, use `spellbook.shim[\"video.js\"]: false` in package.json if you dont need video.js');
     }
   }
 
@@ -36,15 +36,13 @@ module.exports = function(program, config, karmaConfig) {
     files = files.concat(config.test.files);
   }
 
-  var dist = path.relative(config.path, config.dist);
 
   if (config.css && config.css.src && PathsExist(config.css.src)) {
-    files.push(path.join(dist, 'browser', config.name + '.css'));
-    files.push({pattern: path.join(dist, 'browser', config.name + '.css.map'), included: false});
+    files.push(path.join(path.relative(config.path, config.css.dist), config.name + '.css'));
   }
 
   files.push(path.join(__dirname, '..', '..', 'config', 'karma-helper.js'));
-  files.push(path.join(dist, 'test', '**',  '*.test.js'));
+  files.push(path.join(path.relative(config.path, config.test.dist), '**',  '*.test.js'));
 
   karmaConfig = {
     reporters: ['dots'],

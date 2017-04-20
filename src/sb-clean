@@ -4,7 +4,20 @@ var path = require('path');
 var log = require('./utils/log');
 var CommanderWrapper = require('./utils/commander-wrapper');
 var GetFiles = require('./utils/get-files');
+var PathExists = require('./utils/paths-exist');
 var rimraf = require('rimraf');
+
+var isEmpty = function(dir) {
+  try {
+    var files = fs.readdirSync(dir);
+    if (files.length) {
+      return false;
+    }
+  } catch(e) {
+    return true;
+  }
+  return true;
+}
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -12,20 +25,54 @@ var program = CommanderWrapper(function(commander) {
 });
 
 if (program.quiet && program.dryRun) {
-  log.fatal('--dry-run should not be used with --quiet');
+  console.error('--dry-run should not be used with --quiet');
   process.exit(1);
 }
 
 var fileSearches = [
   path.join(config.path, '**',  'npm-debug.log'),
-  config.dist
+  config.js.distBrowser,
+  config.js.distNode,
+  config.test.dist,
+  config.css.dist,
+  config.docs.dist,
+  config.lang.dist
 ];
 
-GetFiles(fileSearches).forEach(function(file) {
-  if (!program.quiet) {
-    log.info('removing ' + file);
+var files = GetFiles(fileSearches);
+var toDelete = [];
+
+files.forEach(function(file) {
+  // do not try and delete the same file twice
+  if (toDelete.indexOf(file) === -1) {
+    toDelete.push(file);
+  } else {
+    return;
   }
+
+  while(isEmpty(path.dirname(file)) && path.dirname(file) !== config.path) {
+    file = path.dirname(file);
+
+    if (toDelete.indexOf(file) === -1) {
+      toDelete.push(file);
+    }
+  }
+});
+
+// make sure longer paths get deleted first
+toDelete.sort(function(a, b) {
+  return b.length - a.length;
+});
+
+toDelete.forEach(function(f) {
+  // nothing to delete if path does not exist
+  if (!PathExists(f)) {
+    return;
+  }
+
+  log.info('removing ' + f);
+
   if (!program.dryRun) {
-    rimraf.sync(file);
+    rimraf.sync(f);
   }
 });
