@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/css/index.css"],"names":[],"mappings":"AAAA;CACC,YAAY;CACZ;;AAED,kHAAkH","file":"test-pkg-main.css","sourcesContent":["p {\n\tcolor: #ecf;\n}\n\n/* some super long line, some super long line, some super long line, some super long line, some super long line */\n"]}
