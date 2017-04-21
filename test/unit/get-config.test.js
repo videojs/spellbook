@@ -11,8 +11,8 @@ var GetDefaults = function(pkg, baseDir) {
     "scope": "",
     "version": pkg.version,
     "path": baseDir,
-    "main": path.join(baseDir, 'dist', 'es5', 'index.js'),
-    "jsNextMain": path.join(baseDir, 'src', 'js', 'index.js'),
+    "main": path.join(baseDir, pkg.main),
+    "jsNextMain": path.join(baseDir, pkg['jsnext:main']),
     "logLevel": "info",
     "ie8": false,
     "shim": {
