@@ -50,7 +50,8 @@ var TestHelper = function(options) {
   shelljs.cp('-R', path.join(fixtureDir, 'test-pkg-main') + path.sep, this.projectDir);
 
   if (this.options.copyDist) {
-    shelljs.cp('-R', path.join(__dirname, '..', 'expected-dist') + path.sep, path.join(this.projectDir, 'dist'));
+    shelljs.cp('-R', path.join(__dirname, '..', 'expected', 'dist') + path.sep, path.join(this.projectDir, 'dist'));
+    shelljs.cp('-R', path.join(__dirname, '..', 'expected', 'build') + path.sep, path.join(this.projectDir, 'build'));
   }
 
   if (!this.options.debug) {
