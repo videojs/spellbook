@@ -99,14 +99,38 @@ var GetDefaults = function(config, baseDir) {
   };
 };
 
+var oldEnvVars = {
+  'TRAVIS': undefined,
+  'TEAMCITY_VERSION': undefined,
+  'BROWSER_STACK_USERNAME': undefined,
+  'SAUCE_USERNAME': undefined
+};
+
 describe('get-karma-config', function() {
   before(function() {
     process.env.SB_LOG_LEVEL = false;
     process.env.SB_INTERNAL = 'true';
+
+    // unset env vars
+    Object.keys(oldEnvVars).forEach(function(v) {
+      if (typeof process.env[v] !== 'undefined') {
+        console.log('temporaraly clearing process.env.' + v + ' = ' + process.env[v]);
+        oldEnvVars[v] = process.env[v];
+        delete process.env[v];
+      }
+    });
   });
   after(function() {
     delete process.env.SB_INTERNAL;
     delete process.env.SB_LOG_LEVEL;
+
+    // reset env vars
+    Object.keys(oldEnvVars).forEach(function(v) {
+      if (typeof oldEnvVars[v] !== 'undefined') {
+        process.env[v] = oldEnvVars[v];
+        console.log('reseting ' + v + ' to ' + oldEnvVars[v]);
+      }
+    });
   });
   parallel('basic', function() {
     it('should return defaults', function(done) {
@@ -881,6 +905,5 @@ describe('get-karma-config', function() {
       assert.deepEqual(newBrowsers, ['Chrome'], 'returns defaults');
       helper.cleanup(done);
     });
-
   });
 });
