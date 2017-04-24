@@ -1,4 +1,4 @@
-var SAUCE_LABS_LAUNCHERS = {
+var launchers = {
   chrome_sl: {
     base: 'SauceLabs',
     browserName: 'chrome',
@@ -46,32 +46,46 @@ var SAUCE_LABS_LAUNCHERS = {
   }
 };
 
-module.exports = function(program, config, karmaConfig) {
-  if (!process.env.SAUCE_USERNAME) {
+var using = function() {
+  return typeof process.env.SAUCE_USERNAME !== 'undefined';
+}
+
+var configure = function(program, config, karmaConfig) {
+  if (!using()) {
     return karmaConfig;
   }
 
   karmaConfig.customLaunchers = karmaConfig.customLaunchers || {};
   karmaConfig.sauceLabs = karmaConfig.sauceLabs || {};
 
-  Object.keys(SAUCE_LABS_LAUNCHERS).forEach(function(k) {
-    var v = SAUCE_LABS_LAUNCHERS[k];
+  if (config.ie8 === false) {
+    delete launchers.ie8_sl;
+  }
+
+  Object.keys(launchers).forEach(function(k) {
+    var v = launchers[k];
 
     karmaConfig.customLaunchers[k] = v;
   });
 
-  karmaConfig.browsers = Object.keys(SAUCE_LABS_LAUNCHERS);
+  // default browsers to add
+  var browsers = Object.keys(launchers);
 
-  // remove ie8 if they don't want to support it
-  if (!config.IE8) {
-    var i = karmaConfig.browsers.indexOf('ie8_sl');
-
-    karmaConfig.browsers.splice(i, 1);
+  // specified browsers to add
+  if (config.test && config.test.slBrowsers && config.test.slBrowsers.length) {
+    browsers = config.test.slBrowsers;
+  } else if (config.test.slBrowsers === false) {
+    browsers = [];
   }
 
-  if (config.test && config.test.slBrowsers) {
-    karmaConfig.browsers = config.test.slBrowsers;
-  }
+  // add browsers
+  karmaConfig.browsers = karmaConfig.browsers.concat(browsers);
 
   return karmaConfig;
+};
+
+module.exports = {
+  configure: configure,
+  using: using,
+  launchers: launchers
 };

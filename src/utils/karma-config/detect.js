@@ -1,8 +1,8 @@
-var log = require('../utils/log');
+var log = require('../log');
 var findBrowser = require('./find-browser');
 
-module.exports = function(program, config, karmaConfig) {
-  karmaConfig.detectBrowsers = karmaConfig.detectBrowsers || {};
+var configure = function(program, config, karmaConfig) {
+  karmaConfig.detectBrowsers = karmaConfig.detectBrowsers ||  {};
   karmaConfig.detectBrowsers.enabled = !program.watch && karmaConfig.browsers.length === 0;
   karmaConfig.detectBrowsers.usePhantomJS = false;
   karmaConfig.detectBrowsers.postDetection = function(availableBrowsers) {
@@ -22,6 +22,7 @@ module.exports = function(program, config, karmaConfig) {
     return availableBrowsers;
   };
 
-
   return karmaConfig;
 };
+
+module.exports = {configure: configure};

@@ -60,7 +60,11 @@ var GetConfig = function (dir) {
   var logLevel = 'info';
 
   if (typeof process.env.SB_LOG_LEVEL !== 'undefined') {
-    logLevel = process.env.SB_LOG_LEVEL
+    if (process.env.SB_LOG_LEVEL === 'false') {
+      logLevel = false;
+    } else {
+      logLevel = process.env.SB_LOG_LEVEL;
+    }
   } else if (typeof workingPkg.spellbook.logLevel !== 'undefined') {
     logLevel = workingPkg.spellbook.logLevel;
   }
@@ -169,7 +173,7 @@ var GetConfig = function (dir) {
     if (config[type] === true || typeof config[type] === 'undefined') {
       config[type] = configDefaults[type];
     } else {
-      config[type] = Object.assign({}, configDefaults[type], config[type]);
+      config[type] = Object.assign(configDefaults[type], config[type]);
     }
 
     if (config[type].src) {
@@ -188,6 +192,7 @@ var GetConfig = function (dir) {
       config[type].distNode = path.join(appRoot, config[type].distNode);
     }
   });
+
 
   return config;
 };

@@ -70,7 +70,46 @@ var GetDefaults = function(pkg, baseDir) {
   };
 };
 
-parallel('get-config', function() {
+describe('get-config:sync', function() {
+  it('process.env.SB_LOG_LEVEL should change log level to false', function(done) {
+    var sb = {};
+
+    process.env.SB_LOG_LEVEL = false;
+
+    var helper = new TestHelper({changePkg: {spellbook: sb}});
+    var expectedConfig = GetDefaults(helper.getPkg(), helper.projectDir);
+    expectedConfig.logLevel = false;
+
+    assert.deepEqual(
+      GetConfig(helper.projectDir),
+      expectedConfig,
+      'log level is changed'
+    );
+    delete process.env.SB_LOG_LEVEL;
+    helper.cleanup(done);
+  });
+
+  it('process.env.SB_LOG_LEVEL should change log level to debug', function(done) {
+    var sb = {};
+
+    process.env.SB_LOG_LEVEL = 'debug';
+
+    var helper = new TestHelper({changePkg: {spellbook: sb}});
+    var expectedConfig = GetDefaults(helper.getPkg(), helper.projectDir);
+    expectedConfig.logLevel = 'debug';
+
+    assert.deepEqual(
+      GetConfig(helper.projectDir),
+      expectedConfig,
+      'log level is changed'
+    );
+    delete process.env.SB_LOG_LEVEL;
+    helper.cleanup(done);
+  });
+
+});
+
+parallel('get-config:async', function() {
   it('should return defaults', function(done) {
     var helper = new TestHelper();
 
@@ -82,54 +121,39 @@ parallel('get-config', function() {
     helper.cleanup(done);
   });
 
-  ['logLevel', /*'SB_LOG_LEVEL'*/].forEach(function(type) {
-    // TODO: change env in parallel without breaking things
-    it(type + ' should change log level to false', function(done) {
-      // var oldLevel = process.env.SB_LOG_LEVEL;
-      var sb = {};
+  it('logLevel should change log level to false', function(done) {
+    var sb = {};
 
-      if (type === 'SB_LOG_LEVEL') {
-        process.env.SB_LOG_LEVEL = false;
-      } else {
-        sb[type] = false;
-      }
+    sb.logLevel = false;
 
-      var helper = new TestHelper({changePkg: {spellbook: sb}});
-      var expectedConfig = GetDefaults(helper.getPkg(), helper.projectDir);
-      expectedConfig.logLevel = false;
+    var helper = new TestHelper({changePkg: {spellbook: sb}});
+    var expectedConfig = GetDefaults(helper.getPkg(), helper.projectDir);
+    expectedConfig.logLevel = false;
 
-      assert.deepEqual(
-        GetConfig(helper.projectDir),
-        expectedConfig,
-        'log level is changed'
-      );
-      // process.env.SB_LOG_LEVEL = oldLevel;
-      helper.cleanup(done);
-    });
+    assert.deepEqual(
+      GetConfig(helper.projectDir),
+      expectedConfig,
+      'log level is changed'
+    );
+    helper.cleanup(done);
+  });
 
-    it(type + ' should change log level to debug', function(done) {
-      // var oldLevel = process.env.SB_LOG_LEVEL;
-      var sb = {};
+  it('logLevel should change log level to debug', function(done) {
+    var sb = {};
 
-      if (type === 'SB_LOG_LEVEL') {
-        process.env.SB_LOG_LEVEL = 'debug';
-      } else {
-        sb[type] = 'debug';
-      }
+    sb.logLevel = 'debug';
 
-      var helper = new TestHelper({changePkg: {spellbook: sb}});
-      var expectedConfig = GetDefaults(helper.getPkg(), helper.projectDir);
-      expectedConfig.logLevel = 'debug';
+    var helper = new TestHelper({changePkg: {spellbook: sb}});
+    var expectedConfig = GetDefaults(helper.getPkg(), helper.projectDir);
+    expectedConfig.logLevel = 'debug';
 
 
-      assert.deepEqual(
-        GetConfig(helper.projectDir),
-        expectedConfig,
-        'log level is changed'
-      );
-      // process.env.SB_LOG_LEVEL = oldLevel;
-      helper.cleanup(done);
-    });
+    assert.deepEqual(
+      GetConfig(helper.projectDir),
+      expectedConfig,
+      'log level is changed'
+    );
+    helper.cleanup(done);
   });
 
   it('should change ie8', function(done) {

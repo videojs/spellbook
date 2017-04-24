@@ -72,7 +72,8 @@
 * rollup to a temporary file seperately from browserify
 * only build the main code bundle once in with `js-browser-main` and include that in `js-browser-test`
 * add rollup bundler support in `build-test-bundlers`
-* fix issues with rollup and --watch (issue is in rollupify )
+* switch to rollup rather than browserify
+* fix issues with rollup and --watch (issue is in rollupify)
   * see: <https://github.com/nolanlawson/rollupify/issues/54>
 * switch to exposify instead of browserify-shim
   * see: <https://github.com/thlorenz/exposify>

@@ -1,4 +1,4 @@
-var BROWSER_STACK_LAUNCHERS = {
+var launchers = {
   chrome_bs: {
     base: 'BrowserStack',
     browser: 'chrome',
@@ -9,7 +9,7 @@ var BROWSER_STACK_LAUNCHERS = {
     base: 'BrowserStack',
     browser: 'firefox',
     os: 'Windows',
-    os_version: '8.1'
+      os_version: '8.1'
   },
   safari_bs:  {
     base: 'BrowserStack',
@@ -53,16 +53,25 @@ var BROWSER_STACK_LAUNCHERS = {
   }
 };
 
-module.exports = function(program, config, karmaConfig) {
-  if (!process.env.BROWSER_STACK_USERNAME) {
+var using = function() {
+  return typeof process.env.BROWSER_STACK_USERNAME !== 'undefined';
+};
+
+var configure = function(program, config, karmaConfig) {
+  if (!using()) {
     return karmaConfig;
   }
 
   karmaConfig.customLaunchers = karmaConfig.customLaunchers || {};
   karmaConfig.browserStack = karmaConfig.browserStack || {};
 
-  Object.keys(BROWSER_STACK_LAUNCHERS).forEach(function(k) {
-    var v = BROWSER_STACK_LAUNCHERS[k];
+  // remove ie8 if they don't want to support it
+  if (config.ie8 === false) {
+    delete launchers.ie8_bs;
+  }
+
+  Object.keys(launchers).forEach(function(k) {
+    var v = launchers[k];
 
     karmaConfig.customLaunchers[k] = v;
   });
@@ -74,18 +83,24 @@ module.exports = function(program, config, karmaConfig) {
     timeout: 600
   };
 
-  karmaConfig.browsers = Object.keys(BROWSER_STACK_LAUNCHERS);
+  // default browsers to add
+  var browsers = Object.keys(launchers);
 
-  // remove ie8 if they don't want to support it
-  if (!config.IE8) {
-    var i = karmaConfig.browsers.indexOf('ie8_bs');
-
-    karmaConfig.browsers.splice(i, 1);
+  // specified browsers to add
+  if (config.test && config.test.bsBrowsers && config.test.bsBrowsers.length) {
+    browsers = config.test.bsBrowsers;
+  } else if (config.test.bsBrowsers === false) {
+    browsers = [];
   }
 
-  if (config.test && config.test.bsBrowsers) {
-    karmaConfig.browsers = config.test.bsBrowsers;
-  }
+  // add browsers
+  karmaConfig.browsers = karmaConfig.browsers.concat(browsers);
 
   return karmaConfig;
+};
+
+module.exports = {
+  configure: configure,
+  launchers: launchers,
+  using: using,
 };

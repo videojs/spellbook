@@ -8,7 +8,8 @@ var Promise = require('bluebird');
 var KarmaServer = require('karma').Server;
 var Watch = require('./utils/watch');
 var debounce = require('lodash.debounce');
-var findBrowser = require('./sb-test-browser-utils/find-browser');
+var findBrowser = require('./utils/karma-config/find-browser');
+var GetKarmaConfig = require('./utils/get-karma-config');
 
 var program = CommanderWrapper(function(commander) {
   return commander
@@ -23,29 +24,8 @@ program.port = program.port || process.env.TEST_PORT || 9876;
 
 process.env.TEST_PORT = program.port;
 
-var karmaConfig = {browsers: config.test && config.test.browsers || []};
-if (program.browsers) {
-  var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
-
-  program.browsers.split(',').forEach(function(userBrowser) {
-    var i = findBrowser(KARMA_BROWSERS, userBrowser);
-
-    if (i === -1) {
-      log.fatal('invalid browser entry: ' + userBrowser);
-      return process.exit(1);
-    }
-
-    karmaConfig.browsers.push(KARMA_BROWSERS[i]);
-  });
-}
-
 // support various configurations
-karmaConfig = require('./sb-test-browser-utils/karma')(program, config, karmaConfig);
-karmaConfig = require('./sb-test-browser-utils/browserstack')(program, config, karmaConfig);
-karmaConfig = require('./sb-test-browser-utils/saucelabs')(program, config, karmaConfig);
-karmaConfig = require('./sb-test-browser-utils/travis')(program, config, karmaConfig);
-karmaConfig = require('./sb-test-browser-utils/teamcity')(program, config, karmaConfig);
-karmaConfig = require('./sb-test-browser-utils/detect-browsers')(program, config, karmaConfig);
+var karmaConfig = GetKarmaConfig(program, config);
 
 var buildPromise = Promise.resolve();
 if (program.build && !program.watch) {

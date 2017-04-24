@@ -1,8 +1,9 @@
-var PathsExist = require('../utils/paths-exist');
+var PathsExist = require('../paths-exist');
+var findBrowser = require('./find-browser');
 var path = require('path');
-var log = require('../utils/log');
+var log = require('../log');
 
-module.exports = function(program, config, karmaConfig) {
+var configure = function(program, config, karmaConfig) {
   var files = [];
   var nodeDir = path.join('node_modules');
   var sinonDir = path.join('sinon', 'pkg');
@@ -17,7 +18,7 @@ module.exports = function(program, config, karmaConfig) {
     files.push(path.join(sbNodeDir, sinonDir, 'sinon.js'));
     files.push(path.join(sbNodeDir, sinonDir, 'sinon-ie.js'));
   } else {
-    log.warn('sinon is not installed!');
+    log.info('sinon is not installed!');
   }
 
   // the default is true
@@ -44,16 +45,35 @@ module.exports = function(program, config, karmaConfig) {
   files.push(path.join(__dirname, '..', '..', 'config', 'karma-helper.js'));
   files.push(path.join(path.relative(config.path, config.test.dist), '**',  '*.test.js'));
 
+  var browsers = [];
+  if (program.browsers) {
+    var KARMA_BROWSERS = ['Chrome', 'Firefox', 'IE', 'Safari'];
+    if (typeof program.browsers === 'string') {
+      program.browsers = program.browsers.split(',');
+    }
+
+    program.browsers.forEach(function(userBrowser) {
+      var i = findBrowser(KARMA_BROWSERS, userBrowser);
+
+      if (i === -1) {
+        log.fatal('invalid browser entry: ' + userBrowser);
+        return process.exit(1);
+      }
+
+      browsers.push(KARMA_BROWSERS[i]);
+    });
+  }
+
   karmaConfig = {
     reporters: ['dots'],
     frameworks: ['qunit', 'detectBrowsers'],
     plugins: ['karma-*'],
     basePath: config.path,
-    browsers: karmaConfig.browsers || [],
-    port: program.port,
+    browsers: browsers,
+    port: program.port || 9876,
     restartOnFileChange: false,
     singleRun: !program.watch,
-    loggers: [{type: path.join(__dirname, '..', '..','src', 'utils', 'log.js')}],
+    loggers: [{type: path.join(__dirname, '..', 'log.js')}],
     client: {clearContext: false, qunit: {showUI: true}},
     customHeaders: [
       {match: '.*', name: 'Cache-Control', value: 'no-cache, no-store, must-revalidate'},
@@ -76,3 +96,5 @@ module.exports = function(program, config, karmaConfig) {
 
   return karmaConfig;
 };
+
+module.exports = {configure: configure};
