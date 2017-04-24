@@ -85,7 +85,11 @@ var log = function(level, msgs) {
   if (level === 'none') {
     return;
   }
-  var config = GetConfig();
+  var config = {logLevel: process.env.SB_LOG_LEVEL || 'info'};
+
+  if (!process.env.SB_INTERNAL) {
+    config = GetConfig();
+  }
   // skip if the currently set log level
   // is less than this log line
   var currentLevelNumber = levelNumber(level);

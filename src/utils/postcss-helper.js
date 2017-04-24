@@ -29,7 +29,7 @@ var postcssHelper = function(options) {
     '--postcss-banner.banner', banner,
     '--postcss-banner.important', 'true',
     '--use', 'autoprefixer',
-    '--autoprefixer.browsers', config.browserList.join(', '),
+    '--autoprefixer.browsers', config.css && config.css.browserList && config.css.browserList.join(', ') || ['> 1%', 'last 4 versions', 'Firefox ESR'].join(', '),
     '--use', 'postcss-import',
     '--output', options.dist + '.css',
     options.src

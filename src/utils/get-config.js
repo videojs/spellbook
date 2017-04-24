@@ -33,7 +33,7 @@ var GetConfig = function (dir) {
   }
 
   var name = workingPkg.name.replace(/^@.+\//, '');
-  var author = workingPkg.author || '';
+  var scope = workingPkg.name.replace(name, '').replace(/\/$/, '');
 
   if (Array.isArray(workingPkg.author)) {
     console.error('Author cannot be an array in package.json, as this is invalid, going to use first author');
@@ -41,64 +41,158 @@ var GetConfig = function (dir) {
     workingPkg.author = workingPkg.author[0];
   }
 
+  var author = workingPkg.author || '';
+
   if (typeof workingPkg.author === 'object') {
     if (!workingPkg.author.name) {
       console.error('author must have a name key or be a string in package.json!');
       console.error('See: https://docs.npmjs.com/files/package.json#people-fields-author-contributors');
-      process.exit(1);
     }
-    author = workingPkg.author.name;
+    author = workingPkg.author.name || '';
     if (workingPkg.author.email) {
       author += ' <' + workingPkg.author.email + '>';
-
     }
     if (workingPkg.author.url) {
       author += ' (' + workingPkg.author.url + ')';
     }
   }
 
+  var logLevel = 'info';
+
+  if (typeof process.env.SB_LOG_LEVEL !== 'undefined') {
+    if (process.env.SB_LOG_LEVEL === 'false') {
+      logLevel = false;
+    } else {
+      logLevel = process.env.SB_LOG_LEVEL;
+    }
+  } else if (typeof workingPkg.spellbook.logLevel !== 'undefined') {
+    logLevel = workingPkg.spellbook.logLevel;
+  }
+
+  var shim = {
+    "qunitjs": {exports: "global:QUnit" },
+    "sinon": {exports: "global:sinon" },
+    "video.js": {exports: "global:videojs"},
+  };
+
+  if (workingPkg.spellbook.shim) {
+    if (typeof workingPkg.spellbook.shim !== 'object') {
+      workingPkg.spellbook.shim = {};
+    }
+
+    Object.keys(workingPkg.spellbook.shim).forEach(function(k) {
+      if (typeof workingPkg.spellbook.shim[k] === 'string') {
+        shim[k] = {exports: workingPkg.spellbook.shim[k]};
+      } else if (workingPkg.spellbook.shim[k] === false) {
+        if (shim[k]) {
+          delete shim[k];
+        }
+      } else {
+        shim[k] = workingPkg.spellbook.shim[k];
+      }
+    });
+
+  // all shims are off
+  } else if (workingPkg.spellbook.shim === false) {
+    shim = {};
+  }
+
   var config = {
     // workingPkg information
     name: name,
-    scope: workingPkg.name.replace(name, '').replace(/\/$/, ''),
+    scope: scope,
+    author: author,
     version: workingPkg.version,
     path: appRoot,
     main: workingPkg['main'] ? path.join(appRoot, workingPkg.main) : '',
     jsNextMain: workingPkg['jsnext:main'] ? path.join(appRoot, workingPkg['jsnext:main']) : '',
 
     // workingPkg settings
-    logLevel: process.env.SB_LOG_LEVEL || workingPkg.spellbook['log-level'] || 'info',
+    logLevel: logLevel,
     ie8: workingPkg.spellbook.ie8 || false,
-    browserList: workingPkg.spellbook.browserList || ['> 1%', 'last 4 versions', 'Firefox ESR'],
-    shimVideojs: workingPkg.spellbook['shimVideojs'] || workingPkg.spellbook['shimVideo.js'] || true,
-    shim: workingPkg.spellbook.shim || {},
+    shim: shim,
     bannerObj: {
       name: workingPkg.name || '',
       version: workingPkg.version || '',
       author: author,
       license: workingPkg.license || ''
-    },
-    dist: path.join(appRoot, 'dist'),
-
-    docs: workingPkg.spellbook.docs === false ? false : Object.assign({
-      src: path.join(appRoot, 'docs')
-    }, workingPkg.spellbook.docs || {}),
-    lang: workingPkg.spellbook.lang === false ? false : Object.assign({
-      src: path.join(appRoot, 'lang')
-    }, workingPkg.spellbook.lang || {}),
-    test: workingPkg.spellbook.test === false ? false : Object.assign({
-      src: path.join(appRoot, 'test'),
-      skipBrowsers: [],
-      travisBrowsers: [],
-    }, workingPkg.spellbook.test || {}),
-
-    css: workingPkg.spellbook.css === false ? false : Object.assign({
-      src: path.join(appRoot, 'src', 'css')
-    }, workingPkg.spellbook.css || {}),
-    js: workingPkg.spellbook.js === false ? false : Object.assign({
-      src: path.join(appRoot, 'src', 'js')
-    }, workingPkg.spellbook.js || {})
+    }
   };
+
+  var configDefaults = {
+    docs: {
+      build: true,
+      lint: true,
+      src: 'docs',
+      dist: 'build/docs'
+    },
+    lang: {
+      build: true,
+      lint: true,
+      src: 'lang',
+      dist: 'dist/lang',
+    },
+    test: {
+      build: true,
+      lint: true,
+      src: 'test',
+      dist: 'build/test',
+      devBrowsers: [],
+      skipBrowsers: [],
+      slBrowsers: [],
+      bsBrowsers: [],
+      travisBrowsers: [],
+      teamcityBrowsers: [],
+      files: [],
+      node: true,
+      bundlers: ['webpack', 'browserify']
+    },
+    js: {
+      build: true,
+      lint: true,
+      src: 'src/js',
+      distBrowser: 'dist',
+      distNode: 'build/es5',
+    },
+    css: {
+      build: true,
+      lint: true,
+      src: 'src/css',
+      dist: 'dist',
+      browserList: ['> 1%', 'last 4 versions', 'Firefox ESR'],
+    }
+  };
+
+  ['docs', 'lang', 'test', 'js', 'css'].forEach(function(type) {
+    config[type] = workingPkg.spellbook[type];
+
+    if (config[type] === false) {
+      return;
+    }
+
+    if (config[type] === true || typeof config[type] === 'undefined') {
+      config[type] = configDefaults[type];
+    } else {
+      config[type] = Object.assign(configDefaults[type], config[type]);
+    }
+
+    if (config[type].src) {
+      config[type].src = path.join(appRoot, config[type].src);
+    }
+
+    if (config[type].dist) {
+      config[type].dist = path.join(appRoot, config[type].dist);
+    }
+
+    if (config[type].distBrowser) {
+      config[type].distBrowser = path.join(appRoot, config[type].distBrowser);
+    }
+
+    if (config[type].distNode) {
+      config[type].distNode = path.join(appRoot, config[type].distNode);
+    }
+  });
+
 
   return config;
 };

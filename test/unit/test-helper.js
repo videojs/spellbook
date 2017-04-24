@@ -5,10 +5,12 @@ var fixtureDir = path.join(__dirname, '..', 'fixtures');
 var rootDir = path.join(__dirname, '..', '..');
 var uuid = require('uuid');
 var PathsExist = require('../../src/utils/paths-exist');
+var GetFiles = require('../../src/utils/get-files');
 var rimraf = require('rimraf');
 var npmRun = require('npm-run');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
+var sbPkg = require('../../package.json');
 
 shelljs.config.silent = false;
 shelljs.config.fatal = true;
@@ -48,7 +50,8 @@ var TestHelper = function(options) {
   shelljs.cp('-R', path.join(fixtureDir, 'test-pkg-main') + path.sep, this.projectDir);
 
   if (this.options.copyDist) {
-    shelljs.cp('-R', path.join(__dirname, '..', 'expected-dist') + path.sep, path.join(this.projectDir, 'dist'));
+    shelljs.cp('-R', path.join(__dirname, '..', 'expected', 'dist') + path.sep, path.join(this.projectDir, 'dist'));
+    shelljs.cp('-R', path.join(__dirname, '..', 'expected', 'build') + path.sep, path.join(this.projectDir, 'build'));
   }
 
   if (!this.options.debug) {
@@ -68,7 +71,7 @@ var TestHelper = function(options) {
   }
 
   if (this.options.changePkg) {
-    this.changePkg(this.projectDir, this.options.changePkg);
+    this.changePkg(this.options.changePkg);
   }
 
   // always cleanup the tmpdir
@@ -162,7 +165,11 @@ TestHelper.prototype.gitInit = function(dir) {
   shelljs.popd();
 };
 
-TestHelper.prototype.changePkg = function(dir, newPkg) {
+TestHelper.prototype.changePkg = function(newPkg, dir) {
+  if (typeof dir === 'undefined') {
+    dir = this.projectDir;
+  }
+
   var pkgFile = path.join(dir, 'package.json');
   var pkg = JSON.parse(fs.readFileSync(pkgFile));
 
@@ -170,6 +177,14 @@ TestHelper.prototype.changePkg = function(dir, newPkg) {
   fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2));
 };
 
+TestHelper.prototype.getPkg = function(dir) {
+  if (typeof dir === 'undefined') {
+    dir = this.projectDir;
+  }
+
+  var pkgFile = path.join(dir, 'package.json');
+  return JSON.parse(fs.readFileSync(pkgFile));
+};
 
 TestHelper.prototype.npmLink = function(dir) {
   var nodeDir = path.join(dir, 'node_modules');
@@ -177,7 +192,7 @@ TestHelper.prototype.npmLink = function(dir) {
 
 
   if (PathsExist(nodeDir)) {
-    rimraf.sync(nodeDir);
+    rimraf.sync(nodir);
   }
 
   mkdirp.sync(binDir);
@@ -209,13 +224,33 @@ TestHelper.prototype.npmLink = function(dir) {
 
 TestHelper.prototype.fixtureClean = function() {
   // pre-cleanup
-  ['bower.json', 'npm-debug.log', 'dist', 'node_modules', '.git'].forEach(function(dir) {
+  ['bower.json', 'npm-debug.log', 'dist', 'build', 'node_modules', '.git'].forEach(function(dir) {
     var d = path.join(fixtureDir, 'test-pkg-main', dir);
 
     if (PathsExist(d)) {
       rimraf.sync(d);
     }
   });
+};
+
+TestHelper.prototype.getBinList = function() {
+  var files = GetFiles(path.join(__dirname, '..', '..', 'src', '*')).filter(function(file) {
+      var basename = path.basename(file);
+
+      // filter out folders
+      if (fs.lstatSync(file).isDirectory()) {
+        return false;
+      }
+
+      // filter out anything already in pkg.bin
+      if (sbPkg.bin[basename]) {
+        return false;
+      }
+
+      return true;
+    });
+
+  return Object.keys(sbPkg.bin).concat(files);
 };
 
 module.exports = TestHelper;

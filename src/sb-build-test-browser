@@ -9,7 +9,7 @@ var log = require('./utils/log');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'incremental rebuild')
-    .option('-d, --dist <dir>', 'file to write output to', path.join(config.dist, 'test'))
+    .option('-d, --dist <dir>', 'file to write output to', config.test.dist)
     .arguments('<dir>')
     .action(function(src) {
       this.src = src;

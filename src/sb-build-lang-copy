@@ -12,7 +12,7 @@ var rimraf = require('rimraf');
 var program = CommanderWrapper(function(commander) {
   return commander
     .option('-w, --watch', 'watch for changes and copy to dist')
-    .option('-d, --dist <dir>', 'dir to build to', path.join(config.dist, 'lang'))
+    .option('-d, --dist <dir>', 'dir to build to', config.lang.dist)
     .arguments('<dir>')
     .action(function(src) {
       this.src = src;

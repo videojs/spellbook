@@ -33,7 +33,7 @@ var content = [
   '}'
 ].join('\n');
 
-var distFile = path.join(config.dist, 'test', 'node-require.js');
+var distFile = path.join(config.test.dist, 'node-require.js');
 mkdirp.sync(path.dirname(distFile));
 fs.writeFileSync(distFile, content);
 

@@ -9,7 +9,6 @@ var Promise = require('bluebird');
 var Watch = require('./utils/watch');
 var browserifyHelper = require('./utils/browserify-helper');
 var webpack = require('webpack');
-var shimConf = require('../config/shim.config.js');
 var Run = require('./utils/run');
 var mkdirp = require('mkdirp');
 var rimraf = require('rimraf');
@@ -38,7 +37,7 @@ if (config.test && config.test.bundlers === false) {
   log.info('bundler test builds are turned off');
   process.exit(0);
 }
-var dist = path.join(config.dist, 'test');
+var dist = config.test.dist;
 
 // always finish the log
 var exit = function(code) {
@@ -52,12 +51,18 @@ process.on('exit', exit);
 
 var build = function() {
   // TODO: get rollup to work during watch
-  program.bundlers = [/*'rollup',*/ 'webpack', 'browserify'];
-
+  var bundlers = [];
   var promises = [];
 
   log.info('Building...');
-  program.bundlers.forEach(function(bundlerName) {
+
+  if (config.test !== false || (typeof config.test === 'object' && config.test.bundlers !== false)) {
+    bundlers = ['webpack', 'browserify'];
+  } else if (typeof config.test === 'object' && typeof config.test.bundlers === 'object') {
+    bundlers = config.test.bundlers;
+  }
+
+  bundlers.forEach(function(bundlerName) {
     var srcFile = path.join(dist, bundlerName + '.start.js');
     var distFile = path.join(dist, bundlerName + '.test.js');
     var unitTestContents  = es6(bundlerName);
@@ -104,8 +109,8 @@ var build = function() {
         var externals = {};
         var first = true;
 
-        Object.keys(shimConf).forEach(function(k) {
-          externals[k] = shimConf[k].exports.replace('global:', '');
+        Object.keys(config.shim).forEach(function(k) {
+          externals[k] = config.shim[k].exports.replace('global:', '');
         });
 
         return new Promise(function(resolve, reject) {
