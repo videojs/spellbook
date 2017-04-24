@@ -21,6 +21,8 @@
 ## General
 
 * custom preinstall script so the project will only install the minimum required packages
+* release sub packages for spellbook
+* Can we include husky
 * switch to memoryFS where we are building temp files
 * test --watch somehow
 * test build-turn-off
