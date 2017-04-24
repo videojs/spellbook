@@ -103,8 +103,12 @@ var bowerSupport = PathsExist(path.join(config.path, 'bower.json'));
 // If the project supports Bower, perform special extra versioning steps.
 if (bowerSupport) {
   commands.push(['sb-build']);
-  commands.push(['git', 'add', '-f', config.js.distBrowser]);
-  commands.push(['git', 'add', '-f', config.css.dist]);
+  if (config.js) {
+    commands.push(['git', 'add', '-f', config.js.distBrowser]);
+  }
+  if (config.css) {
+    commands.push(['git', 'add', '-f', config.css.dist]);
+  }
   commands.push(['git', 'commit', '-a', '--amend', '-m', program.newVersion]);
   commands.push(['git', 'tag', '-f', 'v' + program.newVersion]);
   commands.push(['git', 'reset', 'HEAD~1']);

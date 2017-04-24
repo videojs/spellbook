@@ -54,6 +54,9 @@ server.init({
     path.join(config.path, 'dist', '**', '*.js'),
     path.join(config.path, 'dist', '**', '*.css'),
     path.join(config.path, 'dist', '**', '*.html'),
+    path.join(config.path, 'build', '**', '*.js'),
+    path.join(config.path, 'build', '**', '*.css'),
+    path.join(config.path, 'build', '**', '*.html'),
     path.join(config.path, 'examples', '**', '*.html'),
     path.join(config.path, 'index.html')
   ]

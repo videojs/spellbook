@@ -90,7 +90,7 @@ var run = function() {
 };
 
 if (program.watch) {
-  Watch(path.join(config.path, 'dist', 'es5', '**', '*.js'), debounce(function() {
+  Watch(path.join(config.js.distNode, '**', '*.js'), debounce(function() {
     run();
   }, 1000));
 } else {

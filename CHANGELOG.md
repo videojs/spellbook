@@ -5,6 +5,14 @@ CHANGELOG
 _(none)_
 
 --------------------
+
+## 4.0.0 (2017-04-24)
+* BREAKING: change the default dist to fit with other video.js projects
+* BREAKING: major config changes and no longer shim inorrect packages
+* BREAKING: change test browser specification
+* Allow child argument passing from non `-all` binaries
+* update linters to use --fix & --errors correctly where possible
+
 ## 3.1.3 (2017-04-12)
 * fix karma.js logging
 * re-add global
