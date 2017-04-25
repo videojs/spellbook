@@ -69,7 +69,7 @@ var GetDefaults = function(config, baseDir) {
       },
       {
         "nocache": true,
-        "pattern": path.join(__dirname, '..', '..', 'src', 'config', 'karma-helper.js'),
+        "pattern": path.join(__dirname, '..', '..', 'config', 'karma-helper.js'),
         "watched": false
       },
       {

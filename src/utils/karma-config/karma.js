@@ -1,4 +1,5 @@
 var PathsExist = require('../paths-exist');
+var GetPath = require('../get-path');
 var findBrowser = require('./find-browser');
 var path = require('path');
 var log = require('../log');
@@ -42,7 +43,7 @@ var configure = function(program, config, karmaConfig) {
     files.push(path.join(path.relative(config.path, config.css.dist), config.name + '.css'));
   }
 
-  files.push(path.join(__dirname, '..', '..', 'config', 'karma-helper.js'));
+  files.push(GetPath('karma-helper.js'));
   files.push(path.join(path.relative(config.path, config.test.dist), '**',  '*.test.js'));
 
   var browsers = [];
