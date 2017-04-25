@@ -17,6 +17,7 @@ var GetDefaults = function(pkg, baseDir) {
     "ie8": false,
     "shim": {
       "qunitjs": {exports: "global:QUnit" },
+      "qunit": {exports: "global:QUnit" },
       "sinon": {exports: "global:sinon" },
       "video.js": {exports: "global:videojs"},
     },

@@ -71,6 +71,7 @@ var GetConfig = function (dir) {
 
   var shim = {
     "qunitjs": {exports: "global:QUnit" },
+    "qunit": {exports: "global:QUnit" },
     "sinon": {exports: "global:sinon" },
     "video.js": {exports: "global:videojs"},
   };
@@ -192,7 +193,6 @@ var GetConfig = function (dir) {
       config[type].distNode = path.join(appRoot, config[type].distNode);
     }
   });
-
 
   return config;
 };
