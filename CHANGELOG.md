@@ -6,6 +6,11 @@ _(none)_
 
 --------------------
 
+## 4.0.1 (2017-04-25)
+* fix: shim qunit again
+* fix: better watch exit
+* fix: correct karma-helper path
+
 ## 4.0.0 (2017-04-24)
 * BREAKING: change the default dist to fit with other video.js projects
 * BREAKING: major config changes and no longer shim inorrect packages
