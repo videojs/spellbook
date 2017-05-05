@@ -18,7 +18,7 @@ var es6 = function(bundler) {
     '/**',
     ' * ' + bundler + ' test ',
     ' */',
-    'import pkg from "' + path.join('..', '..', path.relative(config.path, config.jsNextMain)) + '";',
+    'import pkg from "' + path.join('..', '..', path.relative(config.path, config.jsNextMain)).replace(/\\/g,'/') + '";',
     '',
     'QUnit.module("' + bundler + ' require");',
     'QUnit.test("' + config.name + ' should be requireable via ' + bundler + '", (assert) => {',
