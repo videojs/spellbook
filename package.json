@@ -195,7 +195,7 @@
     "remark-html": "^6.0.0",
     "remark-preset-lint-videojs": "^1.0.0",
     "remark-slug": "^4.2.2",
-    "remark-toc": "^4.0.0",
+    "remark-toc": "^4.0.1",
     "rimraf": "^2.5.4",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollupify": "^0.3.4",
