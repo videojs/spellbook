@@ -144,7 +144,7 @@
   "dependencies": {
     "autoprefixer": "^6.6.1",
     "babel-cli": "^6.14.0",
-    "babel-loader": "^7.0.0-beta.1",
+    "babel-loader": "7.0.0",
     "babel-plugin-transform-es3-member-expression-literals": "^6.8.0",
     "babel-plugin-transform-es3-property-literals": "^6.8.0",
     "babel-plugin-transform-object-assign": "^6.8.0",
