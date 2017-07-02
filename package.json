@@ -204,7 +204,7 @@
     "sinon": "1.10.2",
     "source-map-url": "^0.4.0",
     "stylelint": "^7.7.1",
-    "uglify-js": "2.8.22",
+    "uglify-js": "3.0.23",
     "uuid": "^3.0.0",
     "watchify": "^3.7.0",
     "webpack": "^2.3.3"
