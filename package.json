@@ -216,7 +216,7 @@
     "mocha.parallel": "^0.15.0",
     "npm-run-all": "^4.0.0",
     "remark-man": "^5.0.0",
-    "video.js": "^5.11.7"
+    "video.js": "^6.2.4"
   },
   "keywords": [
     "videojs",
