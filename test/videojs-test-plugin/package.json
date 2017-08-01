@@ -1,0 +1,52 @@
+{
+  "name": "videojs-test-plugin",
+  "version": "0.0.0",
+  "description": "nope",
+  "main": "dist/videojs-test-plugin.cjs.js",
+  "module": "dist/videojs-test-plugin.es.js",
+  "scripts": {
+    "build": "sb build",
+    "clean": "sb clean",
+    "docs": "sb docs",
+    "lint": "sb lint",
+    "start": "sb start",
+    "test": "sb test",
+    "version": "sb version",
+    "watch": "sb watch",
+    "prepublish": "npm run build",
+    "prepush": "npm run lint",
+    "precommit": "sb precommit"
+  },
+  "keywords": [
+    "videojs",
+    "videojs-plugin"
+  ],
+  "author": "brandonocasey <brandonocasey@gmail.com>",
+  "license": "MIT",
+  "vjsstandard": {
+    "ignore": [
+      "dist",
+      "docs",
+      "test/dist",
+      "test/karma.conf.js"
+    ]
+  },
+  "files": [
+    "CONTRIBUTING.md",
+    "dist/",
+    "docs/",
+    "index.html",
+    "scripts/",
+    "src/",
+    "test/"
+  ],
+  "dependencies": {
+    "global": "^4.3.2",
+    "video.js": "^5.19.2"
+  },
+  "devDependencies": {
+    "es5-shim": "^4.5.9",
+    "husky": "^0.14.3",
+    "sinon": "^2.2.1"
+  }
+}
