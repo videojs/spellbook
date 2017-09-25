@@ -167,7 +167,7 @@
     "eslint-plugin-jsdoc": "^3.0.0",
     "eslint-plugin-json": "^1.2.0",
     "eslint-plugin-markdown": "^1.0.0-beta.2",
-    "exorcist": "^0.4.0",
+    "exorcist": "^1.0.0",
     "find-root": "^1.0.0",
     "glob": "^7.0.6",
     "global": "^4.3.1",
