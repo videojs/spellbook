@@ -201,7 +201,7 @@
     "rollupify": "^0.3.4",
     "semver": "^5.3.0",
     "shelljs": "^0.7.4",
-    "sinon": "1.10.2",
+    "sinon": "4.1.1",
     "source-map-url": "^0.4.0",
     "stylelint": "^7.7.1",
     "uglify-js": "2.8.22",
