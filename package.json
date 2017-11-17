@@ -185,7 +185,7 @@
     "karma-teamcity-reporter": "^1.0.0",
     "lodash.debounce": "^4.0.8",
     "mkdirp": "^0.5.1",
-    "node-sass": "^4.5.2",
+    "node-sass": "^4.7.1",
     "npm-run": "^4.1.0",
     "postcss-banner": "^3.0.0",
     "postcss-cli": "^3.1.1",
