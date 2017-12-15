@@ -203,7 +203,7 @@
     "shelljs": "^0.7.4",
     "sinon": "1.10.2",
     "source-map-url": "^0.4.0",
-    "stylelint": "^7.7.1",
+    "stylelint": "^8.4.0",
     "uglify-js": "2.8.22",
     "uuid": "^3.0.0",
     "watchify": "^3.7.0",
