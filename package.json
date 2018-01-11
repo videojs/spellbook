@@ -152,7 +152,7 @@
     "babelify": "^7.3.0",
     "bluebird": "^3.4.6",
     "browser-sync": "^2.15.0",
-    "browserify": "^14.0.0",
+    "browserify": "^15.1.0",
     "browserify-banner": "^1.0.3",
     "browserify-shim": "git://github.com/brandonocasey/browserify-shim#configable-inscript",
     "browserify-versionify": "^1.0.6",
