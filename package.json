@@ -206,7 +206,7 @@
     "stylelint": "^7.7.1",
     "uglify-js": "2.8.22",
     "uuid": "^3.0.0",
-    "watchify": "^3.7.0",
+    "watchify": "^3.10.0",
     "webpack": "^2.3.3"
   },
   "devDependencies": {
